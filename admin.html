@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>コンディション管理 - 管理者画面</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6; color: #333; margin: 0; padding: 0; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background-color: #1e3a8a; color: white; padding: 15px 20px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; }
+        .card { background-color: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .section-title { font-size: 18px; font-weight: bold; color: #1e3a8a; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; margin-bottom: 15px; margin-top: 0; }
+        
+        select, input[type="text"] { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; margin-bottom: 10px; box-sizing: border-box; }
+        
+        .dashboard-summary { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .summary-card { flex: 1; min-width: 150px; background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid #d1d5db; }
+        .summary-title { font-size: 12px; font-weight: bold; color: #6b7280; margin-bottom: 5px; }
+        .summary-value { font-size: 28px; font-weight: bold; }
+        .alert-card { border-top-color: #dc2626; } .alert-card .summary-value { color: #dc2626; } 
+        .warning-card { border-top-color: #d97706; } .warning-card .summary-value { color: #d97706; } 
+        .info-card { border-top-color: #2563eb; } .info-card .summary-value { color: #2563eb; } 
+        
+        .missing-list { font-size: 12px; color: #6b7280; margin-top: 5px; min-height: 18px; }
+
+        .table-responsive { overflow-x: auto; }
+        /* 項目が増えたので、表の最小幅を広げました */
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; font-size: 14px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        th { background-color: #f3f4f6; color: #4b5563; font-weight: bold; }
+        tr:hover { background-color: #f9fafb; }
+        .alert-text { color: #dc2626; font-weight: bold; }
+        .tag-text { background-color: #fef08a; color: #b45309; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 4px; display: inline-block; margin-bottom: 2px;}
+        
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .status-badge { font-size: 12px; padding: 4px 8px; border-radius: 12px; font-weight: normal; margin-left: 10px; vertical-align: middle; }
+        .status-local { background-color: #6b7280; color: white; }
+        .status-cloud { background-color: #10b981; color: white; }
+
+        .btn { padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; border: none; transition: background-color 0.2s; font-size: 14px; }
+        .btn-danger { background-color: #ef4444; color: white; }
+        .btn-danger:hover { background-color: #dc2626; }
+        .btn-success { background-color: #10b981; color: white; display: flex; align-items: center; gap: 5px; }
+        .btn-success:hover { background-color: #059669; }
+
+        .filter-area { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .filter-area input { flex: 1; min-width: 200px; margin-bottom: 0; }
+
+        .roster-container { display: flex; flex-wrap: wrap; gap: 8px; }
+        .player-tag { background-color: #e0f2fe; border: 1px solid #bae6fd; color: #1e40af; padding: 6px 12px; border-radius: 20px; font-size: 14px; display: flex; align-items: center; gap: 6px; font-weight: bold;}
+        .delete-player-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 18px; padding: 0; line-height: 1; margin-left: 4px; }
+        .delete-player-btn:hover { color: #b91c1c; }
+    </style>
+</head>
+<body>
+
+    <header>
+        Team Condition - ダッシュボード <span id="connection-status" class="status-badge status-local">ローカル</span>
+    </header>
+
+    <div class="container">
+        
+        <div class="flex-between" style="margin-bottom: 20px;">
+            <h2 style="color: #1e3a8a; margin-top: 0; margin-bottom: 0;">本日のチーム状況</h2>
+            <button class="btn btn-danger" onclick="clearAllData()">全データをリセット</button>
+        </div>
+
+        <!-- 選手名簿の管理 -->
+        <div class="card">
+            <h3 class="section-title">📋 選手名簿の管理</h3>
+            <p style="font-size: 12px; color: #6b7280; margin-top: 0;">ここで登録した選手が「未入力者」のチェック対象になり、選手の入力画面にも選択肢として表示されます。</p>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <input type="text" id="new-player-name" placeholder="新しい選手名を入力..." style="margin-bottom: 0; flex: 1;">
+                <button class="btn btn-success" onclick="addPlayer()" style="white-space: nowrap;">➕ 追加</button>
+            </div>
+            <div id="registered-players-list" class="roster-container">
+                <!-- JavaScriptで名簿が挿入されます -->
+            </div>
+        </div>
+        
+        <!-- サマリー -->
+        <div class="dashboard-summary">
+            <div class="summary-card info-card">
+                <div class="summary-title">本日 未入力の選手</div>
+                <div class="summary-value" id="summary-missing-count">0 名</div>
+                <div id="summary-missing-list" class="missing-list"></div>
+            </div>
+            <div class="summary-card alert-card">
+                <div class="summary-title">本日 疲労度高(8以上)</div>
+                <div class="summary-value" id="summary-fatigue">0 名</div>
+            </div>
+            <div class="summary-card warning-card">
+                <div class="summary-title">本日 睡眠不足(6h未満)</div>
+                <div class="summary-value" id="summary-sleep">0 名</div>
+            </div>
+        </div>
+
+        <!-- グラフ -->
+        <div class="card">
+            <h3 class="section-title">選手別 推移グラフ</h3>
+            <select id="chart-player-select" onchange="updateCharts(window.globalLogs)"></select>
+            <div style="margin-bottom: 40px;"><canvas id="loadChart"></canvas></div>
+            <div><canvas id="rsiChart"></canvas></div>
+        </div>
+
+        <!-- テーブル -->
+        <div class="card table-responsive">
+            <div class="flex-between" style="margin-bottom: 15px;">
+                <h3 class="section-title" style="margin-bottom: 0; border: none;">全データ一覧履歴</h3>
+                <button class="btn btn-success" onclick="downloadCSV()">📥 CSV (エクセル) で保存</button>
+            </div>
+
+            <div class="filter-area">
+                <input type="text" id="search-input" placeholder="🔍 選手名や日付(例: 2023-10)で検索..." oninput="filterAndRenderTable()">
+            </div>
+
+            <table id="admin-table">
+                <thead>
+                    <tr>
+                        <th>日付</th>
+                        <th>選手名</th>
+                        <th>疲労</th>
+                        <th>ｽﾄﾚｽ</th> <!-- 追加 -->
+                        <th>Load</th>
+                        <th>RSI</th>
+                        <th>筋肉痛・張り</th>
+                        <th>心拍数</th> <!-- 追加 -->
+                        <th>歩数</th> <!-- 追加 -->
+                        <th>睡眠</th>
+                        <th>ケガ・違和感</th>
+                    </tr>
+                </thead>
+                <tbody><!-- JavaScriptで挿入 --></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Firebase Classic -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ⭐️【最重要】ここにFirebaseの設定を貼り付けてください ⭐️
+        const myFirebaseConfig = {
+  apiKey: "AIzaSyAQoESOlZIGJfOgfIwpkL0r0YcYu4tl8ZQ",
+  authDomain: "team-conditioning-controling.firebaseapp.com",
+  projectId: "team-conditioning-controling",
+  storageBucket: "team-conditioning-controling.firebasestorage.app",
+  messagingSenderId: "330203393971",
+  appId: "1:330203393971:web:f47b8e66137d0fce8b65c6",
+  measurementId: "G-SCMMTXKZ37"
+};
+
+        window.globalLogs = []; 
+        window.filteredLogs = []; 
+        window.globalRegisteredPlayers = []; 
+        
+        let loadChartInstance = null;
+        let rsiChartInstance = null;
+        
+        let logColRef = null;
+        let playersColRef = null; 
+
+        async function initFirebase() {
+            if (myFirebaseConfig.apiKey !== "API_KEY") {
+                firebase.initializeApp(myFirebaseConfig);
+                const db = firebase.firestore();
+                await firebase.auth().signInAnonymously();
+                
+                logColRef = db.collection('team_condition_logs');
+                playersColRef = db.collection('team_players'); 
+                
+                document.getElementById('connection-status').textContent = 'クラウド同期中';
+                document.getElementById('connection-status').className = 'status-badge status-cloud';
+            }
+
+            if (playersColRef) {
+                playersColRef.onSnapshot((snapshot) => {
+                    const players = [];
+                    snapshot.forEach(doc => {
+                        players.push({ id: doc.id, name: doc.data().name, createdAt: doc.data().createdAt });
+                    });
+                    players.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                    window.globalRegisteredPlayers = players;
+                    renderPlayersList();
+                    updateDashboardSummary(window.globalLogs); 
+                });
+            } else {
+                loadLocalPlayers();
+            }
+
+            if (logColRef) {
+                logColRef.onSnapshot((snapshot) => {
+                    const logs = [];
+                    snapshot.forEach(doc => logs.push(doc.data()));
+                    logs.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                    window.globalLogs = logs;
+                    updateAdminUI(logs);
+                });
+            } else {
+                const logs = JSON.parse(localStorage.getItem('team_condition_logs') || '[]');
+                window.globalLogs = logs;
+                updateAdminUI(logs);
+            }
+        }
+
+        window.updateAdminUI = function(logs) {
+            updateDashboardSummary(logs);
+            updatePlayerSelect(logs);
+            updateCharts(logs);
+            filterAndRenderTable();
+        };
+
+        function getTodayString() {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function addPlayer() {
+            const input = document.getElementById('new-player-name');
+            const name = input.value.trim();
+            if (!name) return;
+            
+            if (window.globalRegisteredPlayers.some(p => p.name === name)) {
+                alert('その選手はすでに登録されています。');
+                return;
+            }
+            
+            if (playersColRef) {
+                playersColRef.add({ name: name, createdAt: new Date().toISOString() });
+            } else {
+                let local = JSON.parse(localStorage.getItem('team_players') || '[]');
+                local.push({ id: Date.now().toString(), name: name, createdAt: new Date().toISOString() });
+                localStorage.setItem('team_players', JSON.stringify(local));
+                loadLocalPlayers();
+            }
+            input.value = '';
+        }
+
+        function deletePlayer(id) {
+            if(!confirm("この選手を名簿から削除しますか？\n（過去に保存されたコンディション記録は消えません）")) return;
+            
+            if (playersColRef) {
+                playersColRef.doc(id).delete();
+            } else {
+                let local = JSON.parse(localStorage.getItem('team_players') || '[]');
+                local = local.filter(p => p.id !== id);
+                localStorage.setItem('team_players', JSON.stringify(local));
+                loadLocalPlayers();
+            }
+        }
+
+        function loadLocalPlayers() {
+            const players = JSON.parse(localStorage.getItem('team_players') || '[]');
+            window.globalRegisteredPlayers = players;
+            renderPlayersList();
+            updateDashboardSummary(window.globalLogs);
+        }
+
+        function renderPlayersList() {
+            const list = document.getElementById('registered-players-list');
+            list.innerHTML = '';
+            
+            if (window.globalRegisteredPlayers.length === 0) {
+                list.innerHTML = '<span style="font-size: 14px; color: #9ca3af;">名簿が空です。選手を追加してください。</span>';
+                return;
+            }
+
+            window.globalRegisteredPlayers.forEach(p => {
+                const tag = document.createElement('div');
+                tag.className = 'player-tag';
+                tag.innerHTML = `
+                    ${p.name}
+                    <button class="delete-player-btn" onclick="deletePlayer('${p.id}')">×</button>
+                `;
+                list.appendChild(tag);
+            });
+        }
+
+        function updateDashboardSummary(logs) {
+            const todayStr = getTodayString();
+            
+            const expectedPlayers = window.globalRegisteredPlayers.map(p => p.name);
+            const todayLogs = logs.filter(log => log.date === todayStr);
+            const todayPlayers = [...new Set(todayLogs.map(log => log.playerName))];
+            
+            const missingPlayers = expectedPlayers.filter(p => !todayPlayers.includes(p));
+
+            document.getElementById('summary-missing-count').textContent = `${missingPlayers.length} 名`;
+            
+            let missingListText = '';
+            if (expectedPlayers.length === 0) {
+                missingListText = '※まず選手名簿を登録してください';
+            } else if (missingPlayers.length > 0) {
+                missingListText = missingPlayers.join(', ');
+            } else {
+                missingListText = '全員完了！✨';
+            }
+            document.getElementById('summary-missing-list').textContent = missingListText;
+
+            document.getElementById('summary-fatigue').textContent = `${todayLogs.filter(log => parseInt(log.fatigue) >= 8).length} 名`;
+            document.getElementById('summary-sleep').textContent = `${todayLogs.filter(log => parseFloat(log.sleep) < 6).length} 名`;
+        }
+
+        function updatePlayerSelect(logs) {
+            const select = document.getElementById('chart-player-select');
+            const currentVal = select.value; 
+            
+            const players = [...new Set(logs.map(log => log.playerName).filter(name => name))];
+
+            select.innerHTML = '<option value="">選手を選択してください</option>';
+            players.forEach(player => {
+                const option = document.createElement('option');
+                option.value = player;
+                option.textContent = player;
+                if (player === currentVal) option.selected = true;
+                select.appendChild(option);
+            });
+            if (!select.value && players.length > 0) select.value = players[0];
+        }
+
+        function updateCharts(logs) {
+            if (typeof Chart === 'undefined') return; 
+            const select = document.getElementById('chart-player-select');
+            const playerName = select.value;
+            if (!playerName) return;
+
+            const playerLogs = logs.filter(log => log.playerName === playerName);
+            const labels = playerLogs.map(log => log.date ? log.date.substring(5) : '不明'); 
+            const loadData = playerLogs.map(log => parseFloat(log.trainingLoad) || 0);
+            const fatigueData = playerLogs.map(log => parseFloat(log.fatigue) || 0);
+            const rsiData = playerLogs.map(log => parseFloat(log.rsi) || 0);
+
+            const ctxLoad = document.getElementById('loadChart').getContext('2d');
+            if (loadChartInstance) loadChartInstance.destroy(); 
+            loadChartInstance = new Chart(ctxLoad, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Training Load', data: loadData, borderColor: '#2563eb', backgroundColor: '#2563eb', yAxisID: 'y' },
+                        { label: '疲労度', data: fatigueData, borderColor: '#dc2626', backgroundColor: '#dc2626', borderDash: [5, 5], yAxisID: 'y1' }
+                    ]
+                },
+                options: { responsive: true, plugins: { title: { display: true, text: 'Training Load と 疲労度の推移' } }, scales: { y: { beginAtZero: true }, y1: { position: 'right', min: 0, max: 10, grid: { drawOnChartArea: false } } } }
+            });
+
+            const ctxRsi = document.getElementById('rsiChart').getContext('2d');
+            if (rsiChartInstance) rsiChartInstance.destroy();
+            rsiChartInstance = new Chart(ctxRsi, {
+                type: 'line',
+                data: { labels: labels, datasets: [{ label: 'RSI', data: rsiData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.2)', fill: true, tension: 0.2 }] },
+                options: { responsive: true, plugins: { title: { display: true, text: 'RSI の推移' } }, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        function filterAndRenderTable() {
+            const searchText = document.getElementById('search-input').value.toLowerCase();
+            const logs = window.globalLogs || [];
+
+            window.filteredLogs = logs.filter(log => {
+                const name = (log.playerName || '').toLowerCase();
+                const date = (log.date || '').toLowerCase();
+                return name.includes(searchText) || date.includes(searchText);
+            });
+
+            renderAdminTable(window.filteredLogs);
+        }
+
+        function renderAdminTable(logsToRender) {
+            const tableBody = document.querySelector('#admin-table tbody');
+            tableBody.innerHTML = '';
+            if (!logsToRender || logsToRender.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="11" style="text-align:center;">記録が見つかりません。</td></tr>';
+                return;
+            }
+            
+            const displayLogs = [...logsToRender].reverse();
+            
+            displayLogs.forEach(function(log) {
+                const tr = document.createElement('tr');
+                const fatigueText = (parseInt(log.fatigue) >= 8) ? `<span class="alert-text">${log.fatigue} ⚠️</span>` : (log.fatigue || '-');
+                const stressText = (parseInt(log.stress) >= 8) ? `<span class="alert-text">${log.stress} ⚠️</span>` : (log.stress || '-');
+                
+                let sorenessHtml = '';
+                if (log.soreness) {
+                    const parts = log.soreness.split(',');
+                    parts.forEach(part => {
+                        if(part.trim()) sorenessHtml += `<span class="tag-text">${part.trim()}</span>`;
+                    });
+                }
+
+                // 新しい項目（ストレス、心拍数、歩数）を追加
+                tr.innerHTML = `
+                    <td>${log.date || ''}</td>
+                    <td style="font-weight:bold;">${log.playerName || ''}</td>
+                    <td>${fatigueText}</td>
+                    <td>${stressText}</td>
+                    <td>${log.trainingLoad && log.trainingLoad !== '-' ? log.trainingLoad : ''}</td>
+                    <td>${log.rsi && log.rsi !== '-' ? log.rsi : ''}</td>
+                    <td>${sorenessHtml}</td>
+                    <td>${log.heartRate || '-'}</td>
+                    <td>${log.steps || '-'}</td>
+                    <td>${log.sleep || ''}</td>
+                    <td style="color:#dc2626;">${log.injury || ''}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function downloadCSV() {
+            const logs = window.filteredLogs || [];
+            if (logs.length === 0) {
+                alert("ダウンロードするデータがありません。");
+                return;
+            }
+
+            let csvContent = '\uFEFF'; 
+            // ヘッダーに新しい項目を追加
+            const headers = ['日付', '選手名', '疲労度', 'ストレス', 'TrainingLoad', 'RSI', 'F-v診断', '筋肉痛', '心拍数', '歩数', '睡眠時間', 'ケガ', 'メニュー', '感想', 'できたこと', '課題'];
+            csvContent += headers.join(',') + '\n';
+
+            const exportLogs = [...logs].reverse();
+            exportLogs.forEach(log => {
+                // 行のデータにも新しい項目を追加
+                const row = [
+                    log.date, log.playerName, log.fatigue, log.stress, log.trainingLoad, log.rsi, log.fvResult,
+                    log.soreness, log.heartRate, log.steps, log.sleep, log.injury, log.menu, log.thoughts, log.good, log.bad
+                ].map(item => {
+                    const text = String(item || '').replace(/"/g, '""').replace(/\n/g, ' ');
+                    return `"${text}"`;
+                });
+                csvContent += row.join(',') + '\n';
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `コンディション記録_${getTodayString()}.csv`;
+            link.style.display = "none";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        async function clearAllData() {
+            if(confirm("本当にすべての『記録データ』を削除しますか？\n(※名簿は消えません。この操作は元に戻せません)")) {
+                if (logColRef) {
+                    try {
+                        const snapshot = await logColRef.get();
+                        snapshot.docs.forEach(doc => doc.ref.delete()); 
+                        alert("クラウド上の記録データをリセットしました。");
+                    } catch(e) {
+                        alert("データ削除に失敗しました。");
+                    }
+                } else {
+                    localStorage.removeItem('team_condition_logs');
+                    window.location.reload();
+                }
+            }
+        }
+
+        initFirebase();
+    </script>
+</body>
+</html>
