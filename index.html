@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>コンディション管理 - 選手画面</title>
+    <!-- Chart.jsの読み込み（個人グラフ用） -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* ==========================================
            デザイン（CSS）
@@ -31,7 +33,7 @@
         .result-value { font-size: 20px; font-weight: bold; color: #1d4ed8; text-align: right; }
         .result-sub { font-size: 12px; color: #3b82f6; display: block; }
         
-        .submit-btn { background-color: #2563eb; color: white; border: none; border-radius: 8px; padding: 15px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-bottom: 40px; transition: background-color 0.2s; }
+        .submit-btn { background-color: #2563eb; color: white; border: none; border-radius: 8px; padding: 15px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: background-color 0.2s; }
         .submit-btn:hover { background-color: #1d4ed8; }
         .submit-btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
 
@@ -47,6 +49,29 @@
 
         .debug-panel { background-color: #1e293b; color: #38bdf8; font-family: monospace; font-size: 12px; padding: 15px; border-radius: 8px; margin-top: 20px; margin-bottom: 40px; border-left: 4px solid #f43f5e; display: none; }
         .debug-title { font-weight: bold; color: #f43f5e; margin-bottom: 5px; font-size: 13px; }
+
+        /* ==========================================
+           履歴表示・グラフ用の追加スタイル
+           ========================================== */
+        .history-card { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .history-date { font-weight: bold; color: #0f172a; border-bottom: 2px solid #cbd5e1; padding-bottom: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .history-stats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+        .stat-badge { font-size: 12px; padding: 4px 8px; border-radius: 6px; font-weight: bold; }
+        .stat-fatigue { background-color: #fee2e2; color: #991b1b; }
+        .stat-load { background-color: #dbeafe; color: #1e40af; }
+        .stat-rsi { background-color: #dcfce7; color: #166534; }
+        .stat-sleep { background-color: #fef3c7; color: #92400e; }
+        
+        .history-text-item { margin-bottom: 8px; font-size: 14px; }
+        .history-label { font-size: 12px; font-weight: bold; color: #64748b; display: block; margin-bottom: 2px; }
+        .history-text-content { background-color: white; padding: 8px; border-radius: 6px; border: 1px solid #e2e8f0; white-space: pre-wrap; color: #334155; }
+        .no-data { text-align: center; color: #64748b; font-size: 14px; padding: 20px; }
+
+        /* 睡眠の質（星評価）用 */
+        .star-rating { display: inline-flex; flex-direction: row-reverse; gap: 4px; justify-content: flex-end; }
+        .star-rating input { display: none; }
+        .star-rating label { font-size: 24px; color: #d1d5db; cursor: pointer; transition: color 0.2s; margin: 0; }
+        .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label { color: #fbbf24; }
     </style>
 </head>
 <body>
@@ -59,105 +84,151 @@
         <form id="condition-form">
             
             <div class="card">
-                <h2 class="section-title">基本情報</h2>
-                <div class="form-group">
-                    <div class="form-label-flex"><label>選手名 <span style="color:red;">*</span></label></div>
-                    <select id="player-name" required>
-                        <option value="" disabled selected>読み込み中...</option>
-                    </select>
-                    <div id="player-warning" style="font-size: 12px; color: #dc2626; display: none; margin-top: 5px;">
-                        ※監督が名簿に選手を登録すると選択できるようになります。
-                    </div>
-                </div>
+                 <h2 class="section-title">基本情報</h2>
+                 <div class="form-group">
+                     <div class="form-label-flex"><label>選手名 <span style="color:red;">*</span></label></div>
+                     <select id="player-name" required>
+                         <option value="" disabled selected>読み込み中...</option>
+                     </select>
+                     <div id="player-warning" style="font-size: 12px; color: #dc2626; display: none; margin-top: 5px;">
+                         ※監督が名簿に選手を登録すると選択できるようになります。
+                     </div>
+                 </div>
 
-                <div class="form-group">
-                    <div class="form-label-flex"><label>日付 <span style="color:red;">*</span></label></div>
-                    <input type="date" id="date" required>
-                </div>
-            </div>
-
-            <!-- コンディション情報を大幅に強化 -->
-            <div class="card">
-                <h2 class="section-title">コンディション</h2>
-                
-                <div class="form-group">
-                    <div class="form-label-flex">
-                        <label>疲労度 (1:絶好調 〜 10:限界)</label>
-                        <div class="emoji-display" id="fatigue-display">😃 1</div>
-                    </div>
-                    <input type="range" id="fatigue" min="1" max="10" value="1" step="1">
-                </div>
-
-                <!-- 【追加】ストレス -->
-                <div class="form-group">
-                    <div class="form-label-flex">
-                        <label>ストレス (1:リラックス 〜 10:重圧)</label>
-                        <div class="emoji-display" id="stress-display">😌 1</div>
-                    </div>
-                    <input type="range" id="stress" min="1" max="10" value="1" step="1">
-                </div>
-
-                <!-- 【追加】心拍数・歩数・睡眠 -->
-                <div class="form-group"><div class="form-label-flex"><label>睡眠時間 (時間)</label></div><input type="number" id="sleep" step="0.5" placeholder="例: 7.5"></div>
-                <div class="form-group"><div class="form-label-flex"><label>起床時心拍数 (bpm)</label></div><input type="number" id="heart-rate" placeholder="例: 60"></div>
-                <div class="form-group"><div class="form-label-flex"><label>歩数 (歩)</label></div><input type="number" id="steps" placeholder="例: 8000"></div>
-                
-                <div class="form-group">
-                    <div class="form-label-flex"><label>筋肉痛・張りのある部位（複数選択可）</label></div>
-                    <div class="tags-container" id="soreness-tags">
-                        <button type="button" class="tag-btn" data-part="ハムストリングス">ハムストリングス</button>
-                        <button type="button" class="tag-btn" data-part="大腿四頭筋">大腿四頭筋</button>
-                        <button type="button" class="tag-btn" data-part="ふくらはぎ">ふくらはぎ</button>
-                        <button type="button" class="tag-btn" data-part="臀部(お尻)">臀部(お尻)</button>
-                        <button type="button" class="tag-btn" data-part="腰">腰</button>
-                        <button type="button" class="tag-btn" data-part="肩・背中">肩・背中</button>
-                        <!-- 【追加】腕・胸筋 -->
-                        <button type="button" class="tag-btn" data-part="腕">腕</button>
-                        <button type="button" class="tag-btn" data-part="胸筋">胸筋</button>
-                    </div>
-                </div>
-
-                <div class="form-group"><div class="form-label-flex"><label>ケガ・違和感の詳細</label></div><textarea id="injury" rows="2" placeholder="詳細があれば記入..."></textarea></div>
+                 <div class="form-group">
+                     <div class="form-label-flex"><label>日付 <span style="color:red;">*</span></label></div>
+                     <input type="date" id="date" required>
+                 </div>
             </div>
 
             <div class="card">
-                <h2 class="section-title">トレーニング負荷 (sRPE)</h2>
-                <div class="form-group"><div class="form-label-flex"><label>運動時間 (分)</label></div><input type="number" id="duration" placeholder="例: 120"></div>
-                
-                <div class="form-group">
-                    <div class="form-label-flex">
-                        <label>RPE: 主観的きつさ (0:楽 〜 10:限界)</label>
-                        <div class="emoji-display" id="rpe-display">😐 5.0</div>
-                    </div>
-                    <input type="range" id="rpe" min="0" max="10" step="0.5" value="5">
-                </div>
-                <div class="result-box"><span class="result-label">Training Load</span><span class="result-value" id="load-result">-</span></div>
+                 <h2 class="section-title">コンディション</h2>
+                 
+                 <div class="form-group">
+                     <div class="form-label-flex">
+                         <label>疲労度 (1:絶好調 〜 10:限界)</label>
+                         <div class="emoji-display" id="fatigue-display">😃 1</div>
+                     </div>
+                     <input type="range" id="fatigue" min="1" max="10" value="1" step="1">
+                 </div>
+
+                 <div class="form-group">
+                     <div class="form-label-flex">
+                         <label>ストレス (1:リラックス 〜 10:重圧)</label>
+                         <div class="emoji-display" id="stress-display">😌 1</div>
+                     </div>
+                     <input type="range" id="stress" min="1" max="10" value="1" step="1">
+                 </div>
+
+                 <!-- 睡眠関連・体重など（任意項目） -->
+                 <div class="form-group">
+                     <div class="form-label-flex"><label>睡眠時間 (時間) <span style="font-size:12px; color:#6b7280; font-weight:normal;">任意</span></label></div>
+                     <input type="number" id="sleep" step="0.5" placeholder="例: 7.5">
+                 </div>
+                 
+                 <div class="form-group">
+                     <div class="form-label-flex"><label>睡眠の質 <span style="font-size:12px; color:#6b7280; font-weight:normal;">任意</span></label></div>
+                     <div class="star-rating">
+                         <input type="radio" id="star5" name="sleep-quality" value="5"><label for="star5">★</label>
+                         <input type="radio" id="star4" name="sleep-quality" value="4"><label for="star4">★</label>
+                         <input type="radio" id="star3" name="sleep-quality" value="3"><label for="star3">★</label>
+                         <input type="radio" id="star2" name="sleep-quality" value="2"><label for="star2">★</label>
+                         <input type="radio" id="star1" name="sleep-quality" value="1"><label for="star1">★</label>
+                     </div>
+                 </div>
+
+                 <div class="form-group">
+                     <div class="form-label-flex"><label>起床時体重 (kg) <span style="font-size:12px; color:#6b7280; font-weight:normal;">任意</span></label></div>
+                     <input type="number" id="weight" step="0.1" placeholder="例: 65.5">
+                 </div>
+                 
+                 <div class="form-group">
+                     <div class="form-label-flex"><label>起床時心拍数 (bpm) <span style="font-size:12px; color:#6b7280; font-weight:normal;">任意</span></label></div>
+                     <input type="number" id="heart-rate" placeholder="例: 60">
+                 </div>
+                 
+                 <div class="form-group">
+                     <div class="form-label-flex"><label>歩数 (歩) <span style="font-size:12px; color:#6b7280; font-weight:normal;">任意</span></label></div>
+                     <input type="number" id="steps" placeholder="例: 8000">
+                 </div>
+                 
+                 <!-- 🔥 管理者画面に合わせた12区分の筋肉痛ボタン -->
+                 <div class="form-group">
+                     <div class="form-label-flex"><label>筋肉痛・張りのある部位（複数選択可）</label></div>
+                     <div class="tags-container" id="soreness-tags">
+                         <button type="button" class="tag-btn" data-part="頭部">頭部</button>
+                         <button type="button" class="tag-btn" data-part="肩">肩</button>
+                         <button type="button" class="tag-btn" data-part="背中">背中</button>
+                         <button type="button" class="tag-btn" data-part="腹筋">腹筋</button>
+                         <button type="button" class="tag-btn" data-part="胸部">胸部</button>
+                         <button type="button" class="tag-btn" data-part="腸腰筋">腸腰筋</button>
+                         <button type="button" class="tag-btn" data-part="臀部">臀部</button>
+                         <button type="button" class="tag-btn" data-part="大腿四頭筋">大腿四頭筋</button>
+                         <button type="button" class="tag-btn" data-part="ハムストリングス">ハムストリングス</button>
+                         <button type="button" class="tag-btn" data-part="カーフ">カーフ</button>
+                         <button type="button" class="tag-btn" data-part="アキレス腱">アキレス腱</button>
+                         <button type="button" class="tag-btn" data-part="足裏">足裏</button>
+                     </div>
+                 </div>
+
+                 <div class="form-group"><div class="form-label-flex"><label>ケガ・違和感の詳細</label></div><textarea id="injury" rows="2" placeholder="詳細があれば記入..."></textarea></div>
             </div>
 
             <div class="card">
-                <h2 class="section-title">反応筋力 (RSI)</h2>
-                <div class="form-group"><div class="form-label-flex"><label>Jump Height (cm)</label></div><input type="number" id="jump-height" step="0.1"></div>
-                <div class="form-group"><div class="form-label-flex"><label>Contact Time (秒)</label></div><input type="number" id="contact-time" step="0.001"></div>
-                <div class="result-box"><span class="result-label">RSI</span><span class="result-value" id="rsi-result">-</span></div>
+                 <h2 class="section-title">トレーニング負荷 (sRPE)</h2>
+                 <div class="form-group"><div class="form-label-flex"><label>運動時間 (分)</label></div><input type="number" id="duration" placeholder="例: 120"></div>
+                 
+                 <div class="form-group">
+                     <div class="form-label-flex">
+                         <label>RPE: 主観的きつさ (0:楽 〜 10:限界)</label>
+                         <div class="emoji-display" id="rpe-display">😐 5.0</div>
+                     </div>
+                     <input type="range" id="rpe" min="0" max="10" step="0.5" value="5">
+                 </div>
+                 <div class="result-box"><span class="result-label">Training Load</span><span class="result-value" id="load-result">-</span></div>
             </div>
 
             <div class="card">
-                <h2 class="section-title">F-v 簡易診断 (弱点分析)</h2>
-                <div class="form-group"><div class="form-label-flex"><label>30m タイム (秒)</label></div><input type="number" id="time-30m" step="0.01"></div>
-                <div class="form-group"><div class="form-label-flex"><label>Fly-in 20m タイム (秒)</label></div><input type="number" id="time-fly20m" step="0.01"></div>
-                <div class="result-box"><span class="result-label">診断結果</span><div style="text-align: right;"><span class="result-value" id="fv-result">-</span><span class="result-sub" id="fv-ratio"></span></div></div>
+                 <h2 class="section-title">反応筋力 (RSI)</h2>
+                 <p style="font-size: 12px; color: #64748b; margin-top: 0; margin-bottom: 10px;">※入力しない場合は「未計測」として記録されます。</p>
+                 <div class="form-group"><div class="form-label-flex"><label>Jump Height (cm)</label></div><input type="number" id="jump-height" step="0.1"></div>
+                 <div class="form-group"><div class="form-label-flex"><label>Contact Time (秒)</label></div><input type="number" id="contact-time" step="0.001"></div>
+                 <div class="result-box"><span class="result-label">RSI</span><span class="result-value" id="rsi-result">-</span></div>
             </div>
 
             <div class="card">
-                <h2 class="section-title">練習の振り返り</h2>
-                <div class="form-group"><div class="form-label-flex"><label>練習メニュー</label></div><textarea id="menu" rows="2"></textarea></div>
-                <div class="form-group"><div class="form-label-flex"><label>感想</label></div><textarea id="thoughts" rows="2"></textarea></div>
-                <div class="form-group"><div class="form-label-flex"><label style="color: #059669;">👍 できたこと</label></div><textarea id="good" rows="2"></textarea></div>
-                <div class="form-group"><div class="form-label-flex"><label style="color: #dc2626;">🔥 課題</label></div><textarea id="bad" rows="2"></textarea></div>
+                 <h2 class="section-title">F-v 簡易診断 (弱点分析)</h2>
+                 <p style="font-size: 12px; color: #64748b; margin-top: 0; margin-bottom: 10px;">※入力しない場合は「未計測」として記録されます。</p>
+                 <div class="form-group"><div class="form-label-flex"><label>30m タイム (秒)</label></div><input type="number" id="time-30m" step="0.01"></div>
+                 <div class="form-group"><div class="form-label-flex"><label>Fly-in 20m タイム (秒)</label></div><input type="number" id="time-fly20m" step="0.01"></div>
+                 <div class="result-box"><span class="result-label">診断結果</span><div style="text-align: right;"><span class="result-value" id="fv-result">-</span><span class="result-sub" id="fv-ratio"></span></div></div>
+            </div>
+
+            <div class="card">
+                 <h2 class="section-title">練習の振り返り</h2>
+                 <div class="form-group"><div class="form-label-flex"><label>練習メニュー</label></div><textarea id="menu" rows="2"></textarea></div>
+                 <div class="form-group"><div class="form-label-flex"><label>感想</label></div><textarea id="thoughts" rows="2"></textarea></div>
+                 <div class="form-group"><div class="form-label-flex"><label style="color: #059669;">👍 できたこと</label></div><textarea id="good" rows="2"></textarea></div>
+                 <div class="form-group"><div class="form-label-flex"><label style="color: #dc2626;">🔥 課題</label></div><textarea id="bad" rows="2"></textarea></div>
             </div>
 
             <button type="submit" id="save-btn" class="submit-btn">記録を保存する</button>
         </form>
+
+        <!-- 個人の過去履歴＆グラフ表示セクション -->
+        <div class="card" id="history-section" style="display: none; margin-bottom: 40px;">
+            <h2 class="section-title">🕒 過去の入力履歴</h2>
+            <p style="font-size: 12px; color: #64748b; margin-top: 0;">※自分の名前を選択すると、過去の記録が表示されます。</p>
+            
+            <!-- 個人グラフ用キャンバス -->
+            <div style="margin-bottom: 20px;">
+                <canvas id="player-chart"></canvas>
+            </div>
+
+            <div id="history-list">
+                <!-- JavaScriptで履歴が挿入されます -->
+            </div>
+        </div>
 
         <div id="debug-panel" class="debug-panel">
             <div class="debug-title">⚠️ Firebase 接続エラー検出</div>
@@ -171,7 +242,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // ⭐️【最重要】ここにFirebaseの設定を貼り付けてください ⭐️
+        // ⭐️【最重要】ここにFirebaseの設定を貼り付けてください⭐️
         const myFirebaseConfig = {
   apiKey: "AIzaSyAQoESOlZIGJfOgfIwpkL0r0YcYu4tl8ZQ",
   authDomain: "team-conditioning-controling.firebaseapp.com",
@@ -185,6 +256,9 @@
         let db = null;
         let colRef = null;
         let playersColRef = null;
+        
+        let allTeamLogs = []; 
+        let playerChartInstance = null; // 個人グラフのインスタンス
 
         async function initFirebase() {
             const statusBadge = document.getElementById('connection-status');
@@ -207,6 +281,7 @@
                     statusBadge.className = 'status-badge status-cloud';
                     debugPanel.style.display = 'none';
 
+                    // 選手の読み込み
                     playersColRef.onSnapshot(snapshot => {
                         const players = [];
                         snapshot.forEach(doc => players.push({name: doc.data().name, createdAt: doc.data().createdAt}));
@@ -214,17 +289,45 @@
                         updatePlayerSelect(players);
                     });
 
+                    // ログデータのリアルタイム読み込み
+                    colRef.onSnapshot(snapshot => {
+                        allTeamLogs = [];
+                        snapshot.forEach(doc => allTeamLogs.push(doc.data()));
+                        // 日付の新しい順（降順）にソート
+                        allTeamLogs.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
+                        
+                        // 現在選択されている選手がいれば履歴を更新
+                        const currentSelectedPlayer = document.getElementById('player-name').value;
+                        if (currentSelectedPlayer) {
+                            renderPlayerHistory(currentSelectedPlayer);
+                        }
+                    });
+
                 } else {
                     console.log("ローカルモード");
-                    loadLocalPlayers();
+                    loadLocalData();
                 }
             } catch (error) {
                 console.error("Firebaseの接続エラー:", error);
-                statusBadge.textContent = '接続エラー 🔴';
+                statusBadge.textContent = '接続エラー🔴';
                 statusBadge.className = 'status-badge status-error';
                 debugPanel.style.display = 'block';
                 debugMessage.innerHTML = `<b>エラー:</b> ${error.message}`;
-                loadLocalPlayers(); 
+                loadLocalData(); 
+            }
+        }
+
+        // ローカルデータの読み込み（Firebase未接続時用）
+        function loadLocalData() {
+            const players = JSON.parse(localStorage.getItem('team_players') || '[]');
+            updatePlayerSelect(players);
+            
+            allTeamLogs = JSON.parse(localStorage.getItem('team_condition_logs') || '[]');
+            allTeamLogs.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
+            
+            const currentSelectedPlayer = document.getElementById('player-name').value;
+            if (currentSelectedPlayer) {
+                renderPlayerHistory(currentSelectedPlayer);
             }
         }
 
@@ -236,7 +339,7 @@
             select.innerHTML = '<option value="" disabled selected>名前を選択してください ▼</option>';
             
             if(players.length === 0) {
-                warning.style.display = 'block'; 
+                 warning.style.display = 'block'; 
             } else {
                 warning.style.display = 'none';
                 players.forEach(p => {
@@ -249,9 +352,128 @@
             }
         }
 
-        function loadLocalPlayers() {
-            const players = JSON.parse(localStorage.getItem('team_players') || '[]');
-            updatePlayerSelect(players);
+        // 個人の履歴とグラフを描画する処理
+        document.getElementById('player-name').addEventListener('change', function() {
+            renderPlayerHistory(this.value);
+        });
+
+        function renderPlayerHistory(playerName) {
+            const historySection = document.getElementById('history-section');
+            const historyList = document.getElementById('history-list');
+            
+            if (!playerName) {
+                historySection.style.display = 'none';
+                return;
+            }
+            
+            historySection.style.display = 'block';
+            
+            // 選択された選手のデータだけを抽出
+            const myLogs = allTeamLogs.filter(log => log.playerName === playerName);
+            
+            // グラフを描画
+            renderPlayerChart(myLogs);
+
+            if (myLogs.length === 0) {
+                historyList.innerHTML = '<div class="no-data">過去の記録はまだありません。</div>';
+                return;
+            }
+
+            let html = '';
+            myLogs.forEach(log => {
+                const sorenessHtml = log.soreness ? `<div class="history-text-item"><span class="history-label">筋肉痛・張り:</span> <span style="color:#b45309; font-weight:bold; font-size:13px;">${log.soreness}</span></div>` : '';
+                const injuryHtml = log.injury ? `<div class="history-text-item"><span class="history-label" style="color:#dc2626;">ケガ・違和感:</span><div class="history-text-content" style="border-color:#fca5a5;">${log.injury}</div></div>` : '';
+                const menuHtml = log.menu ? `<div class="history-text-item"><span class="history-label">練習メニュー:</span><div class="history-text-content">${log.menu}</div></div>` : '';
+                const thoughtsHtml = log.thoughts ? `<div class="history-text-item"><span class="history-label">感想:</span><div class="history-text-content">${log.thoughts}</div></div>` : '';
+                const goodHtml = log.good ? `<div class="history-text-item"><span class="history-label" style="color:#059669;">👍 できたこと:</span><div class="history-text-content" style="border-color:#a7f3d0;">${log.good}</div></div>` : '';
+                const badHtml = log.bad ? `<div class="history-text-item"><span class="history-label" style="color:#dc2626;">🔥 課題:</span><div class="history-text-content" style="border-color:#fca5a5;">${log.bad}</div></div>` : '';
+
+                const sleepQualityStars = log.sleepQuality ? '★'.repeat(log.sleepQuality) : '-';
+                const weightDisplay = log.weight ? `${log.weight} kg` : '-';
+
+                html += `
+                <div class="history-card">
+                    <div class="history-date">
+                        <span>📅 ${log.date || '日付不明'}</span>
+                        <span style="font-size:12px; font-weight:normal; color:#94a3b8;">${log.fvResult && log.fvResult !== '-' && log.fvResult !== '未計測' ? 'F-v: ' + log.fvResult : ''}</span>
+                    </div>
+                    <div class="history-stats">
+                        <span class="stat-badge stat-fatigue">疲労: ${log.fatigue || '-'}</span>
+                        <span class="stat-badge stat-fatigue" style="background:#fde047; color:#854d0e;">ｽﾄﾚｽ: ${log.stress || '-'}</span>
+                        <span class="stat-badge stat-load">Load: ${log.trainingLoad !== '-' ? log.trainingLoad : '-'}</span>
+                        <span class="stat-badge stat-rsi">RSI: ${log.rsi !== '-' ? log.rsi : '-'}</span>
+                        <span class="stat-badge stat-sleep">睡眠: ${log.sleep ? log.sleep + 'h' : '-'} (質: <span style="color:#d97706;">${sleepQualityStars}</span>)</span>
+                        <span class="stat-badge stat-load" style="background:#f3f4f6; color:#4b5563;">体重: ${weightDisplay}</span>
+                    </div>
+                    ${sorenessHtml}
+                    ${injuryHtml}
+                    ${menuHtml}
+                    ${thoughtsHtml}
+                    ${goodHtml}
+                    ${badHtml}
+                </div>
+                `;
+            });
+            historyList.innerHTML = html;
+        }
+
+        // 個人グラフ描画用関数
+        function renderPlayerChart(myLogs) {
+            if (typeof Chart === 'undefined') return;
+            const ctx = document.getElementById('player-chart');
+            if (!ctx) return;
+            
+            // 直近7日分のデータに絞り込み、古い順に並べ替え（グラフのX軸用）
+            const recentLogs = [...myLogs].slice(0, 7).reverse();
+            
+            const labels = recentLogs.map(log => {
+                if (!log.date) return '不明';
+                const parts = log.date.split('-');
+                return parts.length === 3 ? `${parts[1]}/${parts[2]}` : log.date;
+            });
+            
+            const loadData = recentLogs.map(log => parseFloat(log.trainingLoad) || 0);
+            const fatigueData = recentLogs.map(log => parseInt(log.fatigue) || 0);
+
+            if (playerChartInstance) {
+                playerChartInstance.destroy();
+            }
+
+            playerChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Training Load',
+                            data: loadData,
+                            borderColor: '#2563eb',
+                            backgroundColor: '#2563eb',
+                            yAxisID: 'y',
+                            tension: 0.2
+                        },
+                        {
+                            label: '疲労度',
+                            data: fatigueData,
+                            borderColor: '#dc2626',
+                            backgroundColor: '#dc2626',
+                            borderDash: [5, 5],
+                            yAxisID: 'y1',
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: '最近のコンディション推移 (最大7日間)' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, position: 'left' },
+                        y1: { beginAtZero: true, min: 0, max: 10, position: 'right', grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
         }
 
         initFirebase();
@@ -372,14 +594,24 @@
                 btn.textContent = '送信中...';
                 btn.disabled = true;
                 
+                // 星評価の値を取得
+                const sleepQualityNode = document.querySelector('input[name="sleep-quality"]:checked');
+                const sleepQuality = sleepQualityNode ? sleepQualityNode.value : '';
+                
+                // 未計測のハンドリング
+                const rsiValue = rsiResult.textContent === '-' ? '未計測' : rsiResult.textContent;
+                const fvValue = fvResult.textContent === '-' ? '未計測' : fvResult.textContent;
+
                 const logData = {
                     playerName: document.getElementById('player-name').value,
                     date: document.getElementById('date').value,
                     fatigue: fatigueSlider.value,
-                    stress: stressSlider.value, // 【追加】ストレス
+                    stress: stressSlider.value,
                     sleep: document.getElementById('sleep').value,
-                    heartRate: document.getElementById('heart-rate').value, // 【追加】心拍数
-                    steps: document.getElementById('steps').value, // 【追加】歩数
+                    sleepQuality: sleepQuality,
+                    weight: document.getElementById('weight').value,
+                    heartRate: document.getElementById('heart-rate').value,
+                    steps: document.getElementById('steps').value,
                     soreness: selectedSoreness.join(', '), 
                     injury: document.getElementById('injury').value,
                     duration: document.getElementById('duration').value,
@@ -387,8 +619,10 @@
                     trainingLoad: loadResult.textContent,
                     jumpHeight: document.getElementById('jump-height').value,
                     contactTime: document.getElementById('contact-time').value,
-                    rsi: rsiResult.textContent,
-                    fvResult: fvResult.textContent,
+                    rsi: rsiValue,
+                    fvResult: fvValue,
+                    time30m: document.getElementById('time-30m').value,      // 🔥管理者画面向けの実数値追加
+                    timeFly20m: document.getElementById('time-fly20m').value, // 🔥管理者画面向けの実数値追加
                     menu: document.getElementById('menu').value,
                     thoughts: document.getElementById('thoughts').value,
                     good: document.getElementById('good').value,
@@ -403,6 +637,8 @@
                         let savedLogs = JSON.parse(localStorage.getItem('team_condition_logs') || '[]');
                         savedLogs.push(logData);
                         localStorage.setItem('team_condition_logs', JSON.stringify(savedLogs));
+                        // ローカルモード時は手動でデータ再読み込み
+                        loadLocalData(); 
                     }
                     alert('データを保存しました。');
                     
@@ -416,8 +652,11 @@
                     selectedSoreness = [];
                     document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('selected'));
                     fatigueDisplay.textContent = `😃 1`;
-                    stressDisplay.textContent = `😌 1`; // ストレスもリセット
+                    stressDisplay.textContent = `😌 1`; 
                     rpeDisplay.textContent = `😐 5.0`;
+                    
+                    // 星評価のクリア
+                    if(sleepQualityNode) sleepQualityNode.checked = false;
                     
                     calculateLoad(); calculateRsi(); calculateFv();
                     window.scrollTo({ top: 0, behavior: 'smooth' });
