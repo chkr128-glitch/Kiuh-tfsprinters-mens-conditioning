@@ -28,7 +28,7 @@
         .missing-list { font-size: 12px; color: #6b7280; margin-top: 5px; min-height: 18px; }
         .danger-list { font-size: 12px; color: #991b1b; margin-top: 5px; font-weight: bold; }
 
-        /* ⚠️修正：チーム全体分析用のコンテナ（縦並びに変更） */
+        /* チーム全体分析用グリッド */
         .team-analytics-container { display: flex; flex-direction: column; gap: 30px; margin-bottom: 10px; }
         
         /* ヒートマップ用スタイル */
@@ -151,13 +151,13 @@
         <div class="card">
             <h3 class="section-title">🔥 チーム全体の傾向分析 (現在表示中のデータ)</h3>
             
-            <!-- ⚠️修正：縦並びのコンテナに変更 -->
             <div class="team-analytics-container">
                 
                 <!-- 12区分の部位別ヒートマップとランキング表 -->
                 <div style="margin-bottom: 20px;">
                     <h4 style="margin-top:0; color:#4b5563; font-size:15px; text-align:center;">筋肉痛・張りの部位別ヒートマップ</h4>
-                    <p style="font-size:11px; color:#64748b; text-align:center; margin-bottom: 10px;">※色が濃いほど痛みを訴える人数が多い部位です。</p>
+                    <!-- ⚠️ 変更：集計期間の注釈を追加 -->
+                    <p style="font-size:11px; color:#64748b; text-align:center; margin-bottom: 10px;">※記録がある最新日から、<span style="color:#ef4444; font-weight:bold;">その日を含めて過去3日間</span>のデータで集計しています。<br>色が濃いほど痛みを訴える人数が多い部位です。</p>
                     <div class="heatmap-container">
                         <!-- 人体モデル（前） -->
                         <div class="human-body">
@@ -233,9 +233,9 @@
                     </table>
                 </div>
 
-                <!-- ⚠️修正：ヒートマップ＆ランキングの下に配置（縦並び） -->
                 <div style="border-top: 2px dashed #cbd5e1; padding-top: 25px; margin-top: 5px;">
                     <h4 style="margin-top:0; color:#4b5563; font-size:15px; text-align:center; margin-bottom:15px;">F-v プロファイル グループ編成表</h4>
+                    <p style="font-size:11px; color:#64748b; text-align:center; margin-bottom: 10px;">※表示されている期間内の、各選手の「最新の記録」をもとにグループ分けしています。</p>
                     
                     <div class="fv-groups-container">
                         <!-- 力不足グループ -->
@@ -543,7 +543,7 @@
         // 🔥 チーム分析の更新 (ヒートマップ & ランキング表 & F-v)
         // ==========================================
         function updateTeamAnalytics(logs) {
-            // --- 1. 詳細ヒートマップとランキング表の処理 ---
+            // --- 1. 詳細ヒートマップとランキング表の処理 (記録がある最新日から過去3日間のみ抽出) ---
             const sorenessCounts = {
                 "頭部": 0, "肩": 0, "背中": 0, "腹筋": 0, "胸部": 0,
                 "腸腰筋": 0, "臀部": 0, "大腿四頭筋": 0, 
@@ -552,7 +552,31 @@
                 "首": 0, "腰": 0, "胸筋": 0, "臀部(お尻)": 0, "ふくらはぎ": 0
             };
             
-            logs.forEach(log => {
+            // ⚠️ 追加：最新日から過去3日間に絞り込む処理
+            let recentLogsForHeatmap = [];
+            if (logs.length > 0) {
+                // 有効な日付(YYYY-MM-DD)を持つデータから最新日を特定
+                const validDates = logs.map(l => l.date).filter(d => d);
+                if (validDates.length > 0) {
+                    const latestDateStr = validDates.reduce((a, b) => a > b ? a : b);
+                    const latestDate = new Date(latestDateStr);
+                    latestDate.setHours(0, 0, 0, 0); // 時間を0にリセットして日付のみで比較
+                    
+                    // 最新日を含めて3日間（最新日、1日前、2日前）のボーダーラインを作成
+                    const limitDate = new Date(latestDate);
+                    limitDate.setDate(limitDate.getDate() - 2); 
+                    
+                    recentLogsForHeatmap = logs.filter(log => {
+                        if (!log.date) return false;
+                        const d = new Date(log.date);
+                        d.setHours(0, 0, 0, 0);
+                        return d >= limitDate && d <= latestDate;
+                    });
+                }
+            }
+
+            // 過去3日間のデータだけで部位を集計
+            recentLogsForHeatmap.forEach(log => {
                 if(log.soreness) {
                     const parts = log.soreness.split(',');
                     parts.forEach(p => {
@@ -620,7 +644,7 @@
                 .sort((a, b) => b[1] - a[1]); 
             
             if(sortedSoreness.length === 0) {
-                rankingBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8; padding: 15px;">訴えのある部位はありません</td></tr>';
+                rankingBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8; padding: 15px;">過去3日間に訴えのある部位はありません</td></tr>';
             } else {
                 sortedSoreness.forEach((item, index) => {
                     let badge = (index === 0 && item[1] >= 3) ? ' <span style="color:#ef4444; font-size:11px; font-weight:bold;">⚠️多発注意</span>' : '';
@@ -635,6 +659,7 @@
             }
 
             // --- 2. F-v シンプルグループ分け処理 ---
+            // ※F-vプロファイルは「各選手の最新データ」を評価するものなので、期間に絞らず全体(logs)から最新データを上書き取得します。
             const latestFvData = {};
             logs.forEach(log => {
                 if(log.time30m && log.timeFly20m && parseFloat(log.time30m) > 0 && parseFloat(log.timeFly20m) > 0) {
