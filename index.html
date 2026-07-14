@@ -4,6 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AthleSense KIUH - Submit Form</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e3a8a">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AthleSense">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('PWAの登録が成功しました！スコープ: ', registration.scope);
+                    })
+                    .catch(function(err) {
+                        console.log('PWAの登録に失敗しました: ', err);
+                    });
+            });
+        }
+    </script>
     <!-- Chart.jsの読み込み（個人グラフ用） -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
