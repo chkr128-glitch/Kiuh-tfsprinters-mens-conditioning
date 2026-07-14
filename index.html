@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AthleSense KIUH - Submit Form</title>
-
+    <title>AthleSense-KIUH edition - 選手画面</title>
+    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e3a8a">
 
@@ -26,7 +26,7 @@
             });
         }
     </script>
-    <!-- Chart.jsの読み込み（個人グラフ用） -->
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* ==========================================
@@ -69,12 +69,13 @@
         .tag-btn { background-color: #f3f4f6; border: 1px solid #d1d5db; color: #4b5563; padding: 8px 14px; border-radius: 20px; font-size: 14px; cursor: pointer; transition: all 0.2s; }
         .tag-btn.selected { background-color: #fef08a; border-color: #f59e0b; color: #b45309; font-weight: bold; }
 
+        /* 🆕 AIアドバイザーカード用スタイル */
+        .ai-card { background: linear-gradient(145deg, #ffffff, #f0fdf4); border: 1px solid #bbf7d0; }
+        .ai-box { background-color: white; border-radius: 8px; padding: 15px; border-left: 4px solid #10b981; font-size: 14px; color: #1e293b; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); }
+
         .debug-panel { background-color: #1e293b; color: #38bdf8; font-family: monospace; font-size: 12px; padding: 15px; border-radius: 8px; margin-top: 20px; margin-bottom: 40px; border-left: 4px solid #f43f5e; display: none; }
         .debug-title { font-weight: bold; color: #f43f5e; margin-bottom: 5px; font-size: 13px; }
 
-        /* ==========================================
-           履歴表示・グラフ用の追加スタイル
-           ========================================== */
         .history-card { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
         .history-date { font-weight: bold; color: #0f172a; border-bottom: 2px solid #cbd5e1; padding-bottom: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; }
         .history-stats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
@@ -89,7 +90,6 @@
         .history-text-content { background-color: white; padding: 8px; border-radius: 6px; border: 1px solid #e2e8f0; white-space: pre-wrap; color: #334155; }
         .no-data { text-align: center; color: #64748b; font-size: 14px; padding: 20px; }
 
-        /* 睡眠の質（星評価）用 */
         .star-rating { display: inline-flex; flex-direction: row-reverse; gap: 4px; justify-content: flex-end; }
         .star-rating input { display: none; }
         .star-rating label { font-size: 24px; color: #d1d5db; cursor: pointer; transition: color 0.2s; margin: 0; }
@@ -99,8 +99,8 @@
 <body>
 
     <header>
-    AthleSense KIUH <span id="connection-status" class="status-badge status-local">ローカル</span>
-</header>
+        AthleSense-KIUH <span id="connection-status" class="status-badge status-local">ローカル</span>
+    </header>
 
     <div class="container">
         <form id="condition-form">
@@ -142,7 +142,6 @@
                      <input type="range" id="stress" min="1" max="10" value="1" step="1">
                  </div>
 
-                 <!-- 睡眠関連・体重など（任意項目） -->
                  <div class="form-group">
                      <div class="form-label-flex"><label>睡眠時間 (時間) <span style="font-size:12px; color:#6b7280; font-weight:normal;">任意</span></label></div>
                      <input type="number" id="sleep" step="0.5" placeholder="例: 7.5">
@@ -174,7 +173,6 @@
                      <input type="number" id="steps" placeholder="例: 8000">
                  </div>
                  
-                 <!-- 🔥 管理者画面に合わせた12区分の筋肉痛ボタン -->
                  <div class="form-group">
                      <div class="form-label-flex"><label>筋肉痛・張りのある部位（複数選択可）</label></div>
                      <div class="tags-container" id="soreness-tags">
@@ -194,6 +192,13 @@
                  </div>
 
                  <div class="form-group"><div class="form-label-flex"><label>ケガ・違和感の詳細</label></div><textarea id="injury" rows="2" placeholder="詳細があれば記入..."></textarea></div>
+            </div>
+
+            <div class="card ai-card">
+                 <h2 class="section-title" style="color: #16a34a;">✨ AthleSense AI アドバイザー</h2>
+                 <div class="ai-box" id="ai-advice-box">
+                      <div id="ai-advice-text">名前や今日の体調を入力すると、蓄積された論文データからあなた専用のリカバリー方法をリアルタイムに提案します。</div>
+                 </div>
             </div>
 
             <div class="card">
@@ -232,24 +237,26 @@
                  <div class="form-group"><div class="form-label-flex"><label>感想</label></div><textarea id="thoughts" rows="2"></textarea></div>
                  <div class="form-group"><div class="form-label-flex"><label style="color: #059669;">👍 できたこと</label></div><textarea id="good" rows="2"></textarea></div>
                  <div class="form-group"><div class="form-label-flex"><label style="color: #dc2626;">🔥 課題</label></div><textarea id="bad" rows="2"></textarea></div>
+                 
+                 <div class="form-group">
+                     <div class="form-label-flex"><label style="color: #1d4ed8;">🛁 実施した・実施予定のケア</label></div>
+                     <textarea id="care" rows="2" placeholder="例: 湯船に15分浸かる、ハムをマッサージガンで10分ほぐす、交代浴をする など..."></textarea>
+                 </div>
             </div>
 
             <button type="submit" id="save-btn" class="submit-btn">記録を保存する</button>
         </form>
 
-        <!-- 個人の過去履歴＆グラフ表示セクション -->
         <div class="card" id="history-section" style="display: none; margin-bottom: 40px;">
             <h2 class="section-title">🕒 過去の入力履歴</h2>
             <p style="font-size: 12px; color: #64748b; margin-top: 0;">※自分の名前を選択すると、過去の記録が表示されます。</p>
             
-            <!-- 個人グラフ用キャンバス -->
             <div style="margin-bottom: 20px;">
                 <canvas id="player-chart"></canvas>
             </div>
 
             <div id="history-list">
-                <!-- JavaScriptで履歴が挿入されます -->
-            </div>
+                </div>
         </div>
 
         <div id="debug-panel" class="debug-panel">
@@ -258,7 +265,6 @@
         </div>
     </div>
 
-    <!-- Firebase Classic -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -280,7 +286,7 @@
         let playersColRef = null;
         
         let allTeamLogs = []; 
-        let playerChartInstance = null; // 個人グラフのインスタンス
+        let playerChartInstance = null; 
 
         async function initFirebase() {
             const statusBadge = document.getElementById('connection-status');
@@ -303,7 +309,6 @@
                     statusBadge.className = 'status-badge status-cloud';
                     debugPanel.style.display = 'none';
 
-                    // 選手の読み込み
                     playersColRef.onSnapshot(snapshot => {
                         const players = [];
                         snapshot.forEach(doc => players.push({name: doc.data().name, createdAt: doc.data().createdAt}));
@@ -311,14 +316,11 @@
                         updatePlayerSelect(players);
                     });
 
-                    // ログデータのリアルタイム読み込み
                     colRef.onSnapshot(snapshot => {
                         allTeamLogs = [];
                         snapshot.forEach(doc => allTeamLogs.push(doc.data()));
-                        // 日付の新しい順（降順）にソート
                         allTeamLogs.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
                         
-                        // 現在選択されている選手がいれば履歴を更新
                         const currentSelectedPlayer = document.getElementById('player-name').value;
                         if (currentSelectedPlayer) {
                             renderPlayerHistory(currentSelectedPlayer);
@@ -339,7 +341,6 @@
             }
         }
 
-        // ローカルデータの読み込み（Firebase未接続時用）
         function loadLocalData() {
             const players = JSON.parse(localStorage.getItem('team_players') || '[]');
             updatePlayerSelect(players);
@@ -374,7 +375,6 @@
             }
         }
 
-        // 個人の履歴とグラフを描画する処理
         document.getElementById('player-name').addEventListener('change', function() {
             renderPlayerHistory(this.value);
         });
@@ -389,11 +389,7 @@
             }
             
             historySection.style.display = 'block';
-            
-            // 選択された選手のデータだけを抽出
             const myLogs = allTeamLogs.filter(log => log.playerName === playerName);
-            
-            // グラフを描画
             renderPlayerChart(myLogs);
 
             if (myLogs.length === 0) {
@@ -409,6 +405,10 @@
                 const thoughtsHtml = log.thoughts ? `<div class="history-text-item"><span class="history-label">感想:</span><div class="history-text-content">${log.thoughts}</div></div>` : '';
                 const goodHtml = log.good ? `<div class="history-text-item"><span class="history-label" style="color:#059669;">👍 できたこと:</span><div class="history-text-content" style="border-color:#a7f3d0;">${log.good}</div></div>` : '';
                 const badHtml = log.bad ? `<div class="history-text-item"><span class="history-label" style="color:#dc2626;">🔥 課題:</span><div class="history-text-content" style="border-color:#fca5a5;">${log.bad}</div></div>` : '';
+                
+                // 🆕 履歴にケアの内容と当時提示されたAIアドバイスを追加
+                const careHtml = log.care ? `<div class="history-text-item"><span class="history-label" style="color:#1d4ed8;">🛁 実施したケア:</span><div class="history-text-content" style="border-color:#bfdbfe; background-color:#eff6ff;">${log.care}</div></div>` : '';
+                const aiAdviceHtml = log.aiAdvice && log.aiAdvice !== '未計測' ? `<div class="history-text-item"><span class="history-label">提示されたリカバリーアドバイス:</span><div class="history-text-content" style="font-size:12px; background-color:#f8fafc; color:#475569; line-height:1.4;">${log.aiAdvice}</div></div>` : '';
 
                 const sleepQualityStars = log.sleepQuality ? '★'.repeat(log.sleepQuality) : '-';
                 const weightDisplay = log.weight ? `${log.weight} kg` : '-';
@@ -433,21 +433,20 @@
                     ${thoughtsHtml}
                     ${goodHtml}
                     ${badHtml}
+                    ${careHtml}
+                    ${aiAdviceHtml}
                 </div>
                 `;
             });
             historyList.innerHTML = html;
         }
 
-        // 個人グラフ描画用関数
         function renderPlayerChart(myLogs) {
             if (typeof Chart === 'undefined') return;
             const ctx = document.getElementById('player-chart');
             if (!ctx) return;
             
-            // 直近7日分のデータに絞り込み、古い順に並べ替え（グラフのX軸用）
             const recentLogs = [...myLogs].slice(0, 7).reverse();
-            
             const labels = recentLogs.map(log => {
                 if (!log.date) return '不明';
                 const parts = log.date.split('-');
@@ -466,30 +465,13 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        {
-                            label: 'Training Load',
-                            data: loadData,
-                            borderColor: '#2563eb',
-                            backgroundColor: '#2563eb',
-                            yAxisID: 'y',
-                            tension: 0.2
-                        },
-                        {
-                            label: '疲労度',
-                            data: fatigueData,
-                            borderColor: '#dc2626',
-                            backgroundColor: '#dc2626',
-                            borderDash: [5, 5],
-                            yAxisID: 'y1',
-                            tension: 0.2
-                        }
+                        { label: 'Training Load', data: loadData, borderColor: '#2563eb', backgroundColor: '#2563eb', yAxisID: 'y', tension: 0.2 },
+                        { label: '疲労度', data: fatigueData, borderColor: '#dc2626', backgroundColor: '#dc2626', borderDash: [5, 5], yAxisID: 'y1', tension: 0.2 }
                     ]
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        title: { display: true, text: '最近のコンディション推移 (最大7日間)' }
-                    },
+                    plugins: { title: { display: true, text: '最近のコンディション推移 (最大7日間)' } },
                     scales: {
                         y: { beginAtZero: true, position: 'left' },
                         y1: { beginAtZero: true, min: 0, max: 10, position: 'right', grid: { drawOnChartArea: false } }
@@ -500,7 +482,6 @@
 
         initFirebase();
 
-        // 絵文字を判定
         function getEmojiForFatigue(val) {
             if (val <= 3) return "😃";
             if (val <= 6) return "😐";
@@ -522,6 +503,67 @@
             return "🔥";
         }
 
+        // 🆕 新機能：蓄積された科学的エビデンスに基づく自動アドバイスシステム
+        function updateAIAdvice() {
+            const fatigue = parseInt(document.getElementById('fatigue').value);
+            const sleep = parseFloat(document.getElementById('sleep').value) || 0;
+            
+            const sleepQualityNode = document.querySelector('input[name="sleep-quality"]:checked');
+            const sleepQuality = sleepQualityNode ? parseInt(sleepQualityNode.value) : 5; 
+            
+            const rsiText = document.getElementById('rsi-result').textContent;
+            const fvText = document.getElementById('fv-result').textContent;
+            
+            let advices = [];
+            
+            if (selectedSoreness.includes('ハムストリングス')) {
+                advices.push("💡 <b>【ハムストリングス】</b>スプリンターが最も負傷しやすい部位です。強い張りや痛みがある時は無理な静的ストレッチを避け、マッサージガンで周囲（お尻や外側）をほぐすか、湯船での温熱療法で血流を促しましょう（Sugiura et al., 2017）。");
+            }
+            if (selectedSoreness.includes('腸腰筋')) {
+                advices.push("💡 <b>【腸腰筋】</b>太ももを引き上げる走動作（スイング期）で酷使されています。股関節の前側を優しく伸ばすストレッチを行い、拮抗筋である臀部（お尻）の活性化ドリルを組み合わせると、骨盤のコントロールが安定します。");
+            }
+            if (selectedSoreness.includes('カーフ') || selectedSoreness.includes('アキレス腱')) {
+                advices.push("💡 <b>【カーフ・アキレス腱】</b>接地の衝撃（アンクルキック）を耐える腱組織に負荷が溜まっています。足裏（足底腱膜）をテニスボールや青竹踏みで転がしてリリースすると、ふくらはぎ全体の張りが和らぎます。");
+            }
+            if (selectedSoreness.includes('足裏')) {
+                advices.push("💡 <b>【足裏】</b>スパイクの硬さや接地ストレスによる足底の疲労です。手の親指で優しくマッサージするか、ゴルフボールなどを適度な強さで踏んで足底アーチの柔軟性をキープしましょう。");
+            }
+            if (selectedSoreness.includes('臀部')) {
+                advices.push("💡 <b>【臀部】</b>スプリントの推進力を生む大臀筋の疲労です。テニスボールをお尻の下に敷いて自重でほぐすリリースや、仰向けでの大臀筋ストレッチが非常に効果的です。");
+            }
+            if (selectedSoreness.includes('大腿四頭筋')) {
+                advices.push("💡 <b>【大腿四頭筋】</b>ブレーキ動作や前ももへの乗り込み負荷です。フォームローラー等で太もも前をほぐし、骨盤が前傾しすぎて腰に負担がこないように骨盤周りのリセットを行いましょう。");
+            }
+            if (selectedSoreness.includes('背中') || selectedSoreness.includes('肩')) {
+                advices.push("💡 <b>【肩・背中】</b>力みや体幹のキープによる上半身の緊張です。フォームローラーでの胸椎の伸展運動や、お風呂上がりのストレッチングで肩甲骨周りの緊張を抜きましょう。");
+            }
+            if (fatigue >= 8) {
+                advices.push("⚠️ <b>【全身疲労が危険水域】</b>非常に強い疲労が検出されています。Foster(2020)らの研究の通り、この状態での高強度練習の強行は怪我や免疫低下を招きます。炭水化物とタンパク質を速やかに補給し、ぬるま湯（39℃前後）への入浴で副交感神経を優位にしてください。");
+            }
+            if ((sleep > 0 && sleep < 6.5) || sleepQuality <= 2) {
+                advices.push("💤 <b>【睡眠・リカバリー優先】</b>回復の大部分は睡眠中に起こります（Halson, 2014）。時間が確保できない場合は、日中に15〜20分の仮眠（パワーナップ）を取り、神経系の疲労を補いましょう。");
+            }
+            if (rsiText !== '-' && parseFloat(rsiText) < 1.8) {
+                advices.push("⚡ <b>【神経筋疲労（バネの低下）】</b>RSIが低下しています。腱の応答性が落ちているため、ハードなプライオメトリクス（ジャンプ系）や全力スプリントの本数は抑え、接地位置を確認する技術ドリルに主眼を置くことを推奨します。");
+            }
+            if (fvText.includes('力不足')) {
+                advices.push("🏃‍♂️ <b>【F-v特性: 力不足型】</b>加速局面での押し込み（地面への力の伝達）が弱点です。リカバリー期には、臀部やハムストリングスの出力を高める補強（ヒップスラスト等）を意識しましょう（Morin et al.）。");
+            } else if (fvText.includes('速度不足')) {
+                advices.push("🏃‍♂️ <b>【F-v特性: 速度不足型】</b>トップスピード局面での足の切り替えや乗り込みが課題です。プライオメトリクスや、クイックネスを高める意識のドリルが有効です。");
+            }
+            
+            const container = document.getElementById('ai-advice-box');
+            const textEl = document.getElementById('ai-advice-text');
+            
+            if (advices.length === 0) {
+                textEl.innerHTML = "✨ 現在の入力内容に基づいた特別な警告はありません。良好なコンディションです！この調子で質の高いトレーニングを継続しましょう。";
+                container.style.borderLeft = "4px solid #10b981"; 
+            } else {
+                textEl.innerHTML = advices.join("<br><br>");
+                container.style.borderLeft = "4px solid #3b82f6"; 
+            }
+        }
+
         let selectedSoreness = [];
         document.querySelectorAll('.tag-btn').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -533,6 +575,14 @@
                     selectedSoreness.push(part);
                     this.classList.add('selected');
                 }
+                updateAIAdvice(); // 🆕 タグ選択変更時にAIアドバイスを更新
+            });
+        });
+
+        // 🆕 睡眠の質の変更時にAIアドバイスを更新
+        document.querySelectorAll('input[name="sleep-quality"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateAIAdvice();
             });
         });
 
@@ -556,15 +606,18 @@
             const stressDisplay = document.getElementById('stress-display');
             const rpeSlider = document.getElementById('rpe');
             const rpeDisplay = document.getElementById('rpe-display');
+            const sleepInput = document.getElementById('sleep');
 
             fatigueSlider.addEventListener('input', function() {
                 const val = parseInt(this.value);
                 fatigueDisplay.textContent = `${getEmojiForFatigue(val)} ${val}`;
+                updateAIAdvice(); // 更新
             });
 
             stressSlider.addEventListener('input', function() {
                 const val = parseInt(this.value);
                 stressDisplay.textContent = `${getEmojiForStress(val)} ${val}`;
+                updateAIAdvice(); // 更新
             });
 
             rpeSlider.addEventListener('input', function() {
@@ -572,17 +625,21 @@
                 rpeDisplay.textContent = `${getEmojiForRPE(val)} ${val.toFixed(1)}`;
                 calculateLoad();
             });
+            
+            sleepInput.addEventListener('input', updateAIAdvice);
 
             function calculateLoad() {
                 const d = parseFloat(durationInput.value) || 0;
                 const r = parseFloat(rpeSlider.value) || 0;
                 loadResult.textContent = (d > 0 && r > 0) ? (d * r).toFixed(1) : '-';
+                updateAIAdvice();
             }
 
             function calculateRsi() {
                 const h = parseFloat(jumpHeightInput.value) || 0;
                 const c = parseFloat(contactTimeInput.value) || 0;
                 rsiResult.textContent = (h > 0 && c > 0) ? (h / c).toFixed(2) : '-';
+                updateAIAdvice();
             }
 
             function calculateFv() {
@@ -601,6 +658,7 @@
                     fvRatioSub.textContent = '';
                     fvResult.style.color = "#1d4ed8";
                 }
+                updateAIAdvice();
             }
 
             durationInput.addEventListener('input', calculateLoad);
@@ -616,11 +674,9 @@
                 btn.textContent = '送信中...';
                 btn.disabled = true;
                 
-                // 星評価の値を取得
                 const sleepQualityNode = document.querySelector('input[name="sleep-quality"]:checked');
                 const sleepQuality = sleepQualityNode ? sleepQualityNode.value : '';
                 
-                // 未計測のハンドリング
                 const rsiValue = rsiResult.textContent === '-' ? '未計測' : rsiResult.textContent;
                 const fvValue = fvResult.textContent === '-' ? '未計測' : fvResult.textContent;
 
@@ -643,12 +699,14 @@
                     contactTime: document.getElementById('contact-time').value,
                     rsi: rsiValue,
                     fvResult: fvValue,
-                    time30m: document.getElementById('time-30m').value,      // 🔥管理者画面向けの実数値追加
-                    timeFly20m: document.getElementById('time-fly20m').value, // 🔥管理者画面向けの実数値追加
+                    time30m: document.getElementById('time-30m').value,      
+                    timeFly20m: document.getElementById('time-fly20m').value, 
                     menu: document.getElementById('menu').value,
                     thoughts: document.getElementById('thoughts').value,
                     good: document.getElementById('good').value,
                     bad: document.getElementById('bad').value,
+                    care: document.getElementById('care').value, // 🆕 追加：ケアの自由記述内容
+                    aiAdvice: document.getElementById('ai-advice-text').innerHTML, // 🆕 追加：提示されたAIアドバイスの文言
                     createdAt: new Date().toISOString()
                 };
 
@@ -659,7 +717,6 @@
                         let savedLogs = JSON.parse(localStorage.getItem('team_condition_logs') || '[]');
                         savedLogs.push(logData);
                         localStorage.setItem('team_condition_logs', JSON.stringify(savedLogs));
-                        // ローカルモード時は手動でデータ再読み込み
                         loadLocalData(); 
                     }
                     alert('データを保存しました。');
@@ -677,10 +734,9 @@
                     stressDisplay.textContent = `😌 1`; 
                     rpeDisplay.textContent = `😐 5.0`;
                     
-                    // 星評価のクリア
                     if(sleepQualityNode) sleepQualityNode.checked = false;
                     
-                    calculateLoad(); calculateRsi(); calculateFv();
+                    calculateLoad(); calculateRsi(); calculateFv(); updateAIAdvice();
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 } catch (error) {
                     alert("保存に失敗しました。");
