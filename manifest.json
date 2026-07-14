@@ -1,0 +1,17 @@
+{
+  "short_name": "AthleSense",
+  "name": "AthleSense - KIUH edition",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3011/3011244.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "index.html",
+  "background_color": "#f4f7f6",
+  "theme_color": "#3b82f6",
+  "display": "standalone",
+  "orientation": "portrait"
+}
