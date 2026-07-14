@@ -3,7 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AthleSense KIUH - Monitor</title>
+    <title>AthleSense-KIUH edition - 管理者画面</title>
+
+    <!-- PWA基本設定 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e3a8a">
+
+    <!-- iOS（iPhone/iPad）Safari向けの専用PWA設定 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AthleSense Admin">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <!-- サービスワーカーの登録 -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('PWAの登録が成功しました！スコープ: ', registration.scope);
+                    })
+                    .catch(function(err) {
+                        console.log('PWAの登録に失敗しました: ', err);
+                    });
+            });
+        }
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6; color: #333; margin: 0; padding: 0; line-height: 1.6; }
@@ -102,8 +128,8 @@
 <body>
 
     <header>
-    AthleSense KIUH <span id="connection-status" class="status-badge status-local">ローカル</span>
-</header>
+        AthleSense-KIUH - ダッシュボード <span id="connection-status" class="status-badge status-local">ローカル</span>
+    </header>
 
     <div class="container">
         
@@ -331,6 +357,7 @@
                          <th>歩数</th>
                          <th>睡眠(時間/質)</th>
                          <th>ケガ・違和感</th>
+                         <th>ケア・処置</th>
                      </tr>
                  </thead>
                  <tbody><!-- JavaScriptで挿入 --></tbody>
@@ -346,14 +373,8 @@
     <script>
         // ⭐️【最重要】ここにFirebaseの設定を貼り付けてください⭐️
         const myFirebaseConfig = {
-  apiKey: "AIzaSyAQoESOlZIGJfOgfIwpkL0r0YcYu4tl8ZQ",
-  authDomain: "team-conditioning-controling.firebaseapp.com",
-  projectId: "team-conditioning-controling",
-  storageBucket: "team-conditioning-controling.firebasestorage.app",
-  messagingSenderId: "330203393971",
-  appId: "1:330203393971:web:f47b8e66137d0fce8b65c6",
-  measurementId: "G-SCMMTXKZ37"
-};
+          apiKey: "API_KEY", 
+        };
 
         window.globalLogs = []; 
         window.filteredLogs = []; 
@@ -810,7 +831,7 @@
             const tableBody = document.querySelector('#admin-table tbody');
             tableBody.innerHTML = '';
             if (!logsToRender || logsToRender.length === 0) {
-                 tableBody.innerHTML = '<tr><td colspan="13" style="text-align:center;">記録が見つかりません。</td></tr>';
+                 tableBody.innerHTML = '<tr><td colspan="14" style="text-align:center;">記録が見つかりません。</td></tr>';
                  return;
             }
             
@@ -846,6 +867,7 @@
                     <td>${log.steps || '-'}</td>
                     <td>${sleepText}</td>
                     <td style="color:#dc2626;">${log.injury || ''}</td>
+                    <td style="color:#1d4ed8;">${log.care || ''}</td>
                 `;
                 tableBody.appendChild(tr);
             });
@@ -859,16 +881,18 @@
             }
 
             let csvContent = '\uFEFF'; 
-            const headers = ['日付', '選手名', '疲労度', 'ストレス', 'TrainingLoad', 'RSI', 'F-v診断', '筋肉痛', '体重(kg)', '心拍数', '歩数', '睡眠時間', '睡眠の質', 'ケガ', 'メニュー', '感想', 'できたこと', '課題'];
+            const headers = ['日付', '選手名', '疲労度', 'ストレス', 'TrainingLoad', 'RSI', 'F-v診断', '筋肉痛', '体重(kg)', '心拍数', '歩数', '睡眠時間', '睡眠の質', 'ケガ', 'メニュー', '感想', 'できたこと', '課題', '実施したケア', 'AIアドバイス'];
             csvContent += headers.join(',') + '\n';
 
             const exportLogs = [...logs].reverse();
             exportLogs.forEach(log => {
                 const row = [
                     log.date, log.playerName, log.fatigue, log.stress, log.trainingLoad, log.rsi, log.fvResult,
-                    log.soreness, log.weight, log.heartRate, log.steps, log.sleep, log.sleepQuality, log.injury, log.menu, log.thoughts, log.good, log.bad
+                    log.soreness, log.weight, log.heartRate, log.steps, log.sleep, log.sleepQuality, log.injury, log.menu, log.thoughts, log.good, log.bad, log.care, log.aiAdvice
                 ].map(item => {
-                    const text = String(item || '').replace(/"/g, '""').replace(/\n/g, ' ');
+                    let text = String(item || '').replace(/"/g, '""').replace(/\n/g, ' ');
+                    // AIアドバイス等に含まれるHTMLタグ（<b>など）を削除してプレーンテキスト化
+                    text = text.replace(/<[^>]*>?/gm, '');
                     return `"${text}"`;
                 });
                 csvContent += row.join(',') + '\n';
