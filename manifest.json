@@ -3,15 +3,20 @@
   "name": "AthleSense - KIUH edition",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3011/3011244.png",
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
     }
   ],
-  "start_url": "index.html",
-  "background_color": "#f4f7f6",
-  "theme_color": "#3b82f6",
+  "start_url": "./index.html",
+  "background_color": "#f3f4f6",
+  "theme_color": "#1e3a8a",
   "display": "standalone",
   "orientation": "portrait"
 }
