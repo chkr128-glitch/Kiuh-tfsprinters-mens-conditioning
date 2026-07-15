@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AthleSense KIUH - Monitor</title>
+    <title>AthleSense-KIUH edition - 管理者画面</title>
 
     <!-- PWA基本設定 -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest-admin.json">
     <meta name="theme-color" content="#1e3a8a">
 
     <!-- iOS（iPhone/iPad）Safari向けの専用PWA設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AthleSense Admin">
-    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="apple-touch-icon" href="icon-admin.png">
 
     <!-- サービスワーカーの登録 -->
     <script>
@@ -373,14 +373,8 @@
     <script>
         // ⭐️【最重要】ここにFirebaseの設定を貼り付けてください⭐️
         const myFirebaseConfig = {
-  apiKey: "AIzaSyAQoESOlZIGJfOgfIwpkL0r0YcYu4tl8ZQ",
-  authDomain: "team-conditioning-controling.firebaseapp.com",
-  projectId: "team-conditioning-controling",
-  storageBucket: "team-conditioning-controling.firebasestorage.app",
-  messagingSenderId: "330203393971",
-  appId: "1:330203393971:web:f47b8e66137d0fce8b65c6",
-  measurementId: "G-SCMMTXKZ37"
-};
+          apiKey: "API_KEY", 
+        };
 
         window.globalLogs = []; 
         window.filteredLogs = []; 
