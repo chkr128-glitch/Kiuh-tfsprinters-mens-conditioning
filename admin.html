@@ -3,29 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AthleSense KIUH - Monitor</title>
+    <title>AthleSense-KIUH edition - 管理者画面</title>
 
-    <!-- PWA基本設定 -->
     <link rel="manifest" href="manifest-admin.json">
     <meta name="theme-color" content="#1e3a8a">
-
-    <!-- iOS（iPhone/iPad）Safari向けの専用PWA設定 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AthleSense Admin">
     <link rel="apple-touch-icon" href="icon-admin.png">
 
-    <!-- サービスワーカーの登録 -->
     <script>
-        if ('serviceWorker' in navigator) {
+        // ローカルファイル（file://）で開いた時はエラーを出さずにスキップするように修正
+        if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.protocol === 'http:')) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('PWAの登録が成功しました！スコープ: ', registration.scope);
-                    })
-                    .catch(function(err) {
-                        console.log('PWAの登録に失敗しました: ', err);
-                    });
+                navigator.serviceWorker.register('sw.js').catch(function(error) {
+                    console.log('Service Worker registration failed:', error);
+                });
             });
         }
     </script>
@@ -40,7 +33,6 @@
         
         select, input[type="text"] { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; margin-bottom: 10px; box-sizing: border-box; }
         
-        /* サマリーカード */
         .dashboard-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .summary-card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid #d1d5db; }
         .summary-title { font-size: 12px; font-weight: bold; color: #6b7280; margin-bottom: 5px; }
@@ -54,23 +46,20 @@
         .missing-list { font-size: 12px; color: #6b7280; margin-top: 5px; min-height: 18px; }
         .danger-list { font-size: 12px; color: #991b1b; margin-top: 5px; font-weight: bold; }
 
-        /* チーム全体分析用グリッド */
         .team-analytics-container { display: flex; flex-direction: column; gap: 30px; margin-bottom: 10px; }
         
-        /* ヒートマップ用スタイル */
         .heatmap-container { display: flex; justify-content: center; gap: 40px; align-items: center; padding: 20px 10px; background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
         .human-body { width: 110px; flex-shrink: 0; }
         .human-body svg { width: 100%; height: auto; display: block; }
         .heat-spot { transition: opacity 0.4s ease; mix-blend-mode: multiply; }
         
-        /* ランキング表用スタイル */
-        .ranking-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .ranking-table th, .ranking-table td { padding: 10px; border-bottom: 1px solid #e2e8f0; }
-        .ranking-table th { background-color: #f1f5f9; color: #475569; text-align: left; }
+        /* 🔥 修正箇所：ランキング表の横幅をガチガチに固定 */
+        .ranking-table { width: 240px; margin: 10px auto; border-collapse: collapse; font-size: 12px; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); table-layout: fixed; }
+        .ranking-table th, .ranking-table td { padding: 6px 4px; border-bottom: 1px solid #e2e8f0; text-align: center; word-wrap: break-word; overflow-wrap: break-word; }
+        .ranking-table th { background-color: #f1f5f9; color: #475569; }
         .ranking-table tr:last-child td { border-bottom: none; }
         .ranking-title { font-size: 14px; font-weight: bold; color: #334155; margin-top: 15px; margin-bottom: 10px; text-align: center; }
 
-        /* F-v グループ分けテーブルスタイル */
         .fv-groups-container { display: flex; flex-direction: column; gap: 15px; }
         .fv-group-row { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; }
         .fv-group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid #cbd5e1; }
@@ -88,7 +77,6 @@
         .fv-player-tag { background-color: white; border: 1px solid #e2e8f0; border-radius: 20px; padding: 6px 12px; font-size: 13px; font-weight: bold; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 6px; }
         .fv-player-ratio { font-size: 11px; color: #64748b; font-weight: normal; background: #f1f5f9; padding: 2px 6px; border-radius: 10px; }
 
-        /* 分析パネル */
         .analysis-container { display: flex; flex-wrap: wrap; gap: 20px; }
         .chart-area { flex: 2; min-width: 300px; }
         .stats-area { flex: 1; min-width: 200px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }
@@ -98,10 +86,11 @@
         .stat-box-desc { font-size: 11px; color: #64748b; }
 
         .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 1200px; font-size: 13px; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-        th { background-color: #f3f4f6; color: #4b5563; font-weight: bold; }
-        tr:hover { background-color: #f9fafb; }
+        /* 🔥 修正：すべての table ではなく #admin-table だけに巨大な幅を適用するように限定 */
+        #admin-table { width: 100%; border-collapse: collapse; min-width: 1200px; font-size: 13px; }
+        #admin-table th, #admin-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        #admin-table th { background-color: #f3f4f6; color: #4b5563; font-weight: bold; }
+        #admin-table tr:hover { background-color: #f9fafb; }
         .alert-text { color: #dc2626; font-weight: bold; }
         .tag-text { background-color: #fef08a; color: #b45309; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 4px; display: inline-block; margin-bottom: 2px;}
         
@@ -138,7 +127,6 @@
             <button class="btn btn-danger" onclick="clearAllData()">全データをリセット</button>
         </div>
 
-        <!-- 選手名簿の管理 -->
         <div class="card">
             <h3 class="section-title">📋 選手名簿の管理</h3>
             <p style="font-size: 12px; color: #6b7280; margin-top: 0;">ここで登録した選手が「未入力者」のチェック対象になり、選手の入力画面にも選択肢として表示されます。</p>
@@ -149,7 +137,6 @@
             <div id="registered-players-list" class="roster-container"></div>
         </div>
         
-        <!-- サマリー -->
         <div class="dashboard-summary">
             <div class="summary-card info-card">
                  <div class="summary-title">本日 未入力の選手</div>
@@ -173,89 +160,82 @@
             </div>
         </div>
 
-        <!-- 🔥 新機能：チーム全体の傾向分析 -->
         <div class="card">
             <h3 class="section-title">🔥 チーム全体の傾向分析 (現在表示中のデータ)</h3>
             
             <div class="team-analytics-container">
-                
-                <!-- 12区分の部位別ヒートマップとランキング表 -->
                 <div style="margin-bottom: 20px;">
                     <h4 style="margin-top:0; color:#4b5563; font-size:15px; text-align:center;">筋肉痛・張りの部位別ヒートマップ</h4>
-                    <!-- ⚠️ 変更：集計期間の注釈を追加 -->
                     <p style="font-size:11px; color:#64748b; text-align:center; margin-bottom: 10px;">※記録がある最新日から、<span style="color:#ef4444; font-weight:bold;">その日を含めて過去3日間</span>のデータで集計しています。<br>色が濃いほど痛みを訴える人数が多い部位です。</p>
                     <div class="heatmap-container">
-                        <!-- 人体モデル（前） -->
                         <div class="human-body">
                             <svg viewBox="0 0 100 225" width="100%" height="100%">
                                 <text x="50" y="12" font-size="10" font-weight="bold" text-anchor="middle" fill="#6b7280">【 前 】</text>
-                                <!-- Body Base -->
-                                <circle cx="50" cy="30" r="12" fill="#e5e7eb" /> <!-- Head -->
-                                <rect x="32" y="45" width="36" height="65" rx="8" fill="#e5e7eb" /> <!-- Torso -->
-                                <rect x="14" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> <!-- L Arm -->
-                                <rect x="72" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> <!-- R Arm -->
-                                <rect x="34" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> <!-- L Leg -->
-                                <rect x="52" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> <!-- R Leg -->
-                                <ellipse cx="41" cy="210" rx="8" ry="5" fill="#e5e7eb" /> <!-- L Foot -->
-                                <ellipse cx="59" cy="210" rx="8" ry="5" fill="#e5e7eb" /> <!-- R Foot -->
+                                <circle cx="50" cy="30" r="12" fill="#e5e7eb" /> 
+                                <rect x="32" y="45" width="36" height="65" rx="8" fill="#e5e7eb" /> 
+                                <rect x="14" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
+                                <rect x="72" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
+                                <rect x="34" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
+                                <rect x="52" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
+                                <ellipse cx="41" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
+                                <ellipse cx="59" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
                                 
-                                <!-- Heat Spots -->
-                                <circle id="heat-head-f" class="heat-spot" cx="50" cy="30" r="12" fill="#ef4444" opacity="0" /> <!-- 頭部 -->
-                                <circle id="heat-chest" class="heat-spot" cx="50" cy="65" r="14" fill="#ef4444" opacity="0" /> <!-- 胸部 -->
-                                <circle id="heat-abs" class="heat-spot" cx="50" cy="95" r="12" fill="#ef4444" opacity="0" /> <!-- 腹筋 -->
-                                <circle id="heat-hip-l" class="heat-spot" cx="38" cy="115" r="9" fill="#ef4444" opacity="0" /> <!-- 腸腰筋(左) -->
-                                <circle id="heat-hip-r" class="heat-spot" cx="62" cy="115" r="9" fill="#ef4444" opacity="0" /> <!-- 腸腰筋(右) -->
-                                <ellipse id="heat-quads-l" class="heat-spot" cx="41" cy="150" rx="10" ry="16" fill="#ef4444" opacity="0" /> <!-- 四頭筋(左) -->
-                                <ellipse id="heat-quads-r" class="heat-spot" cx="59" cy="150" rx="10" ry="16" fill="#ef4444" opacity="0" /> <!-- 四頭筋(右) -->
+                                <circle id="heat-head-f" class="heat-spot" cx="50" cy="30" r="12" fill="#ef4444" opacity="0" /> 
+                                <circle id="heat-chest" class="heat-spot" cx="50" cy="65" r="14" fill="#ef4444" opacity="0" /> 
+                                <circle id="heat-abs" class="heat-spot" cx="50" cy="95" r="12" fill="#ef4444" opacity="0" /> 
+                                <circle id="heat-hip-l" class="heat-spot" cx="38" cy="115" r="9" fill="#ef4444" opacity="0" /> 
+                                <circle id="heat-hip-r" class="heat-spot" cx="62" cy="115" r="9" fill="#ef4444" opacity="0" /> 
+                                <ellipse id="heat-quads-l" class="heat-spot" cx="41" cy="150" rx="10" ry="16" fill="#ef4444" opacity="0" /> 
+                                <ellipse id="heat-quads-r" class="heat-spot" cx="59" cy="150" rx="10" ry="16" fill="#ef4444" opacity="0" /> 
                             </svg>
                         </div>
                         
-                        <!-- 人体モデル（後） -->
                         <div class="human-body">
                             <svg viewBox="0 0 100 225" width="100%" height="100%">
                                 <text x="50" y="12" font-size="10" font-weight="bold" text-anchor="middle" fill="#6b7280">【 後 】</text>
-                                <!-- Body Base -->
-                                <circle cx="50" cy="30" r="12" fill="#e5e7eb" /> <!-- Head -->
-                                <rect x="32" y="45" width="36" height="65" rx="8" fill="#e5e7eb" /> <!-- Torso -->
-                                <rect x="14" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> <!-- L Arm -->
-                                <rect x="72" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> <!-- R Arm -->
-                                <rect x="34" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> <!-- L Leg -->
-                                <rect x="52" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> <!-- R Leg -->
-                                <ellipse cx="41" cy="210" rx="8" ry="5" fill="#e5e7eb" /> <!-- L Foot -->
-                                <ellipse cx="59" cy="210" rx="8" ry="5" fill="#e5e7eb" /> <!-- R Foot -->
+                                <circle cx="50" cy="30" r="12" fill="#e5e7eb" /> 
+                                <rect x="32" y="45" width="36" height="65" rx="8" fill="#e5e7eb" /> 
+                                <rect x="14" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
+                                <rect x="72" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
+                                <rect x="34" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
+                                <rect x="52" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
+                                <ellipse cx="41" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
+                                <ellipse cx="59" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
                                 
-                                <!-- Heat Spots -->
-                                <circle id="heat-head-b" class="heat-spot" cx="50" cy="30" r="12" fill="#ef4444" opacity="0" /> <!-- 頭部 -->
-                                <circle id="heat-shoulder-l" class="heat-spot" cx="32" cy="55" r="10" fill="#ef4444" opacity="0" /> <!-- 肩(左) -->
-                                <circle id="heat-shoulder-r" class="heat-spot" cx="68" cy="55" r="10" fill="#ef4444" opacity="0" /> <!-- 肩(右) -->
-                                <ellipse id="heat-back" class="heat-spot" cx="50" cy="85" rx="16" ry="20" fill="#ef4444" opacity="0" /> <!-- 背中 -->
-                                <circle id="heat-glutes-l" class="heat-spot" cx="39" cy="120" r="10" fill="#ef4444" opacity="0" /> <!-- 臀部(左) -->
-                                <circle id="heat-glutes-r" class="heat-spot" cx="61" cy="120" r="10" fill="#ef4444" opacity="0" /> <!-- 臀部(右) -->
-                                <ellipse id="heat-hams-l" class="heat-spot" cx="41" cy="150" rx="9" ry="15" fill="#ef4444" opacity="0" /> <!-- ハム(左) -->
-                                <ellipse id="heat-hams-r" class="heat-spot" cx="59" cy="150" rx="9" ry="15" fill="#ef4444" opacity="0" /> <!-- ハム(右) -->
-                                <ellipse id="heat-calves-l" class="heat-spot" cx="41" cy="180" rx="8" ry="12" fill="#ef4444" opacity="0" /> <!-- カーフ(左) -->
-                                <ellipse id="heat-calves-r" class="heat-spot" cx="59" cy="180" rx="8" ry="12" fill="#ef4444" opacity="0" /> <!-- カーフ(右) -->
-                                <circle id="heat-achilles-l" class="heat-spot" cx="41" cy="200" r="5" fill="#ef4444" opacity="0" /> <!-- アキレス腱(左) -->
-                                <circle id="heat-achilles-r" class="heat-spot" cx="59" cy="200" r="5" fill="#ef4444" opacity="0" /> <!-- アキレス腱(右) -->
-                                <ellipse id="heat-sole-l" class="heat-spot" cx="41" cy="210" rx="6" ry="4" fill="#ef4444" opacity="0" /> <!-- 足裏(左) -->
-                                <ellipse id="heat-sole-r" class="heat-spot" cx="59" cy="210" rx="6" ry="4" fill="#ef4444" opacity="0" /> <!-- 足裏(右) -->
+                                <circle id="heat-head-b" class="heat-spot" cx="50" cy="30" r="12" fill="#ef4444" opacity="0" /> 
+                                <circle id="heat-shoulder-l" class="heat-spot" cx="32" cy="55" r="10" fill="#ef4444" opacity="0" /> 
+                                <circle id="heat-shoulder-r" class="heat-spot" cx="68" cy="55" r="10" fill="#ef4444" opacity="0" /> 
+                                <ellipse id="heat-back" class="heat-spot" cx="50" cy="85" rx="16" ry="20" fill="#ef4444" opacity="0" /> 
+                                <circle id="heat-glutes-l" class="heat-spot" cx="39" cy="120" r="10" fill="#ef4444" opacity="0" /> 
+                                <circle id="heat-glutes-r" class="heat-spot" cx="61" cy="120" r="10" fill="#ef4444" opacity="0" /> 
+                                <ellipse id="heat-hams-l" class="heat-spot" cx="41" cy="150" rx="9" ry="15" fill="#ef4444" opacity="0" /> 
+                                <ellipse id="heat-hams-r" class="heat-spot" cx="59" cy="150" rx="9" ry="15" fill="#ef4444" opacity="0" /> 
+                                <ellipse id="heat-calves-l" class="heat-spot" cx="41" cy="180" rx="8" ry="12" fill="#ef4444" opacity="0" /> 
+                                <ellipse id="heat-calves-r" class="heat-spot" cx="59" cy="180" rx="8" ry="12" fill="#ef4444" opacity="0" /> 
+                                <circle id="heat-achilles-l" class="heat-spot" cx="41" cy="200" r="5" fill="#ef4444" opacity="0" /> 
+                                <circle id="heat-achilles-r" class="heat-spot" cx="59" cy="200" r="5" fill="#ef4444" opacity="0" /> 
+                                <ellipse id="heat-sole-l" class="heat-spot" cx="41" cy="210" rx="6" ry="4" fill="#ef4444" opacity="0" /> 
+                                <ellipse id="heat-sole-r" class="heat-spot" cx="59" cy="210" rx="6" ry="4" fill="#ef4444" opacity="0" /> 
                             </svg>
                         </div>
                     </div>
                     
-                    <!-- ランキング表 -->
                     <div class="ranking-title">📋 部位別 張り・痛みランキング</div>
                     <table class="ranking-table">
+                        <colgroup>
+                            <col style="width: 45px;">
+                            <col style="width: 150px;">
+                            <col style="width: 45px;">
+                        </colgroup>
                         <thead>
                             <tr>
-                                <th style="width: 50px; text-align: center;">順位</th>
+                                <th>順位</th>
                                 <th>筋肉部位</th>
-                                <th style="width: 60px; text-align: center;">人数</th>
+                                <th>人数</th>
                             </tr>
                         </thead>
                         <tbody id="soreness-ranking-body">
-                            <!-- JSで挿入 -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
 
@@ -264,7 +244,6 @@
                     <p style="font-size:11px; color:#64748b; text-align:center; margin-bottom: 10px;">※表示されている期間内の、各選手の「最新の記録」をもとにグループ分けしています。</p>
                     
                     <div class="fv-groups-container">
-                        <!-- 力不足グループ -->
                         <div class="fv-group-row fv-force">
                             <div class="fv-group-header">
                                 <div class="fv-group-title">💪 力不足 (Force Deficit)</div>
@@ -273,7 +252,6 @@
                             <div class="fv-player-list" id="fv-list-force"></div>
                         </div>
                         
-                        <!-- バランス型グループ -->
                         <div class="fv-group-row fv-balanced">
                             <div class="fv-group-header">
                                 <div class="fv-group-title">⚖️ バランス型 (Optimal)</div>
@@ -282,7 +260,6 @@
                             <div class="fv-player-list" id="fv-list-balanced"></div>
                         </div>
 
-                        <!-- 速度不足グループ -->
                         <div class="fv-group-row fv-velocity">
                             <div class="fv-group-header">
                                 <div class="fv-group-title">⚡ 速度不足 (Velocity Deficit)</div>
@@ -295,7 +272,6 @@
             </div>
         </div>
 
-        <!-- グラフと分析 -->
         <div class="card">
             <h3 class="section-title">📈 選手別 詳細分析</h3>
             <select id="chart-player-select" onchange="updateCharts(window.globalLogs)"></select>
@@ -330,7 +306,6 @@
             </div>
         </div>
 
-        <!-- テーブル -->
         <div class="card table-responsive">
             <div class="flex-between" style="margin-bottom: 15px;">
                  <h3 class="section-title" style="margin-bottom: 0; border: none;">📋 全データ一覧履歴</h3>
@@ -360,18 +335,16 @@
                          <th>ケア・処置</th>
                      </tr>
                  </thead>
-                 <tbody><!-- JavaScriptで挿入 --></tbody>
+                 <tbody></tbody>
             </table>
         </div>
     </div>
 
-    <!-- Firebase Classic -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // ⭐️【最重要】ここにFirebaseの設定を貼り付けてください⭐️
         const myFirebaseConfig = {
   apiKey: "AIzaSyAQoESOlZIGJfOgfIwpkL0r0YcYu4tl8ZQ",
   authDomain: "team-conditioning-controling.firebaseapp.com",
@@ -566,30 +539,22 @@
             document.getElementById('summary-monotony-list').textContent = highMonotonyPlayers.join(', ');
         }
 
-        // ==========================================
-        // 🔥 チーム分析の更新 (ヒートマップ & ランキング表 & F-v)
-        // ==========================================
         function updateTeamAnalytics(logs) {
-            // --- 1. 詳細ヒートマップとランキング表の処理 (記録がある最新日から過去3日間のみ抽出) ---
             const sorenessCounts = {
                 "頭部": 0, "肩": 0, "背中": 0, "腹筋": 0, "胸部": 0,
                 "腸腰筋": 0, "臀部": 0, "大腿四頭筋": 0, 
                 "ハムストリングス": 0, "カーフ": 0, "アキレス腱": 0, "足裏": 0,
-                // 旧バージョンや大雑把な入力との互換性用
                 "首": 0, "腰": 0, "胸筋": 0, "臀部(お尻)": 0, "ふくらはぎ": 0
             };
             
-            // ⚠️ 追加：最新日から過去3日間に絞り込む処理
             let recentLogsForHeatmap = [];
             if (logs.length > 0) {
-                // 有効な日付(YYYY-MM-DD)を持つデータから最新日を特定
                 const validDates = logs.map(l => l.date).filter(d => d);
                 if (validDates.length > 0) {
                     const latestDateStr = validDates.reduce((a, b) => a > b ? a : b);
                     const latestDate = new Date(latestDateStr);
-                    latestDate.setHours(0, 0, 0, 0); // 時間を0にリセットして日付のみで比較
+                    latestDate.setHours(0, 0, 0, 0); 
                     
-                    // 最新日を含めて3日間（最新日、1日前、2日前）のボーダーラインを作成
                     const limitDate = new Date(latestDate);
                     limitDate.setDate(limitDate.getDate() - 2); 
                     
@@ -602,7 +567,6 @@
                 }
             }
 
-            // 過去3日間のデータだけで部位を集計
             recentLogsForHeatmap.forEach(log => {
                 if(log.soreness) {
                     const parts = log.soreness.split(',');
@@ -613,7 +577,6 @@
                 }
             });
 
-            // 互換性（過去のデータが入力されている場合の振り分け）
             if(sorenessCounts["首"] > 0) sorenessCounts["頭部"] += sorenessCounts["首"];
             if(sorenessCounts["腰"] > 0) sorenessCounts["背中"] += sorenessCounts["腰"];
             if(sorenessCounts["胸筋"] > 0) sorenessCounts["胸部"] += sorenessCounts["胸筋"];
@@ -636,7 +599,6 @@
                 }
             };
 
-            // 前面モデル
             updateHeatSpot('heat-head-f', sorenessCounts['頭部']);
             updateHeatSpot('heat-chest', sorenessCounts['胸部']);
             updateHeatSpot('heat-abs', sorenessCounts['腹筋']);
@@ -645,7 +607,6 @@
             updateHeatSpot('heat-quads-l', sorenessCounts['大腿四頭筋']);
             updateHeatSpot('heat-quads-r', sorenessCounts['大腿四頭筋']);
             
-            // 背面モデル
             updateHeatSpot('heat-head-b', sorenessCounts['頭部']);
             updateHeatSpot('heat-shoulder-l', sorenessCounts['肩']);
             updateHeatSpot('heat-shoulder-r', sorenessCounts['肩']);
@@ -661,7 +622,6 @@
             updateHeatSpot('heat-sole-l', sorenessCounts['足裏']);
             updateHeatSpot('heat-sole-r', sorenessCounts['足裏']);
 
-            // ランキング表の生成
             const rankingBody = document.getElementById('soreness-ranking-body');
             rankingBody.innerHTML = '';
             
@@ -674,19 +634,17 @@
                 rankingBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8; padding: 15px;">過去3日間に訴えのある部位はありません</td></tr>';
             } else {
                 sortedSoreness.forEach((item, index) => {
-                    let badge = (index === 0 && item[1] >= 3) ? ' <span style="color:#ef4444; font-size:11px; font-weight:bold;">⚠️多発注意</span>' : '';
+                    let badge = (index === 0 && item[1] >= 3) ? '<br><span style="color:#ef4444; font-size:10px; font-weight:bold;">⚠️多発</span>' : '';
                     rankingBody.innerHTML += `
                         <tr>
-                            <td style="text-align:center; font-weight:bold; color:#64748b;">${index + 1}</td>
-                            <td style="font-weight:bold; color:#334155;">${item[0]}${badge}</td>
-                            <td style="text-align:center; font-weight:bold; color:#dc2626;">${item[1]}</td>
+                            <td style="font-weight:bold; color:#64748b;">${index + 1}</td>
+                            <td style="font-weight:bold; color:#334155; font-size:11px;">${item[0]}${badge}</td>
+                            <td style="font-weight:bold; color:#dc2626;">${item[1]}</td>
                         </tr>
                     `;
                 });
             }
 
-            // --- 2. F-v シンプルグループ分け処理 ---
-            // ※F-vプロファイルは「各選手の最新データ」を評価するものなので、期間に絞らず全体(logs)から最新データを上書き取得します。
             const latestFvData = {};
             logs.forEach(log => {
                 if(log.time30m && log.timeFly20m && parseFloat(log.time30m) > 0 && parseFloat(log.timeFly20m) > 0) {
@@ -723,9 +681,6 @@
             if (countV === 0) listVelocity.innerHTML = '<div style="color:#94a3b8; font-size:12px; padding: 5px;">該当なし</div>';
         }
 
-        // ==========================================
-        // 選手別チャートの更新
-        // ==========================================
         function updatePlayerSelect(logs) {
             const select = document.getElementById('chart-player-select');
             const currentVal = select.value; 
@@ -828,7 +783,6 @@
                 return name.includes(searchText) || date.includes(searchText);
             });
 
-            // 絞り込まれたデータでテーブルとチーム分析を更新
             renderAdminTable(window.filteredLogs);
             updateTeamAnalytics(window.filteredLogs);
         }
@@ -897,7 +851,6 @@
                     log.soreness, log.weight, log.heartRate, log.steps, log.sleep, log.sleepQuality, log.injury, log.menu, log.thoughts, log.good, log.bad, log.care, log.aiAdvice
                 ].map(item => {
                     let text = String(item || '').replace(/"/g, '""').replace(/\n/g, ' ');
-                    // AIアドバイス等に含まれるHTMLタグ（<b>など）を削除してプレーンテキスト化
                     text = text.replace(/<[^>]*>?/gm, '');
                     return `"${text}"`;
                 });
