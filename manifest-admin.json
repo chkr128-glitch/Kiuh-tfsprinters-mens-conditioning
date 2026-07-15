@@ -1,0 +1,22 @@
+{
+  "short_name": "Admin",
+  "name": "AthleSense KIUH - Monitor",
+  "icons": [
+    {
+      "src": "icon-admin.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-admin.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "./admin.html",
+  "background_color": "#f3f4f6",
+  "theme_color": "#1e3a8a",
+  "display": "standalone",
+  "orientation": "landscape"
+}
