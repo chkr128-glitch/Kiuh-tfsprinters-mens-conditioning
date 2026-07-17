@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AthleSense KIUH</title>
+    <title>AthleSense-KIUH edition - 選手画面</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e3a8a">
@@ -75,7 +75,6 @@
         .stat-load { background-color: #dbeafe; color: #1e40af; }
         .stat-rsi { background-color: #dcfce7; color: #166534; }
         .stat-sleep { background-color: #fef3c7; color: #92400e; }
-        .stat-sprint { background-color: #f3e8ff; color: #6b21a8; }
         
         .history-text-item { margin-bottom: 8px; font-size: 14px; }
         .history-label { font-size: 12px; font-weight: bold; color: #64748b; display: block; margin-bottom: 2px; }
@@ -88,13 +87,15 @@
         .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label { color: #fbbf24; }
 
         .flex-row-gap { display: flex; gap: 10px; align-items: center; }
-        .flex-row-gap > * { flex: 1; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .btn-success { background-color: #10b981; color: white; display: inline-flex; align-items: center; gap: 5px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
+        .btn-success:hover { background-color: #059669; }
     </style>
 </head>
 <body>
 
     <header>
-        AthleSense KIUH <span id="connection-status" class="status-badge status-local">ローカル</span>
+        AthleSense-KIUH <span id="connection-status" class="status-badge status-local">ローカル</span>
     </header>
 
     <div class="container">
@@ -210,33 +211,16 @@
                  <div class="result-box"><span class="result-label">Training Load</span><span class="result-value" id="load-result">-</span></div>
             </div>
 
+            <!-- 🔥 改修：複数のスプリント記録を追加可能に -->
             <div class="card" style="border: 2px solid #3b82f6;">
-                <h2 class="section-title" style="border-bottom: none; margin-bottom: 5px;">⏱️ 本日のスプリント記録</h2>
-                <p style="font-size: 12px; color: #64748b; margin-top: 0; margin-bottom: 15px;">※本日のメイン練習の距離と、一番良かったタイム（ベスト）を記録します。</p>
+                <div class="flex-between" style="border-bottom: none; margin-bottom: 5px;">
+                    <h2 class="section-title" style="border-bottom: none; margin-bottom: 0;">⏱️ 本日のスプリント記録</h2>
+                    <button type="button" class="btn-success" style="padding: 6px 12px; font-size: 13px;" onclick="addSprintRow()">➕ 別の距離も追加</button>
+                </div>
+                <p style="font-size: 12px; color: #64748b; margin-top: 0; margin-bottom: 15px;">※複数の異なる距離を走った場合は「追加」ボタンで入力枠を増やせます。</p>
                 
-                <div class="flex-row-gap">
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label style="font-size: 13px; font-weight: bold; color: #4b5563;">距離を選択</label>
-                        <select id="sprint-distance" style="background-color: white; border-color: #93c5fd;">
-                            <option value="">未計測</option>
-                            <option value="30">30m</option>
-                            <option value="50">50m</option>
-                            <option value="60">60m</option>
-                            <option value="80">80m</option>
-                            <option value="100">100m</option>
-                            <option value="120">120m</option>
-                            <option value="150">150m</option>
-                            <option value="200">200m</option>
-                            <option value="250">250m</option>
-                            <option value="300">300m</option>
-                            <option value="400">400m</option>
-                            <option value="その他">その他</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label style="font-size: 13px; font-weight: bold; color: #4b5563;">タイム (秒)</label>
-                        <input type="number" id="sprint-time" step="0.01" placeholder="例: 11.50" style="background-color: white; border-color: #93c5fd;">
-                    </div>
+                <div id="sprint-rows-container">
+                    <!-- Javascriptで入力行が追加されます -->
                 </div>
             </div>
 
@@ -276,7 +260,6 @@
             <h2 class="section-title">🕒 過去の入力履歴とデータ</h2>
             <p style="font-size: 12px; color: #64748b; margin-top: 0;">※自分の名前を選択すると、過去の記録やランキングが表示されます。</p>
             
-            <!-- 🆕 新機能：自己ベストとランキング -->
             <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
                 <h3 style="margin-top:0; color:#1e40af; font-size:15px; border-bottom: 1px solid #bfdbfe; padding-bottom: 5px; margin-bottom: 10px;">🏆 スプリント自己ベスト & チームランキング</h3>
                 
@@ -325,6 +308,29 @@
         </div>
     </div>
 
+    <!-- スプリント入力行のテンプレート -->
+    <template id="sprint-row-template">
+        <div class="sprint-row flex-row-gap" style="margin-bottom: 10px; align-items: center; border-bottom: 1px dashed #bfdbfe; padding-bottom: 10px;">
+            <select class="sprint-dist-input" style="flex: 2; padding: 10px; border-color: #93c5fd;">
+                <option value="">距離を選択</option>
+                <option value="30">30m</option>
+                <option value="50">50m</option>
+                <option value="60">60m</option>
+                <option value="80">80m</option>
+                <option value="100">100m</option>
+                <option value="120">120m</option>
+                <option value="150">150m</option>
+                <option value="200">200m</option>
+                <option value="250">250m</option>
+                <option value="300">300m</option>
+                <option value="400">400m</option>
+                <option value="その他">その他</option>
+            </select>
+            <input type="number" class="sprint-time-input" step="0.01" placeholder="タイム (秒)" style="flex: 2; padding: 10px; border-color: #93c5fd;">
+            <button type="button" onclick="this.parentElement.remove()" style="flex: 0; background: none; border: none; color: #ef4444; font-size: 24px; cursor: pointer; padding: 0 5px;">×</button>
+        </div>
+    </template>
+
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -346,6 +352,14 @@
         
         let allTeamLogs = []; 
         let playerChartInstance = null; 
+
+        // 複数スプリント行を追加する機能
+        function addSprintRow() {
+            const container = document.getElementById('sprint-rows-container');
+            const template = document.getElementById('sprint-row-template');
+            const clone = template.content.cloneNode(true);
+            container.appendChild(clone);
+        }
 
         async function initFirebase() {
             const statusBadge = document.getElementById('connection-status');
@@ -438,24 +452,31 @@
             renderPlayerHistory(this.value);
         });
 
-        // 🆕 スプリント自己ベスト＆ランキングの計算と表示
         function updateMySprintStats() {
             const playerName = document.getElementById('player-name').value;
             const distance = document.getElementById('my-sprint-distance').value;
             
             if (!playerName) return;
 
-            // 全ログから該当距離のベストタイムを抽出
             const bestTimes = {};
             allTeamLogs.forEach(log => {
-                if (log.sprintDistance === distance && log.sprintTime) {
-                    const time = parseFloat(log.sprintTime);
-                    if (!isNaN(time) && time > 0) {
-                        if (!bestTimes[log.playerName] || time < bestTimes[log.playerName]) {
-                            bestTimes[log.playerName] = time;
+                // 複数のスプリント記録から該当距離のベストタイムを抽出
+                let sLogs = log.sprintLogs || [];
+                // 過去の互換性用
+                if (log.sprintDistance && log.sprintDistance !== '未計測' && log.sprintTime) {
+                    sLogs.push({ distance: log.sprintDistance, time: log.sprintTime });
+                }
+                
+                sLogs.forEach(s => {
+                    if (s.distance === distance && s.time) {
+                        const time = parseFloat(s.time);
+                        if (!isNaN(time) && time > 0) {
+                            if (!bestTimes[log.playerName] || time < bestTimes[log.playerName]) {
+                                bestTimes[log.playerName] = time;
+                            }
                         }
                     }
-                }
+                });
             });
 
             const myBest = bestTimes[playerName];
@@ -466,7 +487,6 @@
             if (myBest) {
                 myBestEl.textContent = myBest.toFixed(2) + ' 秒';
                 
-                // タイムで昇順ソートしてランキング計算
                 const sortedPlayers = Object.entries(bestTimes).sort((a, b) => a[1] - b[1]);
                 let displayRank = 1;
                 let currentRank = 1;
@@ -513,8 +533,6 @@
             }
             
             historySection.style.display = 'block';
-            
-            // 🆕 履歴表示時にランキングも自動更新
             updateMySprintStats();
             
             const myLogs = allTeamLogs.filter(log => log.playerName === playerName);
@@ -540,7 +558,21 @@
                 const sleepQualityStars = log.sleepQuality ? '★'.repeat(log.sleepQuality) : '-';
                 const weightDisplay = log.weight ? `${log.weight} kg` : '-';
                 
-                const sprintDisplay = (log.sprintDistance && log.sprintTime && log.sprintDistance !== '未計測') ? `${log.sprintDistance}m : ${log.sprintTime}秒` : '-';
+                // 複数のスプリント記録をバッジで並べる
+                let sprintDisplayHtml = '';
+                let sLogs = log.sprintLogs || [];
+                // 互換性
+                if (log.sprintDistance && log.sprintDistance !== '未計測' && log.sprintTime) {
+                    sLogs.push({ distance: log.sprintDistance, time: log.sprintTime });
+                }
+                
+                if (sLogs.length > 0) {
+                    sLogs.forEach(s => {
+                        sprintDisplayHtml += `<span style="background-color: #f3e8ff; color: #6b21a8; font-size: 12px; padding: 4px 8px; border-radius: 6px; font-weight: bold; display: inline-block; margin-bottom: 4px;">🏃‍♂️ ${s.distance}m : ${s.time}s</span> `;
+                    });
+                } else {
+                    sprintDisplayHtml = '<span class="stat-badge" style="background-color: #f3e8ff; color: #6b21a8;">🏃‍♂️ -</span>';
+                }
 
                 html += `
                 <div class="history-card">
@@ -553,10 +585,10 @@
                         <span class="stat-badge stat-fatigue" style="background:#fde047; color:#854d0e;">ｽﾄﾚｽ: ${log.stress || '-'}</span>
                         <span class="stat-badge stat-load">Load: ${log.trainingLoad !== '-' ? log.trainingLoad : '-'}</span>
                         <span class="stat-badge stat-rsi">RSI: ${log.rsi !== '-' ? log.rsi : '-'}</span>
-                        <span class="stat-badge stat-sprint">🏃‍♂️ ${sprintDisplay}</span>
                         <span class="stat-badge stat-sleep">睡眠: ${log.sleep ? log.sleep + 'h' : '-'} (質: <span style="color:#d97706;">${sleepQualityStars}</span>)</span>
                         <span class="stat-badge stat-load" style="background:#f3f4f6; color:#4b5563;">体重: ${weightDisplay}</span>
                     </div>
+                    <div style="margin-bottom: 10px;">${sprintDisplayHtml}</div>
                     ${sorenessHtml}
                     ${injuryHtml}
                     ${menuHtml}
@@ -736,6 +768,9 @@
             const rpeDisplay = document.getElementById('rpe-display');
             const sleepInput = document.getElementById('sleep');
 
+            // ページ読み込み時にスプリント入力行を1つ追加
+            addSprintRow();
+
             fatigueSlider.addEventListener('input', function() {
                 const val = parseInt(this.value);
                 fatigueDisplay.textContent = `${getEmojiForFatigue(val)} ${val}`;
@@ -808,8 +843,15 @@
                 const rsiValue = rsiResult.textContent === '-' ? '未計測' : rsiResult.textContent;
                 const fvValue = fvResult.textContent === '-' ? '未計測' : fvResult.textContent;
 
-                const sprintDist = document.getElementById('sprint-distance').value;
-                const sprintTm = document.getElementById('sprint-time').value;
+                // 複数のスプリント記録を配列として収集
+                const sprintDataArray = [];
+                document.querySelectorAll('.sprint-row').forEach(row => {
+                    const dist = row.querySelector('.sprint-dist-input').value;
+                    const time = row.querySelector('.sprint-time-input').value;
+                    if (dist && time) {
+                        sprintDataArray.push({ distance: dist, time: time });
+                    }
+                });
 
                 const logData = {
                     playerName: document.getElementById('player-name').value,
@@ -827,8 +869,7 @@
                     rpe: rpeSlider.value,
                     trainingLoad: loadResult.textContent,
                     
-                    sprintDistance: sprintDist,
-                    sprintTime: sprintTm,
+                    sprintLogs: sprintDataArray, // 配列として保存
                     
                     jumpHeight: document.getElementById('jump-height').value,
                     contactTime: document.getElementById('contact-time').value,
@@ -868,6 +909,11 @@
                     fatigueDisplay.textContent = `😃 1`;
                     stressDisplay.textContent = `😌 1`; 
                     rpeDisplay.textContent = `😐 5.0`;
+                    
+                    // スプリント入力枠をリセットして1行だけにする
+                    const container = document.getElementById('sprint-rows-container');
+                    container.innerHTML = '';
+                    addSprintRow();
                     
                     if(sleepQualityNode) sleepQualityNode.checked = false;
                     
