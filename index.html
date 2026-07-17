@@ -7,31 +7,23 @@
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e3a8a">
-
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AthleSense">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon.png">
 
     <script>
-        if ('serviceWorker' in navigator) {
+        if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.protocol === 'http:')) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('PWAの登録が成功しました！スコープ: ', registration.scope);
-                    })
-                    .catch(function(err) {
-                        console.log('PWAの登録に失敗しました: ', err);
-                    });
+                navigator.serviceWorker.register('sw.js').catch(function(error) {
+                    console.log('PWAの登録に失敗しました: ', error);
+                });
             });
         }
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* ==========================================
-           デザイン（CSS）
-           ========================================== */
         body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 0; line-height: 1.6; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         header { background-color: #3b82f6; color: white; padding: 15px 20px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; }
@@ -69,7 +61,6 @@
         .tag-btn { background-color: #f3f4f6; border: 1px solid #d1d5db; color: #4b5563; padding: 8px 14px; border-radius: 20px; font-size: 14px; cursor: pointer; transition: all 0.2s; }
         .tag-btn.selected { background-color: #fef08a; border-color: #f59e0b; color: #b45309; font-weight: bold; }
 
-        /* 🆕 AIアドバイザーカード用スタイル */
         .ai-card { background: linear-gradient(145deg, #ffffff, #f0fdf4); border: 1px solid #bbf7d0; }
         .ai-box { background-color: white; border-radius: 8px; padding: 15px; border-left: 4px solid #10b981; font-size: 14px; color: #1e293b; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); }
 
@@ -84,6 +75,7 @@
         .stat-load { background-color: #dbeafe; color: #1e40af; }
         .stat-rsi { background-color: #dcfce7; color: #166534; }
         .stat-sleep { background-color: #fef3c7; color: #92400e; }
+        .stat-sprint { background-color: #f3e8ff; color: #6b21a8; }
         
         .history-text-item { margin-bottom: 8px; font-size: 14px; }
         .history-label { font-size: 12px; font-weight: bold; color: #64748b; display: block; margin-bottom: 2px; }
@@ -94,12 +86,15 @@
         .star-rating input { display: none; }
         .star-rating label { font-size: 24px; color: #d1d5db; cursor: pointer; transition: color 0.2s; margin: 0; }
         .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label { color: #fbbf24; }
+
+        .flex-row-gap { display: flex; gap: 10px; align-items: center; }
+        .flex-row-gap > * { flex: 1; }
     </style>
 </head>
 <body>
 
     <header>
-        AthleSense KIUH<span id="connection-status" class="status-badge status-local">ローカル</span>
+        AthleSense KIUH <span id="connection-status" class="status-badge status-local">ローカル</span>
     </header>
 
     <div class="container">
@@ -178,7 +173,6 @@
                      <div class="tags-container" id="soreness-tags">
                          <button type="button" class="tag-btn" data-part="頭部">頭部</button>
                          <button type="button" class="tag-btn" data-part="肩">肩</button>
-                          <button type="button" class="tag-btn" data-part="腕">腕</button>
                          <button type="button" class="tag-btn" data-part="背中">背中</button>
                          <button type="button" class="tag-btn" data-part="腹筋">腹筋</button>
                          <button type="button" class="tag-btn" data-part="胸部">胸部</button>
@@ -216,6 +210,36 @@
                  <div class="result-box"><span class="result-label">Training Load</span><span class="result-value" id="load-result">-</span></div>
             </div>
 
+            <div class="card" style="border: 2px solid #3b82f6;">
+                <h2 class="section-title" style="border-bottom: none; margin-bottom: 5px;">⏱️ 本日のスプリント記録</h2>
+                <p style="font-size: 12px; color: #64748b; margin-top: 0; margin-bottom: 15px;">※本日のメイン練習の距離と、一番良かったタイム（ベスト）を記録します。</p>
+                
+                <div class="flex-row-gap">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="font-size: 13px; font-weight: bold; color: #4b5563;">距離を選択</label>
+                        <select id="sprint-distance" style="background-color: white; border-color: #93c5fd;">
+                            <option value="">未計測</option>
+                            <option value="30">30m</option>
+                            <option value="50">50m</option>
+                            <option value="60">60m</option>
+                            <option value="80">80m</option>
+                            <option value="100">100m</option>
+                            <option value="120">120m</option>
+                            <option value="150">150m</option>
+                            <option value="200">200m</option>
+                            <option value="250">250m</option>
+                            <option value="300">300m</option>
+                            <option value="400">400m</option>
+                            <option value="その他">その他</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="font-size: 13px; font-weight: bold; color: #4b5563;">タイム (秒)</label>
+                        <input type="number" id="sprint-time" step="0.01" placeholder="例: 11.50" style="background-color: white; border-color: #93c5fd;">
+                    </div>
+                </div>
+            </div>
+
             <div class="card">
                  <h2 class="section-title">反応筋力 (RSI)</h2>
                  <p style="font-size: 12px; color: #64748b; margin-top: 0; margin-bottom: 10px;">※入力しない場合は「未計測」として記録されます。</p>
@@ -224,12 +248,12 @@
                  <div class="result-box"><span class="result-label">RSI</span><span class="result-value" id="rsi-result">-</span></div>
             </div>
 
-            <div class="card">
-                 <h2 class="section-title">F-v 簡易診断 (弱点分析)</h2>
-                 <p style="font-size: 12px; color: #64748b; margin-top: 0; margin-bottom: 10px;">※入力しない場合は「未計測」として記録されます。</p>
+            <div class="card" style="background-color: #f8fafc; border: 1px dashed #cbd5e1;">
+                 <h2 class="section-title" style="color: #64748b; border-bottom-color: #cbd5e1;">🔬 F-v 簡易診断 (オプション)</h2>
+                 <p style="font-size: 12px; color: #64748b; margin-top: 0; margin-bottom: 10px;">※手動計測では誤差が大きくなるため、光電管などの正確な機器を使用した際のみ入力してください。</p>
                  <div class="form-group"><div class="form-label-flex"><label>30m タイム (秒)</label></div><input type="number" id="time-30m" step="0.01"></div>
                  <div class="form-group"><div class="form-label-flex"><label>Fly-in 20m タイム (秒)</label></div><input type="number" id="time-fly20m" step="0.01"></div>
-                 <div class="result-box"><span class="result-label">診断結果</span><div style="text-align: right;"><span class="result-value" id="fv-result">-</span><span class="result-sub" id="fv-ratio"></span></div></div>
+                 <div class="result-box" style="background-color: white; border: 1px solid #e2e8f0;"><span class="result-label" style="color: #64748b;">診断結果</span><div style="text-align: right;"><span class="result-value" id="fv-result" style="color: #64748b;">-</span><span class="result-sub" id="fv-ratio" style="color: #94a3b8;"></span></div></div>
             </div>
 
             <div class="card">
@@ -249,15 +273,50 @@
         </form>
 
         <div class="card" id="history-section" style="display: none; margin-bottom: 40px;">
-            <h2 class="section-title">🕒 過去の入力履歴</h2>
-            <p style="font-size: 12px; color: #64748b; margin-top: 0;">※自分の名前を選択すると、過去の記録が表示されます。</p>
+            <h2 class="section-title">🕒 過去の入力履歴とデータ</h2>
+            <p style="font-size: 12px; color: #64748b; margin-top: 0;">※自分の名前を選択すると、過去の記録やランキングが表示されます。</p>
             
+            <!-- 🆕 新機能：自己ベストとランキング -->
+            <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                <h3 style="margin-top:0; color:#1e40af; font-size:15px; border-bottom: 1px solid #bfdbfe; padding-bottom: 5px; margin-bottom: 10px;">🏆 スプリント自己ベスト & チームランキング</h3>
+                
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                    <label style="font-size: 13px; font-weight: bold; color: #1e3a8a;">表示する距離:</label>
+                    <select id="my-sprint-distance" style="flex: 1; padding: 8px; border-color: #93c5fd; background-color: white; border-radius: 6px;">
+                        <option value="30">30m</option>
+                        <option value="50" selected>50m</option>
+                        <option value="60">60m</option>
+                        <option value="80">80m</option>
+                        <option value="100">100m</option>
+                        <option value="120">120m</option>
+                        <option value="150">150m</option>
+                        <option value="200">200m</option>
+                        <option value="250">250m</option>
+                        <option value="300">300m</option>
+                        <option value="400">400m</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                    <div style="flex: 1;">
+                        <div style="font-size: 12px; color: #64748b; font-weight: bold;">あなたの自己ベスト</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #1d4ed8; line-height: 1.2;" id="my-best-time">- 秒</div>
+                    </div>
+                    <div style="flex: 1; text-align: right; border-left: 1px solid #e2e8f0; padding-left: 10px;">
+                        <div style="font-size: 12px; color: #64748b; font-weight: bold;">チーム内順位</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #ea580c; line-height: 1.2;" id="my-team-rank">- 位</div>
+                        <div style="font-size: 11px; color: #94a3b8;" id="my-team-total"></div>
+                    </div>
+                </div>
+            </div>
+
             <div style="margin-bottom: 20px;">
                 <canvas id="player-chart"></canvas>
             </div>
 
             <div id="history-list">
-                </div>
+                <!-- JavaScriptで履歴が挿入されます -->
+            </div>
         </div>
 
         <div id="debug-panel" class="debug-panel">
@@ -271,7 +330,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // ⭐️【最重要】ここにFirebaseの設定を貼り付けてください⭐️
         const myFirebaseConfig = {
   apiKey: "AIzaSyAQoESOlZIGJfOgfIwpkL0r0YcYu4tl8ZQ",
   authDomain: "team-conditioning-controling.firebaseapp.com",
@@ -380,6 +438,71 @@
             renderPlayerHistory(this.value);
         });
 
+        // 🆕 スプリント自己ベスト＆ランキングの計算と表示
+        function updateMySprintStats() {
+            const playerName = document.getElementById('player-name').value;
+            const distance = document.getElementById('my-sprint-distance').value;
+            
+            if (!playerName) return;
+
+            // 全ログから該当距離のベストタイムを抽出
+            const bestTimes = {};
+            allTeamLogs.forEach(log => {
+                if (log.sprintDistance === distance && log.sprintTime) {
+                    const time = parseFloat(log.sprintTime);
+                    if (!isNaN(time) && time > 0) {
+                        if (!bestTimes[log.playerName] || time < bestTimes[log.playerName]) {
+                            bestTimes[log.playerName] = time;
+                        }
+                    }
+                }
+            });
+
+            const myBest = bestTimes[playerName];
+            const myBestEl = document.getElementById('my-best-time');
+            const myRankEl = document.getElementById('my-team-rank');
+            const myTotalEl = document.getElementById('my-team-total');
+
+            if (myBest) {
+                myBestEl.textContent = myBest.toFixed(2) + ' 秒';
+                
+                // タイムで昇順ソートしてランキング計算
+                const sortedPlayers = Object.entries(bestTimes).sort((a, b) => a[1] - b[1]);
+                let displayRank = 1;
+                let currentRank = 1;
+                let previousTime = -1;
+                
+                let foundMyRank = 1;
+                
+                sortedPlayers.forEach((item) => {
+                    const name = item[0];
+                    const time = item[1];
+                    
+                    if (time !== previousTime) {
+                        displayRank = currentRank;
+                    }
+                    
+                    if (name === playerName) {
+                        foundMyRank = displayRank;
+                    }
+                    
+                    previousTime = time;
+                    currentRank++;
+                });
+                
+                const totalParticipants = sortedPlayers.length;
+                
+                myRankEl.textContent = `${foundMyRank} 位`;
+                myTotalEl.textContent = `(計測者: ${totalParticipants}人)`;
+            } else {
+                myBestEl.textContent = '- 秒';
+                myRankEl.textContent = '- 位';
+                myTotalEl.textContent = '(記録なし)';
+            }
+        }
+
+        document.getElementById('my-sprint-distance').addEventListener('change', updateMySprintStats);
+
         function renderPlayerHistory(playerName) {
             const historySection = document.getElementById('history-section');
             const historyList = document.getElementById('history-list');
@@ -390,6 +513,10 @@
             }
             
             historySection.style.display = 'block';
+            
+            // 🆕 履歴表示時にランキングも自動更新
+            updateMySprintStats();
+            
             const myLogs = allTeamLogs.filter(log => log.playerName === playerName);
             renderPlayerChart(myLogs);
 
@@ -407,12 +534,13 @@
                 const goodHtml = log.good ? `<div class="history-text-item"><span class="history-label" style="color:#059669;">👍 できたこと:</span><div class="history-text-content" style="border-color:#a7f3d0;">${log.good}</div></div>` : '';
                 const badHtml = log.bad ? `<div class="history-text-item"><span class="history-label" style="color:#dc2626;">🔥 課題:</span><div class="history-text-content" style="border-color:#fca5a5;">${log.bad}</div></div>` : '';
                 
-                // 🆕 履歴にケアの内容と当時提示されたAIアドバイスを追加
                 const careHtml = log.care ? `<div class="history-text-item"><span class="history-label" style="color:#1d4ed8;">🛁 実施したケア:</span><div class="history-text-content" style="border-color:#bfdbfe; background-color:#eff6ff;">${log.care}</div></div>` : '';
                 const aiAdviceHtml = log.aiAdvice && log.aiAdvice !== '未計測' ? `<div class="history-text-item"><span class="history-label">提示されたリカバリーアドバイス:</span><div class="history-text-content" style="font-size:12px; background-color:#f8fafc; color:#475569; line-height:1.4;">${log.aiAdvice}</div></div>` : '';
 
                 const sleepQualityStars = log.sleepQuality ? '★'.repeat(log.sleepQuality) : '-';
                 const weightDisplay = log.weight ? `${log.weight} kg` : '-';
+                
+                const sprintDisplay = (log.sprintDistance && log.sprintTime && log.sprintDistance !== '未計測') ? `${log.sprintDistance}m : ${log.sprintTime}秒` : '-';
 
                 html += `
                 <div class="history-card">
@@ -425,6 +553,7 @@
                         <span class="stat-badge stat-fatigue" style="background:#fde047; color:#854d0e;">ｽﾄﾚｽ: ${log.stress || '-'}</span>
                         <span class="stat-badge stat-load">Load: ${log.trainingLoad !== '-' ? log.trainingLoad : '-'}</span>
                         <span class="stat-badge stat-rsi">RSI: ${log.rsi !== '-' ? log.rsi : '-'}</span>
+                        <span class="stat-badge stat-sprint">🏃‍♂️ ${sprintDisplay}</span>
                         <span class="stat-badge stat-sleep">睡眠: ${log.sleep ? log.sleep + 'h' : '-'} (質: <span style="color:#d97706;">${sleepQualityStars}</span>)</span>
                         <span class="stat-badge stat-load" style="background:#f3f4f6; color:#4b5563;">体重: ${weightDisplay}</span>
                     </div>
@@ -504,7 +633,6 @@
             return "🔥";
         }
 
-        // 🆕 新機能：蓄積された科学的エビデンスに基づく自動アドバイスシステム
         function updateAIAdvice() {
             const fatigue = parseInt(document.getElementById('fatigue').value);
             const sleep = parseFloat(document.getElementById('sleep').value) || 0;
@@ -518,7 +646,7 @@
             let advices = [];
             
             if (selectedSoreness.includes('ハムストリングス')) {
-                advices.push("💡 <b>【ハムストリングス】</b>スプリンターが最も負傷しやすい部位です。強い張りや痛みがある時は無理な静的ストレッチを避け、マッサージガンで周囲（お尻や外側）をほぐすか、湯船での温熱療法で血流を促しましょう（Sugiura et al., 2017）。");
+                advices.push("💡 <b>【ハムストリングス】</b>スプリンターが最も負傷しやすい部位です。強い張りや痛みがある時は無理な静的ストレッチを避け、マッサージガンで周囲（お尻や外側）をほぐすか、湯船での温熱療法で血流を促しましょう。");
             }
             if (selectedSoreness.includes('腸腰筋')) {
                 advices.push("💡 <b>【腸腰筋】</b>太ももを引き上げる走動作（スイング期）で酷使されています。股関節の前側を優しく伸ばすストレッチを行い、拮抗筋である臀部（お尻）の活性化ドリルを組み合わせると、骨盤のコントロールが安定します。");
@@ -539,16 +667,16 @@
                 advices.push("💡 <b>【肩・背中】</b>力みや体幹のキープによる上半身の緊張です。フォームローラーでの胸椎の伸展運動や、お風呂上がりのストレッチングで肩甲骨周りの緊張を抜きましょう。");
             }
             if (fatigue >= 8) {
-                advices.push("⚠️ <b>【全身疲労が危険水域】</b>非常に強い疲労が検出されています。Foster(2020)らの研究の通り、この状態での高強度練習の強行は怪我や免疫低下を招きます。炭水化物とタンパク質を速やかに補給し、ぬるま湯（39℃前後）への入浴で副交感神経を優位にしてください。");
+                advices.push("⚠️ <b>【全身疲労が危険水域】</b>非常に強い疲労が検出されています。この状態での高強度練習の強行は怪我や免疫低下を招きます。炭水化物とタンパク質を速やかに補給し、ぬるま湯（39℃前後）への入浴で副交感神経を優位にしてください。");
             }
             if ((sleep > 0 && sleep < 6.5) || sleepQuality <= 2) {
-                advices.push("💤 <b>【睡眠・リカバリー優先】</b>回復の大部分は睡眠中に起こります（Halson, 2014）。時間が確保できない場合は、日中に15〜20分の仮眠（パワーナップ）を取り、神経系の疲労を補いましょう。");
+                advices.push("💤 <b>【睡眠・リカバリー優先】</b>回復の大部分は睡眠中に起こります。時間が確保できない場合は、日中に15〜20分の仮眠（パワーナップ）を取り、神経系の疲労を補いましょう。");
             }
             if (rsiText !== '-' && parseFloat(rsiText) < 1.8) {
                 advices.push("⚡ <b>【神経筋疲労（バネの低下）】</b>RSIが低下しています。腱の応答性が落ちているため、ハードなプライオメトリクス（ジャンプ系）や全力スプリントの本数は抑え、接地位置を確認する技術ドリルに主眼を置くことを推奨します。");
             }
             if (fvText.includes('力不足')) {
-                advices.push("🏃‍♂️ <b>【F-v特性: 力不足型】</b>加速局面での押し込み（地面への力の伝達）が弱点です。リカバリー期には、臀部やハムストリングスの出力を高める補強（ヒップスラスト等）を意識しましょう（Morin et al.）。");
+                advices.push("🏃‍♂️ <b>【F-v特性: 力不足型】</b>加速局面での押し込み（地面への力の伝達）が弱点です。リカバリー期には、臀部やハムストリングスの出力を高める補強（ヒップスラスト等）を意識しましょう。");
             } else if (fvText.includes('速度不足')) {
                 advices.push("🏃‍♂️ <b>【F-v特性: 速度不足型】</b>トップスピード局面での足の切り替えや乗り込みが課題です。プライオメトリクスや、クイックネスを高める意識のドリルが有効です。");
             }
@@ -576,11 +704,10 @@
                     selectedSoreness.push(part);
                     this.classList.add('selected');
                 }
-                updateAIAdvice(); // 🆕 タグ選択変更時にAIアドバイスを更新
+                updateAIAdvice();
             });
         });
 
-        // 🆕 睡眠の質の変更時にAIアドバイスを更新
         document.querySelectorAll('input[name="sleep-quality"]').forEach(radio => {
             radio.addEventListener('change', function() {
                 updateAIAdvice();
@@ -612,13 +739,13 @@
             fatigueSlider.addEventListener('input', function() {
                 const val = parseInt(this.value);
                 fatigueDisplay.textContent = `${getEmojiForFatigue(val)} ${val}`;
-                updateAIAdvice(); // 更新
+                updateAIAdvice(); 
             });
 
             stressSlider.addEventListener('input', function() {
                 const val = parseInt(this.value);
                 stressDisplay.textContent = `${getEmojiForStress(val)} ${val}`;
-                updateAIAdvice(); // 更新
+                updateAIAdvice(); 
             });
 
             rpeSlider.addEventListener('input', function() {
@@ -657,7 +784,7 @@
                 } else {
                     fvResult.textContent = '-';
                     fvRatioSub.textContent = '';
-                    fvResult.style.color = "#1d4ed8";
+                    fvResult.style.color = "#64748b";
                 }
                 updateAIAdvice();
             }
@@ -681,6 +808,9 @@
                 const rsiValue = rsiResult.textContent === '-' ? '未計測' : rsiResult.textContent;
                 const fvValue = fvResult.textContent === '-' ? '未計測' : fvResult.textContent;
 
+                const sprintDist = document.getElementById('sprint-distance').value;
+                const sprintTm = document.getElementById('sprint-time').value;
+
                 const logData = {
                     playerName: document.getElementById('player-name').value,
                     date: document.getElementById('date').value,
@@ -696,6 +826,10 @@
                     duration: document.getElementById('duration').value,
                     rpe: rpeSlider.value,
                     trainingLoad: loadResult.textContent,
+                    
+                    sprintDistance: sprintDist,
+                    sprintTime: sprintTm,
+                    
                     jumpHeight: document.getElementById('jump-height').value,
                     contactTime: document.getElementById('contact-time').value,
                     rsi: rsiValue,
@@ -706,8 +840,8 @@
                     thoughts: document.getElementById('thoughts').value,
                     good: document.getElementById('good').value,
                     bad: document.getElementById('bad').value,
-                    care: document.getElementById('care').value, // 🆕 追加：ケアの自由記述内容
-                    aiAdvice: document.getElementById('ai-advice-text').innerHTML, // 🆕 追加：提示されたAIアドバイスの文言
+                    care: document.getElementById('care').value, 
+                    aiAdvice: document.getElementById('ai-advice-text').innerHTML, 
                     createdAt: new Date().toISOString()
                 };
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AthleSense KIUH - Monitor</title>
+    <title>AthleSense KIUH Admin</title>
 
     <link rel="manifest" href="manifest-admin.json">
     <meta name="theme-color" content="#1e3a8a">
@@ -53,8 +53,8 @@
         .human-body svg { width: 100%; height: auto; display: block; }
         .heat-spot { transition: opacity 0.4s ease; mix-blend-mode: multiply; }
         
-        /* 🔥 修正箇所：ランキング表の横幅をガチガチに固定 */
-        .ranking-table { width: 240px; margin: 10px auto; border-collapse: collapse; font-size: 12px; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); table-layout: fixed; }
+        /* ランキング表用スタイル（部位用とスプリント用） */
+        .ranking-table { margin: 10px auto; border-collapse: collapse; font-size: 12px; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); table-layout: fixed; }
         .ranking-table th, .ranking-table td { padding: 6px 4px; border-bottom: 1px solid #e2e8f0; text-align: center; word-wrap: break-word; overflow-wrap: break-word; }
         .ranking-table th { background-color: #f1f5f9; color: #475569; }
         .ranking-table tr:last-child td { border-bottom: none; }
@@ -86,8 +86,7 @@
         .stat-box-desc { font-size: 11px; color: #64748b; }
 
         .table-responsive { overflow-x: auto; }
-        /* 🔥 修正：すべての table ではなく #admin-table だけに巨大な幅を適用するように限定 */
-        #admin-table { width: 100%; border-collapse: collapse; min-width: 1200px; font-size: 13px; }
+        #admin-table { width: 100%; border-collapse: collapse; min-width: 1300px; font-size: 13px; }
         #admin-table th, #admin-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e5e7eb; }
         #admin-table th { background-color: #f3f4f6; color: #4b5563; font-weight: bold; }
         #admin-table tr:hover { background-color: #f9fafb; }
@@ -112,12 +111,15 @@
         .player-tag { background-color: #e0f2fe; border: 1px solid #bae6fd; color: #1e40af; padding: 6px 12px; border-radius: 20px; font-size: 14px; display: flex; align-items: center; gap: 6px; font-weight: bold;}
         .delete-player-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 18px; padding: 0; line-height: 1; margin-left: 4px; }
         .delete-player-btn:hover { color: #b91c1c; }
+
+        .sprint-select-wrapper { text-align: center; margin-bottom: 10px; }
+        .sprint-select-wrapper select { width: 150px; padding: 6px 12px; font-size: 14px; font-weight: bold; color: #1e3a8a; border: 2px solid #93c5fd; border-radius: 6px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <header>
-        AthleSense KIUH - admin <span id="connection-status" class="status-badge status-local">ローカル</span>
+        AthleSense KIUH - Admin <span id="connection-status" class="status-badge status-local">ローカル</span>
     </header>
 
     <div class="container">
@@ -221,7 +223,7 @@
                     </div>
                     
                     <div class="ranking-title">📋 部位別 張り・痛みランキング</div>
-                    <table class="ranking-table">
+                    <table class="ranking-table" style="width: 240px;">
                         <colgroup>
                             <col style="width: 45px;">
                             <col style="width: 150px;">
@@ -236,6 +238,46 @@
                         </thead>
                         <tbody id="soreness-ranking-body">
                             </tbody>
+                    </table>
+                </div>
+
+                <!-- 🆕 スプリント ランキング -->
+                <div style="border-top: 2px dashed #cbd5e1; padding-top: 25px; margin-top: 5px;">
+                    <h4 style="margin-top:0; color:#1d4ed8; font-size:16px; text-align:center; margin-bottom:10px;">🏃‍♂️ スプリント ベストタイム・ランキング</h4>
+                    <p style="font-size:11px; color:#64748b; text-align:center; margin-bottom: 15px;">※検索枠で指定された期間内の「自己ベストタイム」を抽出してランキング化します。</p>
+                    
+                    <div class="sprint-select-wrapper">
+                        <select id="sprint-ranking-distance" onchange="updateSprintRanking(window.filteredLogs)">
+                            <option value="30">30m</option>
+                            <option value="50" selected>50m</option>
+                            <option value="60">60m</option>
+                            <option value="80">80m</option>
+                            <option value="100">100m</option>
+                            <option value="120">120m</option>
+                            <option value="150">150m</option>
+                            <option value="200">200m</option>
+                            <option value="250">250m</option>
+                            <option value="300">300m</option>
+                            <option value="400">400m</option>
+                        </select>
+                    </div>
+
+                    <table class="ranking-table" style="width: 280px;">
+                        <colgroup>
+                            <col style="width: 50px;">
+                            <col style="width: 130px;">
+                            <col style="width: 100px;">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>順位</th>
+                                <th>選手名</th>
+                                <th>タイム (秒)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sprint-ranking-body">
+                            <!-- JSで挿入 -->
+                        </tbody>
                     </table>
                 </div>
 
@@ -324,6 +366,7 @@
                          <th>疲労</th>
                          <th>ｽﾄﾚｽ</th>
                          <th>Load</th>
+                         <th>スプリント</th> <!-- 🆕 追加 -->
                          <th>RSI</th>
                          <th>F-v診断</th>
                          <th>筋肉痛・張り</th>
@@ -539,7 +582,62 @@
             document.getElementById('summary-monotony-list').textContent = highMonotonyPlayers.join(', ');
         }
 
+        // 🆕 スプリント ランキング生成処理
+        window.updateSprintRanking = function(logs) {
+            const distance = document.getElementById('sprint-ranking-distance').value;
+            const rankingBody = document.getElementById('sprint-ranking-body');
+            rankingBody.innerHTML = '';
+
+            const bestTimes = {};
+
+            // 選択された距離のベストタイムを各選手ごとに探す
+            logs.forEach(log => {
+                if (log.sprintDistance === distance && log.sprintTime) {
+                    const time = parseFloat(log.sprintTime);
+                    if (!isNaN(time) && time > 0) {
+                        if (!bestTimes[log.playerName] || time < bestTimes[log.playerName]) {
+                            bestTimes[log.playerName] = time;
+                        }
+                    }
+                }
+            });
+
+            // タイムが速い順（昇順）にソート
+            const sortedPlayers = Object.entries(bestTimes).sort((a, b) => a[1] - b[1]);
+
+            if (sortedPlayers.length === 0) {
+                rankingBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8; padding: 15px;">この距離の記録はありません</td></tr>';
+                return;
+            }
+
+            let currentRank = 1;
+            let displayRank = 1;
+            let previousTime = -1;
+
+            sortedPlayers.forEach((item) => {
+                const playerName = item[0];
+                const time = item[1];
+                
+                // 同タイムの場合は同じ順位にする処理
+                if (time !== previousTime) {
+                    displayRank = currentRank;
+                }
+
+                rankingBody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:bold; color:#64748b;">${displayRank}</td>
+                        <td style="font-weight:bold; color:#334155; font-size:13px;">${playerName}</td>
+                        <td style="font-weight:bold; color:#1d4ed8; font-size:15px;">${time.toFixed(2)}</td>
+                    </tr>
+                `;
+                
+                previousTime = time;
+                currentRank++;
+            });
+        };
+
         function updateTeamAnalytics(logs) {
+            // ヒートマップ処理
             const sorenessCounts = {
                 "頭部": 0, "肩": 0, "背中": 0, "腹筋": 0, "胸部": 0,
                 "腸腰筋": 0, "臀部": 0, "大腿四頭筋": 0, 
@@ -645,6 +743,10 @@
                 });
             }
 
+            // スプリントランキングの更新
+            updateSprintRanking(logs);
+
+            // F-vグループ処理
             const latestFvData = {};
             logs.forEach(log => {
                 if(log.time30m && log.timeFly20m && parseFloat(log.time30m) > 0 && parseFloat(log.timeFly20m) > 0) {
@@ -791,7 +893,7 @@
             const tableBody = document.querySelector('#admin-table tbody');
             tableBody.innerHTML = '';
             if (!logsToRender || logsToRender.length === 0) {
-                 tableBody.innerHTML = '<tr><td colspan="14" style="text-align:center;">記録が見つかりません。</td></tr>';
+                 tableBody.innerHTML = '<tr><td colspan="15" style="text-align:center;">記録が見つかりません。</td></tr>';
                  return;
             }
             
@@ -813,12 +915,17 @@
                 const sleepQualityStars = log.sleepQuality ? '★'.repeat(log.sleepQuality) : '';
                 const sleepText = log.sleep ? `${log.sleep}h ${sleepQualityStars ? '<span style="color:#d97706;">('+sleepQualityStars+')</span>' : ''}` : '-';
 
+                // 🆕 スプリント記録の表示
+                const sprintDisplay = (log.sprintDistance && log.sprintTime && log.sprintDistance !== '未計測') ? 
+                    `<span style="color: #6b21a8; font-weight: bold;">${log.sprintDistance}m : ${log.sprintTime}s</span>` : '-';
+
                 tr.innerHTML = `
                     <td>${log.date || ''}</td>
                     <td style="font-weight:bold;">${log.playerName || ''}</td>
                     <td>${fatigueText}</td>
                     <td>${stressText}</td>
                     <td>${log.trainingLoad && log.trainingLoad !== '-' ? log.trainingLoad : ''}</td>
+                    <td>${sprintDisplay}</td>
                     <td>${log.rsi && log.rsi !== '-' ? log.rsi : ''}</td>
                     <td>${log.fvResult && log.fvResult !== '-' ? log.fvResult : ''}</td>
                     <td>${sorenessHtml}</td>
@@ -841,14 +948,16 @@
             }
 
             let csvContent = '\uFEFF'; 
-            const headers = ['日付', '選手名', '疲労度', 'ストレス', 'TrainingLoad', 'RSI', 'F-v診断', '筋肉痛', '体重(kg)', '心拍数', '歩数', '睡眠時間', '睡眠の質', 'ケガ', 'メニュー', '感想', 'できたこと', '課題', '実施したケア', 'AIアドバイス'];
+            // 🆕 ヘッダーにスプリント項目を追加
+            const headers = ['日付', '選手名', '疲労度', 'ストレス', 'TrainingLoad', 'スプリント距離(m)', 'スプリントタイム(秒)', 'RSI', 'F-v診断', '筋肉痛', '体重(kg)', '心拍数', '歩数', '睡眠時間', '睡眠の質', 'ケガ', 'メニュー', '感想', 'できたこと', '課題', '実施したケア', 'AIアドバイス'];
             csvContent += headers.join(',') + '\n';
 
             const exportLogs = [...logs].reverse();
             exportLogs.forEach(log => {
                 const row = [
-                    log.date, log.playerName, log.fatigue, log.stress, log.trainingLoad, log.rsi, log.fvResult,
-                    log.soreness, log.weight, log.heartRate, log.steps, log.sleep, log.sleepQuality, log.injury, log.menu, log.thoughts, log.good, log.bad, log.care, log.aiAdvice
+                    log.date, log.playerName, log.fatigue, log.stress, log.trainingLoad, 
+                    log.sprintDistance === '未計測' ? '' : log.sprintDistance, log.sprintTime, 
+                    log.rsi, log.fvResult, log.soreness, log.weight, log.heartRate, log.steps, log.sleep, log.sleepQuality, log.injury, log.menu, log.thoughts, log.good, log.bad, log.care, log.aiAdvice
                 ].map(item => {
                     let text = String(item || '').replace(/"/g, '""').replace(/\n/g, ' ');
                     text = text.replace(/<[^>]*>?/gm, '');
