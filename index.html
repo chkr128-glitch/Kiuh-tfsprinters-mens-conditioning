@@ -24,89 +24,157 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #2563eb; --primary-dark: #1e3a8a; --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #334155; --text-muted: #64748b; }
-        body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; line-height: 1.6; }
+        /* ☀️ ライトモード（通常）のカラー変数 */
+        :root { 
+            --primary: #2563eb; 
+            --primary-dark: #1e3a8a; 
+            --bg-color: #f8fafc; 
+            --card-bg: #ffffff; 
+            --text-main: #334155; 
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --input-bg: #f8fafc;
+            --result-bg: #eff6ff;
+            --ai-card-bg: linear-gradient(145deg, #ffffff, #f0fdf4);
+            --ai-card-border: #bbf7d0;
+            --ai-box-bg: white;
+            --ai-box-text: #1e293b;
+            --weather-bg: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            --weather-text: #1e3a8a;
+            --weather-advice-bg: rgba(255,255,255,0.6);
+            --weather-advice-text: #0f172a;
+            --tag-sel-bg: #fef08a;
+            --tag-sel-border: #f59e0b;
+            --tag-sel-text: #b45309;
+            --history-card-bg: #f8fafc;
+            --history-text-content-bg: white;
+            --warning-text: #dc2626;
+            --good-text: #059669;
+        }
+        
+        /* 🌙 ダークモードのカラー変数 */
+        body.dark-mode {
+            --primary: #60a5fa; 
+            --primary-dark: #93c5fd; 
+            --bg-color: #0f172a; 
+            --card-bg: #1e293b; 
+            --text-main: #f8fafc; 
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --input-bg: #0f172a;
+            --result-bg: #334155;
+            --ai-card-bg: linear-gradient(145deg, #1e293b, #064e3b);
+            --ai-card-border: #059669;
+            --ai-box-bg: #0f172a;
+            --ai-box-text: #f8fafc;
+            --weather-bg: linear-gradient(135deg, #1e3a8a, #0f172a);
+            --weather-text: #93c5fd;
+            --weather-advice-bg: rgba(0,0,0,0.4);
+            --weather-advice-text: #f8fafc;
+            --tag-sel-bg: #78350f;
+            --tag-sel-border: #b45309;
+            --tag-sel-text: #fde68a;
+            --history-card-bg: #0f172a;
+            --history-text-content-bg: #1e293b;
+            --warning-text: #fca5a5;
+            --good-text: #6ee7b7;
+        }
+
+        body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; line-height: 1.6; transition: background-color 0.3s, color 0.3s; }
         .container { max-width: 600px; margin: 0 auto; padding: 15px; padding-bottom: 80px; }
         
-        header { background-color: var(--primary-dark); color: white; padding: 15px 20px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        /* ヘッダーは青で固定（見やすさのため） */
+        header { background-color: #1e3a8a; color: white; padding: 15px 20px; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .theme-toggle-btn { background: none; border: none; font-size: 22px; cursor: pointer; padding: 0; color: white; }
         
-        /* 天気ウィジェット */
-        .weather-widget { background: linear-gradient(135deg, #e0f2fe, #bae6fd); border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px; border-left: 5px solid #3b82f6;}
-        .weather-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: #1e3a8a; }
-        .weather-advice { font-size: 13px; color: #0f172a; background: rgba(255,255,255,0.6); padding: 10px; border-radius: 8px; }
+        .weather-widget { background: var(--weather-bg); border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px; border-left: 5px solid var(--primary); transition: all 0.3s; }
+        .weather-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: var(--weather-text); }
+        .weather-advice { font-size: 13px; color: var(--weather-advice-text); background: var(--weather-advice-bg); padding: 10px; border-radius: 8px; transition: all 0.3s; }
         
-        /* 共通カードスタイル */
-        .card { background-color: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .section-title { font-size: 17px; font-weight: bold; color: var(--primary-dark); border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; margin-top: 0; display: flex; align-items: center; gap: 5px; }
+        .card { background-color: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: all 0.3s; }
+        .section-title { font-size: 17px; font-weight: bold; color: var(--primary-dark); border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px; margin-top: 0; display: flex; align-items: center; gap: 5px; transition: color 0.3s, border-color 0.3s; }
         
         .form-group { margin-bottom: 15px; }
         .form-label-flex { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
-        .form-label-flex label { font-size: 14px; font-weight: bold; color: #475569; margin: 0; }
-        .emoji-display { font-size: 22px; font-weight: bold; color: var(--primary-dark); }
+        .form-label-flex label { font-size: 14px; font-weight: bold; color: var(--text-muted); margin: 0; transition: color 0.3s; }
+        .emoji-display { font-size: 22px; font-weight: bold; color: var(--primary-dark); transition: color 0.3s; }
         
-        select, input[type="text"], input[type="date"], input[type="number"], textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-size: 16px; background-color: #f8fafc; appearance: none; transition: border-color 0.2s; }
-        select:focus, input:focus, textarea:focus { outline: none; border-color: var(--primary); background-color: white; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        select, input[type="text"], input[type="date"], input[type="number"], textarea { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; font-size: 16px; background-color: var(--input-bg); color: var(--text-main); appearance: none; transition: all 0.3s; }
+        select:focus, input:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
         textarea { resize: vertical; }
 
-        input[type="range"] { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; outline: none; -webkit-appearance: none; margin-bottom: 10px; }
+        input[type="range"] { width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; outline: none; -webkit-appearance: none; margin-bottom: 10px; transition: background-color 0.3s; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-        .result-box { background-color: #eff6ff; border-radius: 8px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .result-box { background-color: var(--result-bg); border-radius: 8px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border: 1px solid var(--border-color); transition: all 0.3s; }
+        .result-label { font-size: 14px; font-weight: bold; color: var(--primary-dark); transition: color 0.3s; }
+        .result-value { font-size: 20px; font-weight: bold; color: var(--primary); text-align: right; transition: color 0.3s; }
+        .result-sub { font-size: 12px; color: var(--primary); display: block; }
         
-        .submit-btn { background-color: var(--primary); color: white; border: none; border-radius: 8px; padding: 15px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: background-color 0.2s; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
-        .submit-btn:hover { background-color: var(--primary-dark); }
+        .submit-btn { background-color: var(--primary); color: white; border: none; border-radius: 8px; padding: 15px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: background-color 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .submit-btn:hover { filter: brightness(1.1); }
 
         .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
-        .tag-btn { background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; padding: 8px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
-        .tag-btn.selected { background-color: #fef08a; border-color: #f59e0b; color: #b45309; font-weight: bold; }
+        .tag-btn { background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+        .tag-btn.selected { background-color: var(--tag-sel-bg); border-color: var(--tag-sel-border); color: var(--tag-sel-text); font-weight: bold; }
 
-        .ai-card { background: linear-gradient(145deg, #ffffff, #f0fdf4); border: 1px solid #bbf7d0; }
-        .ai-box { background-color: white; border-radius: 8px; padding: 15px; border-left: 4px solid #10b981; font-size: 13.5px; color: #1e293b; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); line-height: 1.5; }
+        .ai-card { background: var(--ai-card-bg); border: 2px solid var(--ai-card-border); transition: all 0.3s; }
+        .ai-box { background-color: var(--ai-box-bg); border-radius: 8px; padding: 15px; border-left: 4px solid #10b981; font-size: 13.5px; color: var(--ai-box-text); line-height: 1.5; transition: all 0.3s; }
+
+        /* IRS メーター */
+        .irs-container { background-color: var(--card-bg); border-radius: 8px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: all 0.3s; }
+        .irs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .irs-title { font-size: 15px; font-weight: bold; margin: 0; display: flex; align-items: center; gap: 5px; color: var(--text-main); transition: color 0.3s; }
+        .irs-value-text { font-size: 20px; font-weight: bold; color: var(--text-main); transition: color 0.3s; }
+        .irs-bar-bg { width: 100%; height: 12px; background-color: var(--border-color); border-radius: 6px; overflow: hidden; margin-bottom: 8px; transition: background-color 0.3s; }
+        .irs-bar-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; border-radius: 6px; }
+        .irs-status { font-size: 14px; font-weight: bold; text-align: right; }
+        .irs-note { font-size: 11px; color: var(--text-muted); margin: 0; line-height: 1.4; border-top: 1px dashed var(--border-color); padding-top: 8px; margin-top: 8px; transition: color 0.3s, border-color 0.3s; }
 
         .star-rating { display: inline-flex; flex-direction: row-reverse; gap: 4px; justify-content: flex-end; }
         .star-rating input { display: none; }
-        .star-rating label { font-size: 26px; color: #cbd5e1; cursor: pointer; transition: color 0.2s; margin: 0; }
+        .star-rating label { font-size: 26px; color: var(--border-color); cursor: pointer; transition: color 0.2s; margin: 0; }
         .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label { color: #fbbf24; }
 
         .flex-row-gap { display: flex; gap: 10px; align-items: center; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         
-        .profile-section { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .profile-section { background: var(--card-bg); padding: 15px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: all 0.3s; }
 
-        .tab-nav { display: flex; background: white; border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .tab-nav { display: flex; background: var(--card-bg); border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: all 0.3s; }
         .tab-btn { flex: 1; padding: 15px 0; text-align: center; font-weight: bold; font-size: 14px; color: var(--text-muted); background: none; border: none; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
-        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background-color: #eff6ff; }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background-color: var(--result-bg); }
         
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .reminder-box { background: #fffbeb; border: 1px solid #fde68a; padding: 15px; border-radius: 8px; margin-top: 15px; }
+        .reminder-box { background: var(--result-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; margin-top: 15px; transition: all 0.3s; }
         .toggle-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .4s; border-radius: 34px; }
         .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #10b981; }
         input:checked + .slider:before { transform: translateX(24px); }
 
-        .history-card { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .history-card { background-color: var(--history-card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px; transition: all 0.3s; }
+        .history-date { font-weight: bold; color: var(--text-main); border-bottom: 2px solid var(--border-color); padding-bottom: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; transition: all 0.3s; }
         .stat-badge { font-size: 11px; padding: 4px 6px; border-radius: 4px; font-weight: bold; display: inline-block; margin-bottom: 4px;}
-        .debug-panel { background-color: #1e293b; color: #38bdf8; font-family: monospace; font-size: 12px; padding: 15px; border-radius: 8px; margin-top: 20px; margin-bottom: 40px; border-left: 4px solid #f43f5e; display: none; }
-        .debug-title { font-weight: bold; color: #f43f5e; margin-bottom: 5px; font-size: 13px; }
         .history-text-item { margin-bottom: 8px; font-size: 14px; }
-        .history-label { font-size: 12px; font-weight: bold; color: #64748b; display: block; margin-bottom: 2px; }
-        .history-text-content { background-color: white; padding: 8px; border-radius: 6px; border: 1px solid #e2e8f0; white-space: pre-wrap; color: #334155; }
-        .no-data { text-align: center; color: #64748b; font-size: 14px; padding: 20px; }
-        .status-badge { font-size: 12px; padding: 4px 8px; border-radius: 12px; font-weight: normal; margin-left: 10px; vertical-align: middle; }
-        .status-local { background-color: #6b7280; color: white; }
-        .status-connecting { background-color: #d97706; color: white; }
-        .status-cloud { background-color: #10b981; color: white; }
-        .status-error { background-color: #dc2626; color: white; }
+        .history-label { font-size: 12px; font-weight: bold; color: var(--text-muted); display: block; margin-bottom: 2px; }
+        .history-text-content { background-color: var(--history-text-content-bg); padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); white-space: pre-wrap; color: var(--text-main); transition: all 0.3s; }
+        .no-data { text-align: center; color: var(--text-muted); font-size: 14px; padding: 20px; }
+        
+        .sprint-dist-input, .sprint-time-input { border-color: var(--primary) !important; }
     </style>
 </head>
 <body>
 
-    <header>AthleSense KIUH</header>
+    <header>
+        <span style="visibility: hidden; font-size: 22px;">🌙</span>
+        <span>AthleSense KIUH</span>
+        <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" title="ダークモード切替">🌙</button>
+    </header>
 
     <div class="container">
         
@@ -118,18 +186,18 @@
             <div class="weather-advice" id="weather-advice">
                 気象データに基づくコンディショニング提案を読み込んでいます...
             </div>
-            <button onclick="fetchWeather()" style="background:none; border:none; color:#2563eb; font-size:12px; text-align:right; cursor:pointer; padding:0;">🔄 天気を更新</button>
+            <button onclick="fetchWeather()" style="background:none; border:none; color:var(--primary); font-size:12px; text-align:right; cursor:pointer; padding:0; font-weight:bold;">🔄 天気を更新</button>
         </div>
 
         <div class="profile-section">
-            <div class="form-label-flex"><label>👤 選手名と日付を選択 <span style="color:red;">*</span></label></div>
+            <div class="form-label-flex"><label>👤 選手名と日付を選択 <span style="color:var(--warning-text);">*</span></label></div>
             <div class="flex-row-gap">
                 <select id="player-name" required style="flex: 2;">
                     <option value="" disabled selected>読み込み中...</option>
                 </select>
                 <input type="date" id="date" required style="flex: 1.5; padding: 10px;">
             </div>
-            <div id="player-warning" style="font-size: 11px; color: #dc2626; display: none; margin-top: 5px;">※監督が名簿に選手を登録すると選択できるようになります。</div>
+            <div id="player-warning" style="font-size: 11px; color: var(--warning-text); display: none; margin-top: 5px;">※監督が名簿に選手を登録すると選択できるようになります。</div>
         </div>
 
         <div class="tab-nav">
@@ -138,25 +206,28 @@
             <button class="tab-btn" onclick="switchTab('history')">🏆 履歴・設定</button>
         </div>
 
+        <!-- ==========================================
+             タブ1: 練習前 (Pre-Training)
+        =========================================== -->
         <div id="tab-pre" class="tab-content active">
             <form id="form-pre">
                 <div class="card">
                      <h2 class="section-title">🌅 起床時のコンディション</h2>
-                     <p style="font-size: 12px; color: #64748b; margin-top: 0;">※練習前に体の状態をチェックし、怪我のリスクを減らしましょう。</p>
+                     <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">※練習前に体の状態をチェックし、怪我のリスクを減らしましょう。</p>
                      
                      <div class="form-group">
-                         <div class="form-label-flex"><label>睡眠時間 (時間) <span style="font-size:12px; color:#6b7280; font-weight:normal;">任意</span></label></div>
+                         <div class="form-label-flex"><label>睡眠時間 (時間) <span style="font-size:12px; font-weight:normal;">任意</span></label></div>
                          <input type="number" id="sleep" step="0.5" placeholder="例: 7.5">
                      </div>
                      
                      <div class="form-group">
-                         <div class="form-label-flex"><label>主観的な睡眠の質 <span style="font-size:12px; color:#6b7280; font-weight:normal;">任意</span></label></div>
+                         <div class="form-label-flex"><label>主観的な睡眠の質 <span style="font-size:12px; font-weight:normal;">任意</span></label></div>
                          <div class="star-rating">
-                             <input type="radio" id="star5" name="sleep-quality" value="5"><label for="star5">★</label>
-                             <input type="radio" id="star4" name="sleep-quality" value="4"><label for="star4">★</label>
-                             <input type="radio" id="star3" name="sleep-quality" value="3"><label for="star3">★</label>
-                             <input type="radio" id="star2" name="sleep-quality" value="2"><label for="star2">★</label>
-                             <input type="radio" id="star1" name="sleep-quality" value="1"><label for="star1">★</label>
+                             <input type="radio" id="star5-pre" name="sleep-quality" value="5"><label for="star5-pre">★</label>
+                             <input type="radio" id="star4-pre" name="sleep-quality" value="4"><label for="star4-pre">★</label>
+                             <input type="radio" id="star3-pre" name="sleep-quality" value="3"><label for="star3-pre">★</label>
+                             <input type="radio" id="star2-pre" name="sleep-quality" value="2"><label for="star2-pre">★</label>
+                             <input type="radio" id="star1-pre" name="sleep-quality" value="1"><label for="star1-pre">★</label>
                          </div>
                      </div>
 
@@ -207,8 +278,19 @@
                      </div>
                 </div>
 
+                <!-- 🔥 IRSメーター（練習前） -->
+                <div class="irs-container">
+                    <div class="irs-header">
+                        <h4 class="irs-title">⚠️ Injury Risk Score (怪我リスク)</h4>
+                        <div class="irs-value-text" id="irs-value-pre">10%</div>
+                    </div>
+                    <div class="irs-bar-bg"><div class="irs-bar-fill" id="irs-bar-pre" style="width: 10%; background-color: #10b981;"></div></div>
+                    <div class="irs-status" id="irs-status-pre" style="color: #10b981;">🟢 安全圏 (Normal)</div>
+                    <p class="irs-note">※スコアが高くても必ず怪我をするわけではありません。あくまで科学的データに基づく統計的な傾向です。50%を超えたら高強度スプリントを控えるなど、勇気ある決断の目安にしてください。</p>
+                </div>
+
                 <div class="card ai-card">
-                     <h2 class="section-title" style="color: #16a34a;">✨ AI 事前アドバイス</h2>
+                     <h2 class="section-title" style="color: var(--good-text); border-bottom:none;">✨ AI 事前アドバイス</h2>
                      <div class="ai-box" id="ai-advice-pre">
                           数値を入力すると、練習前に意識すべきポイントや怪我予防の提案を表示します。
                      </div>
@@ -218,6 +300,9 @@
             </form>
         </div>
 
+        <!-- ==========================================
+             タブ2: 練習後 (Post-Training)
+        =========================================== -->
         <div id="tab-post" class="tab-content">
             <form id="form-post">
                 <div class="card">
@@ -233,7 +318,7 @@
                      <div class="result-box"><span class="result-label">Training Load</span><span class="result-value" id="load-result">-</span></div>
                 </div>
 
-                <div class="card" style="border: 2px solid #3b82f6;">
+                <div class="card" style="border: 2px solid var(--primary);">
                     <div class="flex-between" style="border-bottom: none; margin-bottom: 5px;">
                         <h2 class="section-title" style="border-bottom: none; margin-bottom: 0;">⏱️ 本日のスプリント記録</h2>
                         <button type="button" onclick="addSprintRow()" style="background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: bold; cursor: pointer;">➕ 追加</button>
@@ -241,10 +326,9 @@
                     <div id="sprint-rows-container"></div>
                 </div>
 
-                <!-- 🔥 練習後の筋肉痛・張りを記録する部分を新設 -->
                 <div class="card">
                      <h2 class="section-title">📝 練習後のダメージ確認</h2>
-                     <p style="font-size: 12px; color: #64748b; margin-top: 0;">※練習によって新たに発生した張りや痛みのある部位を選択してください。</p>
+                     <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">※練習によって新たに発生した張りや痛みのある部位を選択してください。</p>
                      
                      <div class="form-group">
                          <div class="form-label-flex"><label>練習後の筋肉痛・張り</label></div>
@@ -264,22 +348,33 @@
                              <button type="button" class="tag-btn tag-btn-post" data-part="足裏">足裏</button>
                          </div>
                      </div>
-                     <div class="form-group"><div class="form-label-flex"><label style="color: #dc2626;">🔥 ケガ・痛みの詳細</label></div><textarea id="bad" rows="2" placeholder="痛みや怪我の状況があれば詳しく..."></textarea></div>
+                     <div class="form-group"><div class="form-label-flex"><label style="color: var(--warning-text);">🔥 ケガ・痛みの詳細</label></div><textarea id="bad" rows="2" placeholder="痛みや怪我の状況があれば詳しく..."></textarea></div>
+                </div>
+
+                <!-- 🔥 IRSメーター（練習後：明日に向けてのリスク） -->
+                <div class="irs-container">
+                    <div class="irs-header">
+                        <h4 class="irs-title">⚠️ 明日の Injury Risk Score (怪我リスク)</h4>
+                        <div class="irs-value-text" id="irs-value-post">10%</div>
+                    </div>
+                    <div class="irs-bar-bg"><div class="irs-bar-fill" id="irs-bar-post" style="width: 10%; background-color: #10b981;"></div></div>
+                    <div class="irs-status" id="irs-status-post" style="color: #10b981;">🟢 安全圏 (Normal)</div>
+                    <p class="irs-note">※練習後のダメージに基づく「明日の怪我リスク」の予測です。スコアが高い場合は、今夜の念入りなリカバリー（入浴・睡眠）が必須です。</p>
                 </div>
 
                 <div class="card">
                      <h2 class="section-title">📝 練習の振り返り・ケア</h2>
                      <div class="form-group"><div class="form-label-flex"><label>練習メニュー</label></div><textarea id="menu" rows="2"></textarea></div>
                      <div class="form-group"><div class="form-label-flex"><label>歩数 (歩)</label></div><input type="number" id="steps" placeholder="例: 8000"></div>
-                     <div class="form-group"><div class="form-label-flex"><label style="color: #059669;">👍 できたこと</label></div><textarea id="good" rows="2"></textarea></div>
+                     <div class="form-group"><div class="form-label-flex"><label style="color: var(--good-text);">👍 できたこと</label></div><textarea id="good" rows="2"></textarea></div>
                      <div class="form-group">
-                         <div class="form-label-flex"><label style="color: #1d4ed8;">🛁 今夜実施するケア (重要)</label></div>
-                         <textarea id="care" rows="2" placeholder="例: 湯船に15分、ハムの交代浴、交代浴..."></textarea>
+                         <div class="form-label-flex"><label style="color: var(--primary-dark);">🛁 今夜実施するケア (重要)</label></div>
+                         <textarea id="care" rows="2" placeholder="例: 湯船に15分、ハムの交代浴、ストレッチ..."></textarea>
                      </div>
                 </div>
 
                 <div class="card ai-card">
-                     <h2 class="section-title" style="color: #16a34a;">✨ AI リカバリーアドバイス</h2>
+                     <h2 class="section-title" style="color: var(--good-text); border-bottom:none;">✨ AI リカバリーアドバイス</h2>
                      <div class="ai-box" id="ai-advice-post">
                           練習の負荷やダメージ状況から、今日の夜に最適なリカバリー方法を提案します。
                      </div>
@@ -289,30 +384,33 @@
             </form>
         </div>
 
+        <!-- ==========================================
+             タブ3: 履歴・設定 (History & Settings)
+        =========================================== -->
         <div id="tab-history" class="tab-content">
             <div class="card">
                 <h2 class="section-title">⏰ リマインダー設定</h2>
-                <p style="font-size: 13px; color: #475569; margin-top: 0;">練習前・練習後の入力を忘れないように、ブラウザの通知でお知らせします。</p>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">練習前・練習後の入力を忘れないように、ブラウザの通知でお知らせします。</p>
                 <div class="reminder-box">
                     <div class="flex-between">
-                        <span style="font-weight: bold; color: #92400e;">🔔 通知機能をオンにする</span>
+                        <span style="font-weight: bold; color: var(--text-main);">🔔 通知機能をオンにする</span>
                         <label class="toggle-switch">
                             <input type="checkbox" id="notification-toggle" onchange="toggleNotifications(this)">
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <div id="notification-status" style="font-size: 12px; color: #b45309; margin-top: 8px; display: none;">
+                    <div id="notification-status" style="font-size: 12px; color: var(--warning-text); margin-top: 8px; display: none;">
                         ※初回オン時に「通知の許可」を求められますので「許可」を選択してください。
                     </div>
                 </div>
             </div>
 
             <div class="card" id="history-section" style="display: none;">
-                <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-                    <h3 style="margin-top:0; color:#1e40af; font-size:15px; border-bottom: 1px solid #bfdbfe; padding-bottom: 5px; margin-bottom: 10px;">🏆 自己ベスト & チーム内順位</h3>
+                <div style="background-color: var(--result-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                    <h3 style="margin-top:0; color:var(--primary-dark); font-size:15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-bottom: 10px;">🏆 自己ベスト & チーム内順位</h3>
                     <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
-                        <label style="font-size: 13px; font-weight: bold; color: #1e3a8a;">表示距離:</label>
-                        <select id="my-sprint-distance" style="flex: 1; padding: 8px; border-color: #93c5fd; background-color: white; border-radius: 6px;">
+                        <label style="font-size: 13px; font-weight: bold; color: var(--primary-dark);">表示距離:</label>
+                        <select id="my-sprint-distance" style="flex: 1; padding: 8px;">
                             <option value="50" selected>50m</option>
                             <option value="60">60m</option>
                             <option value="100">100m</option>
@@ -321,13 +419,13 @@
                             <option value="300">300m</option>
                         </select>
                     </div>
-                    <div style="display: flex; justify-content: space-between; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                    <div style="display: flex; justify-content: space-between; background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
                         <div style="flex: 1;">
-                            <div style="font-size: 12px; color: #64748b; font-weight: bold;">自己ベスト</div>
-                            <div style="font-size: 24px; font-weight: bold; color: #1d4ed8; line-height: 1.2;" id="my-best-time">- 秒</div>
+                            <div style="font-size: 12px; color: var(--text-muted); font-weight: bold;">自己ベスト</div>
+                            <div style="font-size: 24px; font-weight: bold; color: var(--primary); line-height: 1.2;" id="my-best-time">- 秒</div>
                         </div>
-                        <div style="flex: 1; text-align: right; border-left: 1px solid #e2e8f0; padding-left: 10px;">
-                            <div style="font-size: 12px; color: #64748b; font-weight: bold;">チーム内順位</div>
+                        <div style="flex: 1; text-align: right; border-left: 1px solid var(--border-color); padding-left: 10px;">
+                            <div style="font-size: 12px; color: var(--text-muted); font-weight: bold;">チーム内順位</div>
                             <div style="font-size: 24px; font-weight: bold; color: #ea580c; line-height: 1.2;" id="my-team-rank">- 位</div>
                         </div>
                     </div>
@@ -342,8 +440,8 @@
 
     <!-- スプリント入力行テンプレート -->
     <template id="sprint-row-template">
-        <div class="sprint-row flex-row-gap" style="margin-bottom: 10px; align-items: center; border-bottom: 1px dashed #bfdbfe; padding-bottom: 10px;">
-            <select class="sprint-dist-input" style="flex: 2; padding: 10px; border-color: #93c5fd;">
+        <div class="sprint-row flex-row-gap" style="margin-bottom: 10px; align-items: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 10px;">
+            <select class="sprint-dist-input" style="flex: 2; padding: 10px; border-color: var(--primary);">
                 <option value="">距離</option>
                 <option value="30">30m</option>
                 <option value="50">50m</option>
@@ -356,7 +454,7 @@
                 <option value="300">300m</option>
                 <option value="400">400m</option>
             </select>
-            <input type="number" class="sprint-time-input" step="0.01" placeholder="タイム(秒)" style="flex: 2; padding: 10px; border-color: #93c5fd;">
+            <input type="number" class="sprint-time-input" step="0.01" placeholder="タイム(秒)" style="flex: 2; padding: 10px; border-color: var(--primary);">
             <button type="button" onclick="this.parentElement.remove()" style="flex: 0; background: none; border: none; color: #ef4444; font-size: 24px; cursor: pointer; padding: 0 5px;">×</button>
         </div>
     </template>
@@ -383,10 +481,45 @@
         let allTeamLogs = []; 
         let playerChartInstance = null; 
         
-        // 🔥 朝と練習後で変数を分ける
         let selectedSorenessPre = [];
         let selectedSorenessPost = [];
 
+        // ==========================================
+        // 🌙 テーマ切替機能 (Dark Mode)
+        // ==========================================
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.getElementById('theme-toggle').textContent = isDark ? '☀️' : '🌙';
+            
+            // グラフがある場合は文字色を更新
+            if(playerChartInstance) {
+                const tickColor = isDark ? '#94a3b8' : '#64748b';
+                const gridColor = isDark ? '#334155' : '#e2e8f0';
+                playerChartInstance.options.scales.x.ticks.color = tickColor;
+                playerChartInstance.options.scales.x.grid.color = gridColor;
+                playerChartInstance.options.scales.y.ticks.color = tickColor;
+                playerChartInstance.options.scales.y.grid.color = gridColor;
+                playerChartInstance.options.scales.y1.ticks.color = tickColor;
+                playerChartInstance.options.plugins.title.color = tickColor;
+                playerChartInstance.options.plugins.legend.labels.color = tickColor;
+                playerChartInstance.update();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 保存されたテーマの読み込み
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('theme-toggle').textContent = '☀️';
+            }
+        });
+
+        // ==========================================
+        // 🌤️ 天気・位置情報システム 
+        // ==========================================
         function fetchWeather() {
             const locText = document.getElementById('location-text');
             const tempText = document.getElementById('temp-text');
@@ -419,11 +552,11 @@
                         tempText.textContent = `${temp} ℃`;
                         
                         let advice = "";
-                        if(temp >= 30) advice = "🥵 <b>【熱中症・脱水警戒】</b><br>非常に暑いです。練習30分前に250〜500mlのウォーターローディングを行い、練習中も塩分（電解質）を含むドリンクをこまめに摂りましょう。";
-                        else if(temp >= 25) advice = "💦 <b>【暑熱環境】</b><br>発汗量が増え、体重の2%の水分を失うとスプリントの出力が露骨に落ちます。喉が渇く前に水分補給を。";
+                        if(temp >= 30) advice = "🥵 <b>【熱中症・脱水警戒】</b><br>非常に暑いです。練習30分前に250〜500mlの水分補給を行い、練習中も塩分を含むドリンクを摂りましょう。";
+                        else if(temp >= 25) advice = "💦 <b>【暑熱環境】</b><br>発汗量が増え、体重の2%の水分を失うと出力が露骨に落ちます。喉が渇く前に水分補給を。";
                         else if(temp >= 15) advice = "😊 <b>【適温環境】</b><br>スプリントに適した良い気候です。質の高い出力にフォーカスしましょう。";
-                        else if(temp >= 10) advice = "🧥 <b>【肌寒い環境】</b><br>体が温まるまで時間がかかります。防寒着を着たまま、動的ストレッチ（ダイナミックウォームアップ）の時間を普段より長めに取りましょう。";
-                        else advice = "🥶 <b>【寒冷・肉離れ警戒】</b><br>気温が低く、筋肉（特にハムやふくらはぎ）が硬直しやすいです。急激な出力は肉離れのリスク大！アップを念入りに行ってください。";
+                        else if(temp >= 10) advice = "🧥 <b>【肌寒い環境】</b><br>体が温まるまで時間がかかります。動的ストレッチの時間を長めに取りましょう。";
+                        else advice = "🥶 <b>【寒冷・肉離れ警戒】</b><br>筋肉が硬直しやすいです。急激な出力は肉離れのリスク大！アップを念入りに行ってください。";
                         
                         adviceBox.innerHTML = advice;
                     })
@@ -490,95 +623,147 @@
         }
 
         // ==========================================
-        // ✨ AIアドバイザー（朝用・練習後用）
+        // 🧬 IRS (Injury Risk Score) 算出ロジック
+        // ==========================================
+        function calculateIRS(type) {
+            let score = 10; 
+            
+            if(type === 'pre') {
+                const fatigue = parseInt(document.getElementById('fatigue').value);
+                const stress = parseInt(document.getElementById('stress').value);
+                const sleep = parseFloat(document.getElementById('sleep').value) || 0;
+                const sleepQualityNode = document.querySelector('input[name="sleep-quality"]:checked');
+                const sleepQuality = sleepQualityNode ? parseInt(sleepQualityNode.value) : 5; 
+                
+                if (fatigue >= 8) score += 20;
+                else if (fatigue >= 6) score += 10;
+                if (stress >= 8) score += 10;
+
+                if (sleep > 0 && sleep < 6) score += 15;
+                else if (sleep > 0 && sleep < 7) score += 5;
+                if (sleepQuality <= 2) score += 10;
+
+                if (selectedSorenessPre.includes('ハムストリングス')) score += 25; 
+                if (selectedSorenessPre.includes('カーフ') || selectedSorenessPre.includes('アキレス腱')) score += 15;
+                if (selectedSorenessPre.includes('腸腰筋') || selectedSorenessPre.includes('大腿四頭筋')) score += 10;
+                
+                const criticalParts = ['ハムストリングス', 'カーフ', 'アキレス腱', '腸腰筋', '大腿四頭筋'];
+                selectedSorenessPre.forEach(part => {
+                    if(!criticalParts.includes(part)) score += 5;
+                });
+
+                updateIRSUIDisplay('pre', score);
+                
+            } else if (type === 'post') {
+                const rpe = parseFloat(document.getElementById('rpe').value) || 0;
+                const loadText = document.getElementById('load-result').textContent;
+                const load = loadText !== '-' ? parseFloat(loadText) : 0;
+                
+                if (rpe >= 8) score += 15;
+                if (load > 600) score += 15;
+
+                if (selectedSorenessPost.includes('ハムストリングス')) score += 30; 
+                if (selectedSorenessPost.includes('カーフ') || selectedSorenessPost.includes('アキレス腱')) score += 20;
+                if (selectedSorenessPost.includes('腸腰筋') || selectedSorenessPost.includes('大腿四頭筋')) score += 15;
+                
+                const criticalParts = ['ハムストリングス', 'カーフ', 'アキレス腱', '腸腰筋', '大腿四頭筋'];
+                selectedSorenessPost.forEach(part => {
+                    if(!criticalParts.includes(part)) score += 5;
+                });
+
+                updateIRSUIDisplay('post', score);
+            }
+        }
+
+        function updateIRSUIDisplay(type, rawScore) {
+            let score = Math.min(rawScore, 95);
+            const fillEl = document.getElementById(`irs-bar-${type}`);
+            const valEl = document.getElementById(`irs-value-${type}`);
+            const statusEl = document.getElementById(`irs-status-${type}`);
+            
+            valEl.textContent = `${score}%`;
+            fillEl.style.width = `${score}%`;
+
+            if (score <= 30) {
+                fillEl.style.backgroundColor = "#10b981"; 
+                statusEl.style.color = "#10b981";
+                statusEl.textContent = "🟢 安全圏 (Normal)";
+            } else if (score <= 50) {
+                fillEl.style.backgroundColor = "#f59e0b"; 
+                statusEl.style.color = "#f59e0b";
+                statusEl.textContent = "🟡 注意 (Caution)";
+            } else if (score <= 75) {
+                fillEl.style.backgroundColor = "#ea580c"; 
+                statusEl.style.color = "#ea580c";
+                statusEl.textContent = "🟠 警戒 (Warning)";
+            } else {
+                fillEl.style.backgroundColor = "#dc2626"; 
+                statusEl.style.color = "#dc2626";
+                statusEl.textContent = "🔴 危険 (Danger)";
+            }
+        }
+
+        // ==========================================
+        // ✨ AIアドバイザー
         // ==========================================
         function updateAIAdvicePre() {
+            calculateIRS('pre');
+
             const fatigue = parseInt(document.getElementById('fatigue').value);
-            const stress = parseInt(document.getElementById('stress').value);
             const sleep = parseFloat(document.getElementById('sleep').value) || 0;
             const sleepQualityNode = document.querySelector('input[name="sleep-quality"]:checked');
             const sleepQuality = sleepQualityNode ? parseInt(sleepQualityNode.value) : 5; 
             
             let advices = [];
             
-            if (sleep > 0 && sleep < 7) {
-                advices.push("💤 <b>【睡眠不足アラート】</b><br>睡眠が7時間未満の場合、<b>ケガのリスクが約1.7倍</b>に跳ね上がり、反応速度も低下します。今日の練習は集中力を高め、終了後は早めに寝るよう計画してください。");
-            } else if (sleepQuality <= 2) {
-                advices.push("💤 <b>【睡眠の質低下】</b><br>長く寝ても質が悪いと神経系の疲労が抜けません。アップでは「リラックス」を意識してください。");
-            }
+            if (sleep > 0 && sleep < 7) advices.push("💤 <b>【睡眠不足アラート】</b><br>睡眠が7時間未満の場合、<b>ケガのリスクが約1.7倍</b>に跳ね上がり、反応速度も低下します。今日の練習は集中力を高め、終了後は早めに寝るよう計画してください。");
+            else if (sleepQuality <= 2) advices.push("💤 <b>【睡眠の質低下】</b><br>長く寝ても質が悪いと神経系の疲労が抜けません。アップでは「リラックス」を意識してください。");
 
-            if (selectedSorenessPre.includes('ハムストリングス')) {
-                advices.push("💡 <b>【ハムの張り】</b><br>練習前に仰向けで足を上げ、無理のない範囲で静的な収縮を入れて痛みの度合いをチェックしてください。");
-            }
-            if (selectedSorenessPre.includes('腸腰筋') || selectedSorenessPre.includes('大腿四頭筋')) {
-                advices.push("💡 <b>【前ももの張り】</b><br>ブレーキ動作が多くなっているか、骨盤が後傾気味です。アップで大臀筋（お尻）にスイッチを入れるドリルを多めに行いましょう。");
-            }
-            if (selectedSorenessPre.includes('カーフ') || selectedSorenessPre.includes('アキレス腱') || selectedSorenessPre.includes('足裏')) {
-                advices.push("💡 <b>【足部・下腿の疲労】</b><br>接地時のバネ組織が疲労しています。今日は過度な跳躍や反発ドリルは控えめにするのが無難です。");
-            }
-            if (selectedSorenessPre.includes('腕')) {
-                advices.push("💡 <b>【腕の張り】</b><br>スプリント時の腕振りによる疲労や、ウエイトトレーニングの影響が考えられます。肩甲骨周りと合わせてストレッチを行い、上半身の連動性を保ちましょう。");
-            }
+            if (selectedSorenessPre.includes('ハムストリングス')) advices.push("💡 <b>【ハムの張り】</b><br>練習前に仰向けで足を上げ、無理のない範囲で静的な収縮を入れて痛みの度合いをチェックしてください。");
+            if (selectedSorenessPre.includes('腸腰筋') || selectedSorenessPre.includes('大腿四頭筋')) advices.push("💡 <b>【前ももの張り】</b><br>ブレーキ動作が多くなっているか、骨盤が後傾気味です。アップで大臀筋（お尻）にスイッチを入れるドリルを多めに行いましょう。");
+            if (selectedSorenessPre.includes('カーフ') || selectedSorenessPre.includes('アキレス腱') || selectedSorenessPre.includes('足裏')) advices.push("💡 <b>【足部・下腿の疲労】</b><br>接地時のバネ組織が疲労しています。今日は過度な跳躍や反発ドリルは控えめにするのが無難です。");
+            if (selectedSorenessPre.includes('腕')) advices.push("💡 <b>【腕の張り】</b><br>スプリント時の腕振りによる疲労や、ウエイトトレーニングの影響が考えられます。肩甲骨周りと合わせてストレッチを行い、上半身の連動性を保ちましょう。");
 
-            if (fatigue >= 8) {
-                advices.push("⚠️ <b>【過労警告】</b><br>起床時から強い疲労があります。高強度のスプリントは避け、回復走や技術確認に留める勇気を持つことも重要です。");
-            }
+            if (fatigue >= 8) advices.push("⚠️ <b>【過労警告】</b><br>起床時から強い疲労があります。高強度のスプリントは避け、回復走や技術確認に留める勇気を持つことも重要です。");
 
             const box = document.getElementById('ai-advice-pre');
             if (advices.length === 0) {
                 box.innerHTML = "✨ <b>【Good!】</b> 起床時の状態は良好です。天候に合わせたウォームアップを行い、今日の目標にフォーカスしましょう！";
                 box.style.borderLeftColor = "#10b981";
             } else {
-                box.innerHTML = advices.join("<hr style='border-top:1px dashed #cbd5e1; margin:10px 0;'>");
+                box.innerHTML = advices.join("<hr style='border-top:1px dashed var(--border-color); margin:10px 0;'>");
                 box.style.borderLeftColor = "#f59e0b";
             }
         }
 
         function updateAIAdvicePost() {
+            calculateIRS('post');
+
             const loadText = document.getElementById('load-result').textContent;
             const rpe = parseFloat(document.getElementById('rpe').value);
             let advices = [];
 
-            if (loadText !== '-' && parseFloat(loadText) > 600) {
-                advices.push("🔥 <b>【ハイロード警告】</b><br>今日の負荷は非常に高いです。筋肉のグリコーゲンが枯渇しているため、練習後30分以内に炭水化物とタンパク質を必ず摂取してください。");
-            }
-            if (rpe >= 8) {
-                advices.push("🥵 <b>【高RPEへの対応】</b><br>かなりキツイ練習でした。神経系が興奮しているため、今夜はぬるめのお湯に浸かり、副交感神経を優位にしてリラックスしましょう。");
-            }
+            if (loadText !== '-' && parseFloat(loadText) > 600) advices.push("🔥 <b>【ハイロード警告】</b><br>今日の負荷は非常に高いです。筋肉のグリコーゲンが枯渇しているため、練習後30分以内に炭水化物とタンパク質を必ず摂取してください。");
+            if (rpe >= 8) advices.push("🥵 <b>【高RPEへの対応】</b><br>かなりキツイ練習でした。神経系が興奮しているため、今夜はぬるめのお湯に浸かり、副交感神経を優位にしてリラックスしましょう。");
 
             const sprintDataArray = getSprintData();
-            if (sprintDataArray.length >= 3) {
-                advices.push("🏃‍♂️ <b>【スプリント過多注意】</b><br>複数回のスプリント計測を行いました。脳へのダメージが大きいため、明日は爆発的なメニューを避けるのが理想的です。");
-            }
+            if (sprintDataArray.length >= 3) advices.push("🏃‍♂️ <b>【スプリント過多注意】</b><br>複数回のスプリント計測を行いました。脳へのダメージが大きいため、明日は爆発的なメニューを避けるのが理想的です。");
 
-            // 🔥 練習後の張り・痛みに対する専用アドバイス（疲労回復・ケア特化に変更）
-            if (selectedSorenessPost.includes('ハムストリングス')) {
-                advices.push("💡 <b>【ハムのケア】</b><br>スプリントで最も酷使される部位です。強い張りがある場合は無理にストレッチせず、まずはアイシング等で熱を抜き、その後交代浴やお風呂で血流を促して疲労物質を流しましょう。");
-            }
-            if (selectedSorenessPost.includes('腸腰筋') || selectedSorenessPost.includes('大腿四頭筋')) {
-                advices.push("💡 <b>【前もも・股関節のケア】</b><br>ブレーキ動作や脚の引き上げで疲労しています。お風呂上がりに股関節の前側をゆっくり伸ばす静的ストレッチや、フォームローラーで太もも前をほぐすのが有効です。");
-            }
-            if (selectedSorenessPost.includes('カーフ') || selectedSorenessPost.includes('アキレス腱') || selectedSorenessPost.includes('足裏')) {
-                advices.push("💡 <b>【足部・下腿のケア】</b><br>接地の衝撃でふくらはぎや足底が硬くなっています。テニスボールや青竹踏みで足裏をほぐし、ふくらはぎは下から上へ血流を戻すように優しくマッサージしてください。");
-            }
-            if (selectedSorenessPost.includes('臀部')) {
-                advices.push("💡 <b>【お尻のケア】</b><br>推進力を生む大きな筋肉が疲労しています。テニスボールをお尻の下に置いて自重でリリースしたり、仰向けで膝を胸に抱えるストレッチで張りをとりましょう。");
-            }
-            if (selectedSorenessPost.includes('背中') || selectedSorenessPost.includes('肩') || selectedSorenessPost.includes('腕')) {
-                advices.push("💡 <b>【上半身のケア】</b><br>腕振りや体幹の固定による疲労です。フォームローラーでの胸椎の伸展や、肩甲骨周りのストレッチを行い、上半身の力みをリセットしましょう。");
-            }
+            if (selectedSorenessPost.includes('ハムストリングス')) advices.push("💡 <b>【ハムのケア】</b><br>スプリントで最も酷使される部位です。強い張りがある場合は無理にストレッチせず、まずはアイシング等で熱を抜き、その後交代浴やお風呂で血流を促して疲労物質を流しましょう。");
+            if (selectedSorenessPost.includes('腸腰筋') || selectedSorenessPost.includes('大腿四頭筋')) advices.push("💡 <b>【前もも・股関節のケア】</b><br>ブレーキ動作や脚の引き上げで疲労しています。お風呂上がりに股関節の前側をゆっくり伸ばす静的ストレッチや、フォームローラーで太もも前をほぐすのが有効です。");
+            if (selectedSorenessPost.includes('カーフ') || selectedSorenessPost.includes('アキレス腱') || selectedSorenessPost.includes('足裏')) advices.push("💡 <b>【足部・下腿のケア】</b><br>接地の衝撃でふくらはぎや足底が硬くなっています。テニスボールや青竹踏みで足裏をほぐし、ふくらはぎは下から上へ血流を戻すように優しくマッサージしてください。");
+            if (selectedSorenessPost.includes('臀部')) advices.push("💡 <b>【お尻のケア】</b><br>推進力を生む大きな筋肉が疲労しています。テニスボールをお尻の下に置いて自重でリリースしたり、仰向けで膝を胸に抱えるストレッチで張りをとりましょう。");
+            if (selectedSorenessPost.includes('背中') || selectedSorenessPost.includes('肩') || selectedSorenessPost.includes('腕')) advices.push("💡 <b>【上半身のケア】</b><br>腕振りや体幹の固定による疲労です。フォームローラーでの胸椎の伸展や、肩甲骨周りのストレッチを行い、上半身の力みをリセットしましょう。");
 
             const badText = document.getElementById('bad').value;
-            if(badText.includes('痛') || badText.includes('違和感')) {
-                advices.push("🚑 <b>【痛みへの対処】</b><br>痛みを伴う違和感がある場合、無理なストレッチはかえって炎症を悪化させます。様子を見て安静にしてください。");
-            }
+            if(badText.includes('痛') || badText.includes('違和感')) advices.push("🚑 <b>【痛みへの対処】</b><br>痛みを伴う違和感がある場合、無理なストレッチはかえって炎症を悪化させます。様子を見て安静にしてください。");
 
             const box = document.getElementById('ai-advice-post');
             if (advices.length === 0) {
                 box.innerHTML = "✨ <b>【お疲れ様でした】</b><br>適度な負荷の練習でした。入力した「実施するケア」を必ず実行し、明日に備えてしっかり睡眠を取りましょう！";
                 box.style.borderLeftColor = "#10b981";
             } else {
-                box.innerHTML = advices.join("<hr style='border-top:1px dashed #cbd5e1; margin:10px 0;'>");
+                box.innerHTML = advices.join("<hr style='border-top:1px dashed var(--border-color); margin:10px 0;'>");
                 box.style.borderLeftColor = "#3b82f6";
             }
         }
@@ -671,10 +856,9 @@
                 partialData.heartRate = document.getElementById('heart-rate').value;
                 partialData.fatigue = document.getElementById('fatigue').value;
                 partialData.stress = document.getElementById('stress').value;
-                
-                // 過去の互換性のため、朝の張りは soreness という名前で保存
                 partialData.soreness = selectedSorenessPre.join(', ');
                 partialData.aiAdvicePre = document.getElementById('ai-advice-pre').innerHTML;
+                partialData.irsPre = document.getElementById('irs-value-pre').textContent;
             } else {
                 partialData.duration = document.getElementById('duration').value;
                 partialData.rpe = document.getElementById('rpe').value;
@@ -684,12 +868,10 @@
                 partialData.steps = document.getElementById('steps').value;
                 partialData.good = document.getElementById('good').value;
                 partialData.bad = document.getElementById('bad').value;
-                
-                // 練習後の張り
                 partialData.sorenessPost = selectedSorenessPost.join(', ');
-                
                 partialData.care = document.getElementById('care').value;
                 partialData.aiAdvicePost = document.getElementById('ai-advice-post').innerHTML;
+                partialData.irsPost = document.getElementById('irs-value-post').textContent;
             }
 
             try {
@@ -715,8 +897,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('date').valueAsDate = new Date();
-            addSprintRow();
-
+            
             document.getElementById('fatigue').addEventListener('input', function() {
                 document.getElementById('fatigue-display').textContent = `${getEmojiForFatigue(this.value)} ${this.value}`;
                 updateAIAdvicePre();
@@ -744,7 +925,6 @@
             rpeSlider.addEventListener('input', calcLoad);
             document.getElementById('bad').addEventListener('input', updateAIAdvicePost);
             
-            // 朝の張り選択ボタン
             document.querySelectorAll('.tag-btn-pre').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const part = this.getAttribute('data-part');
@@ -759,7 +939,6 @@
                 });
             });
 
-            // 練習後の張り選択ボタン
             document.querySelectorAll('.tag-btn-post').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const part = this.getAttribute('data-part');
@@ -816,26 +995,73 @@
             list.innerHTML = '';
             myLogs.forEach(log => {
                 let sprintHtml = '';
-                if(log.sprintLogs) log.sprintLogs.forEach(s => sprintHtml += `<span class="stat-badge" style="background:#f3e8ff; color:#6b21a8;">🏃‍♂️ ${s.distance}m: ${s.time}s</span> `);
+                if(log.sprintLogs) log.sprintLogs.forEach(s => sprintHtml += `<span class="stat-badge" style="background:var(--primary); color:white;">🏃‍♂️ ${s.distance}m: ${s.time}s</span> `);
                 
-                const sorenessHtml = log.soreness ? `<div class="history-text-item"><span class="history-label">🌅 朝の張り:</span> <span style="color:#b45309; font-weight:bold; font-size:13px;">${log.soreness}</span></div>` : '';
+                const sorenessHtml = log.soreness ? `<div class="history-text-item"><span class="history-label">🌅 朝の張り:</span> <span style="color:var(--tag-sel-text); font-weight:bold; font-size:13px;">${log.soreness}</span></div>` : '';
                 const sorenessPostHtml = log.sorenessPost ? `<div class="history-text-item"><span class="history-label">🏃‍♂️ 練習後の張り:</span> <span style="color:#ea580c; font-weight:bold; font-size:13px;">${log.sorenessPost}</span></div>` : '';
 
                 list.innerHTML += `
                 <div class="history-card">
-                    <div style="font-weight:bold; border-bottom:1px solid #e2e8f0; padding-bottom:5px; margin-bottom:10px;">📅 ${log.date}</div>
+                    <div class="history-date">📅 ${log.date}</div>
                     <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;">
-                        <span class="stat-badge" style="background:#fee2e2; color:#991b1b;">疲労(朝): ${log.fatigue||'-'}</span>
-                        <span class="stat-badge" style="background:#dbeafe; color:#1e40af;">Load: ${log.trainingLoad||'-'}</span>
+                        <span class="stat-badge" style="background:var(--warning-text); color:white;">疲労(朝): ${log.fatigue||'-'}</span>
+                        <span class="stat-badge" style="background:var(--primary); color:white;">Load: ${log.trainingLoad||'-'}</span>
                         ${sprintHtml}
                     </div>
-                    <div style="font-size:12px; color:#475569;">
+                    <div style="font-size:12px; color:var(--text-muted);">
                         ${sorenessHtml}
                         ${sorenessPostHtml}
-                        <b>練習後ケア:</b> ${log.care||'-'}
+                        <div style="margin-top: 5px;">
+                            <b style="color:var(--text-main);">練習後ケア:</b>
+                            <div class="history-text-content">${log.care||'-'}</div>
+                        </div>
                     </div>
                 </div>`;
             });
+
+            // グラフの描画
+            if (typeof Chart !== 'undefined') {
+                const ctx = document.getElementById('player-chart');
+                if (ctx) {
+                    const recentLogs = [...myLogs].slice(0, 7).reverse();
+                    const labels = recentLogs.map(log => {
+                        if (!log.date) return '不明';
+                        const parts = log.date.split('-');
+                        return parts.length === 3 ? `${parts[1]}/${parts[2]}` : log.date;
+                    });
+                    const loadData = recentLogs.map(log => parseFloat(log.trainingLoad) || 0);
+                    const fatigueData = recentLogs.map(log => parseInt(log.fatigue) || 0);
+
+                    if (playerChartInstance) playerChartInstance.destroy();
+
+                    const isDark = document.body.classList.contains('dark-mode');
+                    const tickColor = isDark ? '#94a3b8' : '#64748b';
+                    const gridColor = isDark ? '#334155' : '#e2e8f0';
+
+                    playerChartInstance = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                { label: 'Training Load', data: loadData, borderColor: '#3b82f6', backgroundColor: '#3b82f6', yAxisID: 'y', tension: 0.2 },
+                                { label: '疲労度', data: fatigueData, borderColor: '#ef4444', backgroundColor: '#ef4444', borderDash: [5, 5], yAxisID: 'y1', tension: 0.2 }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { 
+                                title: { display: true, text: '最近のコンディション推移 (最大7日間)', color: tickColor },
+                                legend: { labels: { color: tickColor } }
+                            },
+                            scales: {
+                                x: { ticks: { color: tickColor }, grid: { color: gridColor } },
+                                y: { beginAtZero: true, position: 'left', ticks: { color: tickColor }, grid: { color: gridColor } },
+                                y1: { beginAtZero: true, min: 0, max: 10, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: tickColor } }
+                            }
+                        }
+                    });
+                }
+            }
         }
         document.getElementById('my-sprint-distance').addEventListener('change', () => renderPlayerHistory(document.getElementById('player-name').value));
 
