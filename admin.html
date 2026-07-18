@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AthleSense-KIUH edition - 管理者画面</title>
+    <title>AthleSense KIUH - Admin</title>
 
     <link rel="manifest" href="manifest-admin.json">
     <meta name="theme-color" content="#1e3a8a">
@@ -26,7 +26,7 @@
     <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6; color: #333; margin: 0; padding: 0; line-height: 1.6; }
         .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
-        header { background-color: #1e3a8a; color: white; padding: 15px 20px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; }
+        header { background-color: #1e3a8a; color: white; padding: 15px 20px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .card { background-color: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .section-title { font-size: 18px; font-weight: bold; color: #1e3a8a; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; margin-bottom: 15px; margin-top: 0; }
         
@@ -84,12 +84,14 @@
         .stat-box-desc { font-size: 11px; color: #64748b; }
 
         .table-responsive { overflow-x: auto; }
-        #admin-table { width: 100%; border-collapse: collapse; min-width: 1300px; font-size: 13px; }
+        #admin-table { width: 100%; border-collapse: collapse; min-width: 1400px; font-size: 13px; }
         #admin-table th, #admin-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e5e7eb; }
         #admin-table th { background-color: #f3f4f6; color: #4b5563; font-weight: bold; }
         #admin-table tr:hover { background-color: #f9fafb; }
         .alert-text { color: #dc2626; font-weight: bold; }
+        
         .tag-text { background-color: #fef08a; color: #b45309; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 4px; display: inline-block; margin-bottom: 2px;}
+        .tag-text-post { background-color: #ffedd5; color: #c2410c; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 4px; display: inline-block; margin-bottom: 2px;}
         
         .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .status-badge { font-size: 12px; padding: 4px 8px; border-radius: 12px; font-weight: normal; margin-left: 10px; vertical-align: middle; }
@@ -117,7 +119,7 @@
 <body>
 
     <header>
-        AthleSense-KIUH - ダッシュボード <span id="connection-status" class="status-badge status-local">ローカル</span>
+        AthleSense KIUH - Admin <span id="connection-status" class="status-badge status-local">ローカル</span>
     </header>
 
     <div class="container">
@@ -166,7 +168,7 @@
             <div class="team-analytics-container">
                 <div style="margin-bottom: 20px;">
                     <h4 style="margin-top:0; color:#4b5563; font-size:15px; text-align:center;">筋肉痛・張りの部位別ヒートマップ</h4>
-                    <p style="font-size:11px; color:#64748b; text-align:center; margin-bottom: 10px;">※記録がある最新日から、<span style="color:#ef4444; font-weight:bold;">その日を含めて過去3日間</span>のデータで集計しています。<br>色が濃いほど痛みを訴える人数が多い部位です。</p>
+                    <p style="font-size:11px; color:#64748b; text-align:center; margin-bottom: 10px;">※記録がある最新日から過去3日間のデータで集計。<br>（朝の張りと練習後のダメージを統合して算出しています）</p>
                     <div class="heatmap-container">
                         <div class="human-body">
                             <svg viewBox="0 0 100 225" width="100%" height="100%">
@@ -183,6 +185,10 @@
                                 <circle id="heat-head-f" class="heat-spot" cx="50" cy="30" r="12" fill="#ef4444" opacity="0" /> 
                                 <circle id="heat-chest" class="heat-spot" cx="50" cy="65" r="14" fill="#ef4444" opacity="0" /> 
                                 <circle id="heat-abs" class="heat-spot" cx="50" cy="95" r="12" fill="#ef4444" opacity="0" /> 
+                                
+                                <ellipse id="heat-arm-l-f" class="heat-spot" cx="21" cy="80" rx="7" ry="25" fill="#ef4444" opacity="0" />
+                                <ellipse id="heat-arm-r-f" class="heat-spot" cx="79" cy="80" rx="7" ry="25" fill="#ef4444" opacity="0" />
+                                
                                 <circle id="heat-hip-l" class="heat-spot" cx="38" cy="115" r="9" fill="#ef4444" opacity="0" /> 
                                 <circle id="heat-hip-r" class="heat-spot" cx="62" cy="115" r="9" fill="#ef4444" opacity="0" /> 
                                 <ellipse id="heat-quads-l" class="heat-spot" cx="41" cy="150" rx="10" ry="16" fill="#ef4444" opacity="0" /> 
@@ -206,6 +212,10 @@
                                 <circle id="heat-shoulder-l" class="heat-spot" cx="32" cy="55" r="10" fill="#ef4444" opacity="0" /> 
                                 <circle id="heat-shoulder-r" class="heat-spot" cx="68" cy="55" r="10" fill="#ef4444" opacity="0" /> 
                                 <ellipse id="heat-back" class="heat-spot" cx="50" cy="85" rx="16" ry="20" fill="#ef4444" opacity="0" /> 
+                                
+                                <ellipse id="heat-arm-l-b" class="heat-spot" cx="21" cy="80" rx="7" ry="25" fill="#ef4444" opacity="0" />
+                                <ellipse id="heat-arm-r-b" class="heat-spot" cx="79" cy="80" rx="7" ry="25" fill="#ef4444" opacity="0" />
+                                
                                 <circle id="heat-glutes-l" class="heat-spot" cx="39" cy="120" r="10" fill="#ef4444" opacity="0" /> 
                                 <circle id="heat-glutes-r" class="heat-spot" cx="61" cy="120" r="10" fill="#ef4444" opacity="0" /> 
                                 <ellipse id="heat-hams-l" class="heat-spot" cx="41" cy="150" rx="9" ry="15" fill="#ef4444" opacity="0" /> 
@@ -341,6 +351,69 @@
                         <div class="stat-box-value" id="stat-strain">-</div>
                         <div class="stat-box-desc">総合的な負担 (Total Load × Monotony)。この値の急増に注意。</div>
                     </div>
+
+                    <div style="margin-top: 25px; padding-top: 20px; border-top: 2px dashed #cbd5e1;">
+                        <h4 style="margin-top: 0; color: #1e3a8a; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; font-size: 13px;">痛み・張り (直近7回分)</h4>
+                        <div class="heatmap-container" style="gap: 15px; padding: 10px 5px; margin-bottom: 10px; background-color: transparent; border: none;">
+                            <div class="human-body" style="width: 70px;">
+                                <svg viewBox="0 0 100 225" width="100%" height="100%">
+                                    <text x="50" y="12" font-size="12" font-weight="bold" text-anchor="middle" fill="#6b7280">前</text>
+                                    <circle cx="50" cy="30" r="12" fill="#e5e7eb" /> 
+                                    <rect x="32" y="45" width="36" height="65" rx="8" fill="#e5e7eb" /> 
+                                    <rect x="14" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
+                                    <rect x="72" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
+                                    <rect x="34" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
+                                    <rect x="52" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
+                                    <ellipse cx="41" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
+                                    <ellipse cx="59" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
+                                    
+                                    <circle id="player-heat-head-f" class="heat-spot" cx="50" cy="30" r="12" fill="#ef4444" opacity="0" /> 
+                                    <circle id="player-heat-chest" class="heat-spot" cx="50" cy="65" r="14" fill="#ef4444" opacity="0" /> 
+                                    <circle id="player-heat-abs" class="heat-spot" cx="50" cy="95" r="12" fill="#ef4444" opacity="0" /> 
+                                    <ellipse id="player-heat-arm-l-f" class="heat-spot" cx="21" cy="80" rx="7" ry="25" fill="#ef4444" opacity="0" />
+                                    <ellipse id="player-heat-arm-r-f" class="heat-spot" cx="79" cy="80" rx="7" ry="25" fill="#ef4444" opacity="0" />
+                                    <circle id="player-heat-hip-l" class="heat-spot" cx="38" cy="115" r="9" fill="#ef4444" opacity="0" /> 
+                                    <circle id="player-heat-hip-r" class="heat-spot" cx="62" cy="115" r="9" fill="#ef4444" opacity="0" /> 
+                                    <ellipse id="player-heat-quads-l" class="heat-spot" cx="41" cy="150" rx="10" ry="16" fill="#ef4444" opacity="0" /> 
+                                    <ellipse id="player-heat-quads-r" class="heat-spot" cx="59" cy="150" rx="10" ry="16" fill="#ef4444" opacity="0" /> 
+                                </svg>
+                            </div>
+                            
+                            <div class="human-body" style="width: 70px;">
+                                <svg viewBox="0 0 100 225" width="100%" height="100%">
+                                    <text x="50" y="12" font-size="12" font-weight="bold" text-anchor="middle" fill="#6b7280">後</text>
+                                    <circle cx="50" cy="30" r="12" fill="#e5e7eb" /> 
+                                    <rect x="32" y="45" width="36" height="65" rx="8" fill="#e5e7eb" /> 
+                                    <rect x="14" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
+                                    <rect x="72" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
+                                    <rect x="34" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
+                                    <rect x="52" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
+                                    <ellipse cx="41" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
+                                    <ellipse cx="59" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
+                                    
+                                    <circle id="player-heat-head-b" class="heat-spot" cx="50" cy="30" r="12" fill="#ef4444" opacity="0" /> 
+                                    <circle id="player-heat-shoulder-l" class="heat-spot" cx="32" cy="55" r="10" fill="#ef4444" opacity="0" /> 
+                                    <circle id="player-heat-shoulder-r" class="heat-spot" cx="68" cy="55" r="10" fill="#ef4444" opacity="0" /> 
+                                    <ellipse id="player-heat-back" class="heat-spot" cx="50" cy="85" rx="16" ry="20" fill="#ef4444" opacity="0" /> 
+                                    <ellipse id="player-heat-arm-l-b" class="heat-spot" cx="21" cy="80" rx="7" ry="25" fill="#ef4444" opacity="0" />
+                                    <ellipse id="player-heat-arm-r-b" class="heat-spot" cx="79" cy="80" rx="7" ry="25" fill="#ef4444" opacity="0" />
+                                    <circle id="player-heat-glutes-l" class="heat-spot" cx="39" cy="120" r="10" fill="#ef4444" opacity="0" /> 
+                                    <circle id="player-heat-glutes-r" class="heat-spot" cx="61" cy="120" r="10" fill="#ef4444" opacity="0" /> 
+                                    <ellipse id="player-heat-hams-l" class="heat-spot" cx="41" cy="150" rx="9" ry="15" fill="#ef4444" opacity="0" /> 
+                                    <ellipse id="player-heat-hams-r" class="heat-spot" cx="59" cy="150" rx="9" ry="15" fill="#ef4444" opacity="0" /> 
+                                    <ellipse id="player-heat-calves-l" class="heat-spot" cx="41" cy="180" rx="8" ry="12" fill="#ef4444" opacity="0" /> 
+                                    <ellipse id="player-heat-calves-r" class="heat-spot" cx="59" cy="180" rx="8" ry="12" fill="#ef4444" opacity="0" /> 
+                                    <circle id="player-heat-achilles-l" class="heat-spot" cx="41" cy="200" r="5" fill="#ef4444" opacity="0" /> 
+                                    <circle id="player-heat-achilles-r" class="heat-spot" cx="59" cy="200" r="5" fill="#ef4444" opacity="0" /> 
+                                    <ellipse id="player-heat-sole-l" class="heat-spot" cx="41" cy="210" rx="6" ry="4" fill="#ef4444" opacity="0" /> 
+                                    <ellipse id="player-heat-sole-r" class="heat-spot" cx="59" cy="210" rx="6" ry="4" fill="#ef4444" opacity="0" /> 
+                                </svg>
+                            </div>
+                        </div>
+                        <ul id="player-soreness-list" style="font-size: 12px; padding-left: 20px; margin: 0; color: #475569; min-height: 40px;">
+                            <!-- JSで挿入 -->
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -366,7 +439,8 @@
                          <th>スプリント記録</th>
                          <th>RSI</th>
                          <th>F-v診断</th>
-                         <th>筋肉痛・張り</th>
+                         <th>張り(朝)</th>
+                         <th>張り(後)</th>
                          <th>体重</th>
                          <th>心拍数</th>
                          <th>歩数</th>
@@ -385,15 +459,16 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
+        // 🔑 埋め込み済みFirebase設定
         const myFirebaseConfig = {
-  apiKey: "AIzaSyAQoESOlZIGJfOgfIwpkL0r0YcYu4tl8ZQ",
-  authDomain: "team-conditioning-controling.firebaseapp.com",
-  projectId: "team-conditioning-controling",
-  storageBucket: "team-conditioning-controling.firebasestorage.app",
-  messagingSenderId: "330203393971",
-  appId: "1:330203393971:web:f47b8e66137d0fce8b65c6",
-  measurementId: "G-SCMMTXKZ37"
-};
+          apiKey: "AIzaSyAQoESOlZIGJfOgfIwpkL0r0YcYu4tl8ZQ",
+          authDomain: "team-conditioning-controling.firebaseapp.com",
+          projectId: "team-conditioning-controling",
+          storageBucket: "team-conditioning-controling.firebasestorage.app",
+          messagingSenderId: "330203393971",
+          appId: "1:330203393971:web:f47b8e66137d0fce8b65c6",
+          measurementId: "G-SCMMTXKZ37"
+        };
 
         window.globalLogs = []; 
         window.filteredLogs = []; 
@@ -579,7 +654,6 @@
             document.getElementById('summary-monotony-list').textContent = highMonotonyPlayers.join(', ');
         }
 
-        // 複数スプリントデータ対応のランキング計算
         window.updateSprintRanking = function(logs) {
             const distance = document.getElementById('sprint-ranking-distance').value;
             const rankingBody = document.getElementById('sprint-ranking-body');
@@ -588,10 +662,8 @@
             const bestTimes = {};
 
             logs.forEach(log => {
-                // 🔥ここを修正：元のデータを書き換えないようにコピー（スプレッド構文）を作成
                 let sLogs = log.sprintLogs ? [...log.sprintLogs] : [];
                 
-                // 過去バージョンとの互換性
                 if (log.sprintDistance && log.sprintDistance !== '未計測' && log.sprintTime) {
                     sLogs.push({ distance: log.sprintDistance, time: log.sprintTime });
                 }
@@ -642,7 +714,7 @@
 
         function updateTeamAnalytics(logs) {
             const sorenessCounts = {
-                "頭部": 0, "肩": 0, "背中": 0, "腹筋": 0, "胸部": 0,
+                "頭部": 0, "肩": 0, "背中": 0, "腹筋": 0, "胸部": 0, "腕": 0,
                 "腸腰筋": 0, "臀部": 0, "大腿四頭筋": 0, 
                 "ハムストリングス": 0, "カーフ": 0, "アキレス腱": 0, "足裏": 0,
                 "首": 0, "腰": 0, "胸筋": 0, "臀部(お尻)": 0, "ふくらはぎ": 0
@@ -668,14 +740,20 @@
                 }
             }
 
+            // 朝の張りと練習後の張りを統合して集計（重複を避けるためにSetを使用）
             recentLogsForHeatmap.forEach(log => {
+                const combinedSoreness = new Set();
+                
                 if(log.soreness) {
-                    const parts = log.soreness.split(',');
-                    parts.forEach(p => {
-                        const part = p.trim();
-                        if(sorenessCounts[part] !== undefined) sorenessCounts[part]++;
-                    });
+                    log.soreness.split(',').forEach(p => { if(p.trim()) combinedSoreness.add(p.trim()); });
                 }
+                if(log.sorenessPost) {
+                    log.sorenessPost.split(',').forEach(p => { if(p.trim()) combinedSoreness.add(p.trim()); });
+                }
+                
+                combinedSoreness.forEach(part => {
+                    if(sorenessCounts[part] !== undefined) sorenessCounts[part]++;
+                });
             });
 
             if(sorenessCounts["首"] > 0) sorenessCounts["頭部"] += sorenessCounts["首"];
@@ -686,7 +764,7 @@
 
             const counts = [
                 sorenessCounts["頭部"], sorenessCounts["肩"], sorenessCounts["背中"], 
-                sorenessCounts["腹筋"], sorenessCounts["胸部"], sorenessCounts["腸腰筋"], 
+                sorenessCounts["腹筋"], sorenessCounts["胸部"], sorenessCounts["腕"], sorenessCounts["腸腰筋"], 
                 sorenessCounts["臀部"], sorenessCounts["大腿四頭筋"], sorenessCounts["ハムストリングス"], 
                 sorenessCounts["カーフ"], sorenessCounts["アキレス腱"], sorenessCounts["足裏"]
             ];
@@ -703,6 +781,8 @@
             updateHeatSpot('heat-head-f', sorenessCounts['頭部']);
             updateHeatSpot('heat-chest', sorenessCounts['胸部']);
             updateHeatSpot('heat-abs', sorenessCounts['腹筋']);
+            updateHeatSpot('heat-arm-l-f', sorenessCounts['腕']);
+            updateHeatSpot('heat-arm-r-f', sorenessCounts['腕']);
             updateHeatSpot('heat-hip-l', sorenessCounts['腸腰筋']);
             updateHeatSpot('heat-hip-r', sorenessCounts['腸腰筋']);
             updateHeatSpot('heat-quads-l', sorenessCounts['大腿四頭筋']);
@@ -712,6 +792,8 @@
             updateHeatSpot('heat-shoulder-l', sorenessCounts['肩']);
             updateHeatSpot('heat-shoulder-r', sorenessCounts['肩']);
             updateHeatSpot('heat-back', sorenessCounts['背中']);
+            updateHeatSpot('heat-arm-l-b', sorenessCounts['腕']);
+            updateHeatSpot('heat-arm-r-b', sorenessCounts['腕']);
             updateHeatSpot('heat-glutes-l', sorenessCounts['臀部']);
             updateHeatSpot('heat-glutes-r', sorenessCounts['臀部']);
             updateHeatSpot('heat-hams-l', sorenessCounts['ハムストリングス']);
@@ -726,7 +808,7 @@
             const rankingBody = document.getElementById('soreness-ranking-body');
             rankingBody.innerHTML = '';
             
-            const displayKeys = ["頭部", "肩", "背中", "腹筋", "胸部", "腸腰筋", "臀部", "大腿四頭筋", "ハムストリングス", "カーフ", "アキレス腱", "足裏"];
+            const displayKeys = ["頭部", "肩", "背中", "腹筋", "胸部", "腕", "腸腰筋", "臀部", "大腿四頭筋", "ハムストリングス", "カーフ", "アキレス腱", "足裏"];
             const sortedSoreness = Object.entries(sorenessCounts)
                 .filter(item => item[1] > 0 && displayKeys.includes(item[0]))
                 .sort((a, b) => b[1] - a[1]); 
@@ -829,6 +911,92 @@
             
             document.getElementById('stat-strain').textContent = metrics.strain;
 
+            // --- 個人用の部位別ヒートマップと名称の更新 ---
+            const pSorenessCounts = {
+                "頭部": 0, "肩": 0, "背中": 0, "腹筋": 0, "胸部": 0, "腕": 0,
+                "腸腰筋": 0, "臀部": 0, "大腿四頭筋": 0, 
+                "ハムストリングス": 0, "カーフ": 0, "アキレス腱": 0, "足裏": 0,
+                "首": 0, "腰": 0, "胸筋": 0, "臀部(お尻)": 0, "ふくらはぎ": 0
+            };
+
+            const recentLogsForPlayerHeatmap = playerLogs.slice(-7); // 直近7回分で集計
+
+            recentLogsForPlayerHeatmap.forEach(log => {
+                const combinedSoreness = new Set();
+                if(log.soreness) log.soreness.split(',').forEach(p => { if(p.trim()) combinedSoreness.add(p.trim()); });
+                if(log.sorenessPost) log.sorenessPost.split(',').forEach(p => { if(p.trim()) combinedSoreness.add(p.trim()); });
+                
+                combinedSoreness.forEach(part => {
+                    if(pSorenessCounts[part] !== undefined) pSorenessCounts[part]++;
+                });
+            });
+
+            if(pSorenessCounts["首"] > 0) pSorenessCounts["頭部"] += pSorenessCounts["首"];
+            if(pSorenessCounts["腰"] > 0) pSorenessCounts["背中"] += pSorenessCounts["腰"];
+            if(pSorenessCounts["胸筋"] > 0) pSorenessCounts["胸部"] += pSorenessCounts["胸筋"];
+            if(pSorenessCounts["臀部(お尻)"] > 0) pSorenessCounts["臀部"] += pSorenessCounts["臀部(お尻)"];
+            if(pSorenessCounts["ふくらはぎ"] > 0) pSorenessCounts["カーフ"] += pSorenessCounts["ふくらはぎ"];
+
+            const pCounts = [
+                pSorenessCounts["頭部"], pSorenessCounts["肩"], pSorenessCounts["背中"], 
+                pSorenessCounts["腹筋"], pSorenessCounts["胸部"], pSorenessCounts["腕"], pSorenessCounts["腸腰筋"], 
+                pSorenessCounts["臀部"], pSorenessCounts["大腿四頭筋"], pSorenessCounts["ハムストリングス"], 
+                pSorenessCounts["カーフ"], pSorenessCounts["アキレス腱"], pSorenessCounts["足裏"]
+            ];
+            const pMaxCount = Math.max(...pCounts, 0);
+
+            const updatePlayerHeatSpot = (id, count) => {
+                const el = document.getElementById(id);
+                if(el) {
+                    const opacity = pMaxCount > 0 ? (count / pMaxCount) * 0.85 : 0;
+                    el.setAttribute('opacity', opacity);
+                }
+            };
+
+            updatePlayerHeatSpot('player-heat-head-f', pSorenessCounts['頭部']);
+            updatePlayerHeatSpot('player-heat-chest', pSorenessCounts['胸部']);
+            updatePlayerHeatSpot('player-heat-abs', pSorenessCounts['腹筋']);
+            updatePlayerHeatSpot('player-heat-arm-l-f', pSorenessCounts['腕']);
+            updatePlayerHeatSpot('player-heat-arm-r-f', pSorenessCounts['腕']);
+            updatePlayerHeatSpot('player-heat-hip-l', pSorenessCounts['腸腰筋']);
+            updatePlayerHeatSpot('player-heat-hip-r', pSorenessCounts['腸腰筋']);
+            updatePlayerHeatSpot('player-heat-quads-l', pSorenessCounts['大腿四頭筋']);
+            updatePlayerHeatSpot('player-heat-quads-r', pSorenessCounts['大腿四頭筋']);
+            
+            updatePlayerHeatSpot('player-heat-head-b', pSorenessCounts['頭部']);
+            updatePlayerHeatSpot('player-heat-shoulder-l', pSorenessCounts['肩']);
+            updatePlayerHeatSpot('player-heat-shoulder-r', pSorenessCounts['肩']);
+            updatePlayerHeatSpot('player-heat-back', pSorenessCounts['背中']);
+            updatePlayerHeatSpot('player-heat-arm-l-b', pSorenessCounts['腕']);
+            updatePlayerHeatSpot('player-heat-arm-r-b', pSorenessCounts['腕']);
+            updatePlayerHeatSpot('player-heat-glutes-l', pSorenessCounts['臀部']);
+            updatePlayerHeatSpot('player-heat-glutes-r', pSorenessCounts['臀部']);
+            updatePlayerHeatSpot('player-heat-hams-l', pSorenessCounts['ハムストリングス']);
+            updatePlayerHeatSpot('player-heat-hams-r', pSorenessCounts['ハムストリングス']);
+            updatePlayerHeatSpot('player-heat-calves-l', pSorenessCounts['カーフ']);
+            updatePlayerHeatSpot('player-heat-calves-r', pSorenessCounts['カーフ']);
+            updatePlayerHeatSpot('player-heat-achilles-l', pSorenessCounts['アキレス腱']);
+            updatePlayerHeatSpot('player-heat-achilles-r', pSorenessCounts['アキレス腱']);
+            updatePlayerHeatSpot('player-heat-sole-l', pSorenessCounts['足裏']);
+            updatePlayerHeatSpot('player-heat-sole-r', pSorenessCounts['足裏']);
+
+            const pRankingBody = document.getElementById('player-soreness-list');
+            pRankingBody.innerHTML = '';
+            
+            const pDisplayKeys = ["頭部", "肩", "背中", "腹筋", "胸部", "腕", "腸腰筋", "臀部", "大腿四頭筋", "ハムストリングス", "カーフ", "アキレス腱", "足裏"];
+            const pSortedSoreness = Object.entries(pSorenessCounts)
+                .filter(item => item[1] > 0 && pDisplayKeys.includes(item[0]))
+                .sort((a, b) => b[1] - a[1]); 
+            
+            if(pSortedSoreness.length === 0) {
+                pRankingBody.innerHTML = '<li style="list-style:none; color:#94a3b8; margin-left:-20px; text-align:center;">直近の訴えなし</li>';
+            } else {
+                pSortedSoreness.forEach((item) => {
+                    pRankingBody.innerHTML += `<li><span style="font-weight:bold; color:#334155;">${item[0]}</span> <span style="color:#dc2626;">(${item[1]}回)</span></li>`;
+                });
+            }
+            // ----------------------------------------------------
+
             const displayLogs = playerLogs.slice(-30);
             
             const labels = displayLogs.map(log => {
@@ -894,7 +1062,7 @@
             const tableBody = document.querySelector('#admin-table tbody');
             tableBody.innerHTML = '';
             if (!logsToRender || logsToRender.length === 0) {
-                 tableBody.innerHTML = '<tr><td colspan="15" style="text-align:center;">記録が見つかりません。</td></tr>';
+                 tableBody.innerHTML = '<tr><td colspan="16" style="text-align:center;">記録が見つかりません。</td></tr>';
                  return;
             }
             
@@ -905,22 +1073,28 @@
                 const fatigueText = (parseInt(log.fatigue) >= 8) ? `<span class="alert-text">${log.fatigue} ⚠️</span>` : (log.fatigue || '-');
                 const stressText = (parseInt(log.stress) >= 8) ? `<span class="alert-text">${log.stress} ⚠️</span>` : (log.stress || '-');
                 
+                // 朝の張り
                 let sorenessHtml = '';
                 if (log.soreness) {
-                    const parts = log.soreness.split(',');
-                    parts.forEach(part => {
-                        if(part.trim()) sorenessHtml += `<span class="tag-text">${part.trim()}</span>`;
+                    log.soreness.split(',').forEach(part => {
+                        if(part.trim()) sorenessHtml += `<span class="tag-text">${part.trim()}</span><br>`;
                     });
-                }
+                } else { sorenessHtml = '-'; }
+
+                // 練習後の張り
+                let sorenessPostHtml = '';
+                if (log.sorenessPost) {
+                    log.sorenessPost.split(',').forEach(part => {
+                        if(part.trim()) sorenessPostHtml += `<span class="tag-text-post">${part.trim()}</span><br>`;
+                    });
+                } else { sorenessPostHtml = '-'; }
 
                 const sleepQualityStars = log.sleepQuality ? '★'.repeat(log.sleepQuality) : '';
                 const sleepText = log.sleep ? `${log.sleep}h ${sleepQualityStars ? '<span style="color:#d97706;">('+sleepQualityStars+')</span>' : ''}` : '-';
 
-                // 🔥ここを修正：元のデータを書き換えないようにコピーを作成
                 let sprintDisplayHtml = '';
                 let sLogs = log.sprintLogs ? [...log.sprintLogs] : [];
                 
-                // 過去の互換性
                 if (log.sprintDistance && log.sprintDistance !== '未計測' && log.sprintTime) {
                     sLogs.push({ distance: log.sprintDistance, time: log.sprintTime });
                 }
@@ -943,12 +1117,13 @@
                     <td>${log.rsi && log.rsi !== '-' ? log.rsi : ''}</td>
                     <td>${log.fvResult && log.fvResult !== '-' ? log.fvResult : ''}</td>
                     <td>${sorenessHtml}</td>
+                    <td>${sorenessPostHtml}</td>
                     <td>${log.weight ? log.weight + ' kg' : '-'}</td>
                     <td>${log.heartRate || '-'}</td>
                     <td>${log.steps || '-'}</td>
                     <td>${sleepText}</td>
-                    <td style="color:#dc2626;">${log.injury || ''}</td>
-                    <td style="color:#1d4ed8;">${log.care || ''}</td>
+                    <td style="color:#dc2626; max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${log.injury || ''}">${log.injury || ''}</td>
+                    <td style="color:#1d4ed8; max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${log.care || ''}">${log.care || ''}</td>
                 `;
                 tableBody.appendChild(tr);
             });
@@ -967,13 +1142,14 @@
                 'スプリント1_距離', 'スプリント1_タイム', 
                 'スプリント2_距離', 'スプリント2_タイム', 
                 'スプリント3_距離', 'スプリント3_タイム', 
-                'RSI', 'F-v診断', '筋肉痛', '体重(kg)', '心拍数', '歩数', '睡眠時間', '睡眠の質', 'ケガ', 'メニュー', '感想', 'できたこと', '課題', '実施したケア', 'AIアドバイス'
+                'RSI', 'F-v診断', '朝の筋肉痛・張り', '練習後の筋肉痛・張り', 
+                '体重(kg)', '心拍数', '歩数', '睡眠時間', '睡眠の質', 
+                'ケガ', 'メニュー', '感想', 'できたこと', '課題', '実施したケア', 'AI事前アドバイス', 'AIリカバリーアドバイス'
             ];
             csvContent += headers.join(',') + '\n';
 
             const exportLogs = [...logs].reverse();
             exportLogs.forEach(log => {
-                // 🔥ここを修正：元のデータを書き換えないようにコピーを作成
                 let sLogs = log.sprintLogs ? [...log.sprintLogs] : [];
                 
                 if (log.sprintDistance && log.sprintDistance !== '未計測' && log.sprintTime) {
@@ -988,7 +1164,10 @@
                     s1.distance, s1.time,
                     s2.distance, s2.time,
                     s3.distance, s3.time,
-                    log.rsi, log.fvResult, log.soreness, log.weight, log.heartRate, log.steps, log.sleep, log.sleepQuality, log.injury, log.menu, log.thoughts, log.good, log.bad, log.care, log.aiAdvice
+                    log.rsi, log.fvResult, log.soreness, log.sorenessPost, 
+                    log.weight, log.heartRate, log.steps, log.sleep, log.sleepQuality, 
+                    log.injury, log.menu, log.thoughts, log.good, log.bad, log.care, 
+                    log.aiAdvicePre, log.aiAdvicePost
                 ].map(item => {
                     let text = String(item || '').replace(/"/g, '""').replace(/\n/g, ' ');
                     text = text.replace(/<[^>]*>?/gm, '');
