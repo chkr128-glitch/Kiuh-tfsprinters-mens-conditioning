@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AthleSense KIUH Admin</title>
+    <title>AthleSense-KIUH edition - 管理者画面</title>
 
     <link rel="manifest" href="manifest-admin.json">
     <meta name="theme-color" content="#1e3a8a">
@@ -13,7 +13,6 @@
     <link rel="apple-touch-icon" href="icon-admin.png">
 
     <script>
-        // ローカルファイル（file://）で開いた時はエラーを出さずにスキップするように修正
         if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.protocol === 'http:')) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('sw.js').catch(function(error) {
@@ -53,7 +52,6 @@
         .human-body svg { width: 100%; height: auto; display: block; }
         .heat-spot { transition: opacity 0.4s ease; mix-blend-mode: multiply; }
         
-        /* ランキング表用スタイル（部位用とスプリント用） */
         .ranking-table { margin: 10px auto; border-collapse: collapse; font-size: 12px; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); table-layout: fixed; }
         .ranking-table th, .ranking-table td { padding: 6px 4px; border-bottom: 1px solid #e2e8f0; text-align: center; word-wrap: break-word; overflow-wrap: break-word; }
         .ranking-table th { background-color: #f1f5f9; color: #475569; }
@@ -119,7 +117,7 @@
 <body>
 
     <header>
-        AthleSense KIUH - Admin <span id="connection-status" class="status-badge status-local">ローカル</span>
+        AthleSense-KIUH - ダッシュボード <span id="connection-status" class="status-badge status-local">ローカル</span>
     </header>
 
     <div class="container">
@@ -241,7 +239,6 @@
                     </table>
                 </div>
 
-                <!-- 🆕 スプリント ランキング -->
                 <div style="border-top: 2px dashed #cbd5e1; padding-top: 25px; margin-top: 5px;">
                     <h4 style="margin-top:0; color:#1d4ed8; font-size:16px; text-align:center; margin-bottom:10px;">🏃‍♂️ スプリント ベストタイム・ランキング</h4>
                     <p style="font-size:11px; color:#64748b; text-align:center; margin-bottom: 15px;">※検索枠で指定された期間内の「自己ベストタイム」を抽出してランキング化します。</p>
@@ -366,7 +363,7 @@
                          <th>疲労</th>
                          <th>ｽﾄﾚｽ</th>
                          <th>Load</th>
-                         <th>スプリント</th> <!-- 🆕 追加 -->
+                         <th>スプリント記録</th>
                          <th>RSI</th>
                          <th>F-v診断</th>
                          <th>筋肉痛・張り</th>
@@ -582,7 +579,7 @@
             document.getElementById('summary-monotony-list').textContent = highMonotonyPlayers.join(', ');
         }
 
-        // 🆕 スプリント ランキング生成処理
+        // 複数スプリントデータ対応のランキング計算
         window.updateSprintRanking = function(logs) {
             const distance = document.getElementById('sprint-ranking-distance').value;
             const rankingBody = document.getElementById('sprint-ranking-body');
@@ -590,19 +587,27 @@
 
             const bestTimes = {};
 
-            // 選択された距離のベストタイムを各選手ごとに探す
             logs.forEach(log => {
-                if (log.sprintDistance === distance && log.sprintTime) {
-                    const time = parseFloat(log.sprintTime);
-                    if (!isNaN(time) && time > 0) {
-                        if (!bestTimes[log.playerName] || time < bestTimes[log.playerName]) {
-                            bestTimes[log.playerName] = time;
+                // 🔥ここを修正：元のデータを書き換えないようにコピー（スプレッド構文）を作成
+                let sLogs = log.sprintLogs ? [...log.sprintLogs] : [];
+                
+                // 過去バージョンとの互換性
+                if (log.sprintDistance && log.sprintDistance !== '未計測' && log.sprintTime) {
+                    sLogs.push({ distance: log.sprintDistance, time: log.sprintTime });
+                }
+                
+                sLogs.forEach(s => {
+                    if (s.distance === distance && s.time) {
+                        const time = parseFloat(s.time);
+                        if (!isNaN(time) && time > 0) {
+                            if (!bestTimes[log.playerName] || time < bestTimes[log.playerName]) {
+                                bestTimes[log.playerName] = time;
+                            }
                         }
                     }
-                }
+                });
             });
 
-            // タイムが速い順（昇順）にソート
             const sortedPlayers = Object.entries(bestTimes).sort((a, b) => a[1] - b[1]);
 
             if (sortedPlayers.length === 0) {
@@ -618,7 +623,6 @@
                 const playerName = item[0];
                 const time = item[1];
                 
-                // 同タイムの場合は同じ順位にする処理
                 if (time !== previousTime) {
                     displayRank = currentRank;
                 }
@@ -637,7 +641,6 @@
         };
 
         function updateTeamAnalytics(logs) {
-            // ヒートマップ処理
             const sorenessCounts = {
                 "頭部": 0, "肩": 0, "背中": 0, "腹筋": 0, "胸部": 0,
                 "腸腰筋": 0, "臀部": 0, "大腿四頭筋": 0, 
@@ -743,10 +746,8 @@
                 });
             }
 
-            // スプリントランキングの更新
             updateSprintRanking(logs);
 
-            // F-vグループ処理
             const latestFvData = {};
             logs.forEach(log => {
                 if(log.time30m && log.timeFly20m && parseFloat(log.time30m) > 0 && parseFloat(log.timeFly20m) > 0) {
@@ -915,9 +916,22 @@
                 const sleepQualityStars = log.sleepQuality ? '★'.repeat(log.sleepQuality) : '';
                 const sleepText = log.sleep ? `${log.sleep}h ${sleepQualityStars ? '<span style="color:#d97706;">('+sleepQualityStars+')</span>' : ''}` : '-';
 
-                // 🆕 スプリント記録の表示
-                const sprintDisplay = (log.sprintDistance && log.sprintTime && log.sprintDistance !== '未計測') ? 
-                    `<span style="color: #6b21a8; font-weight: bold;">${log.sprintDistance}m : ${log.sprintTime}s</span>` : '-';
+                // 🔥ここを修正：元のデータを書き換えないようにコピーを作成
+                let sprintDisplayHtml = '';
+                let sLogs = log.sprintLogs ? [...log.sprintLogs] : [];
+                
+                // 過去の互換性
+                if (log.sprintDistance && log.sprintDistance !== '未計測' && log.sprintTime) {
+                    sLogs.push({ distance: log.sprintDistance, time: log.sprintTime });
+                }
+                
+                if (sLogs.length > 0) {
+                    sLogs.forEach(s => {
+                        sprintDisplayHtml += `<span style="color: #6b21a8; font-weight: bold; display: block; margin-bottom: 2px;">${s.distance}m : ${s.time}s</span>`;
+                    });
+                } else {
+                    sprintDisplayHtml = '-';
+                }
 
                 tr.innerHTML = `
                     <td>${log.date || ''}</td>
@@ -925,7 +939,7 @@
                     <td>${fatigueText}</td>
                     <td>${stressText}</td>
                     <td>${log.trainingLoad && log.trainingLoad !== '-' ? log.trainingLoad : ''}</td>
-                    <td>${sprintDisplay}</td>
+                    <td>${sprintDisplayHtml}</td>
                     <td>${log.rsi && log.rsi !== '-' ? log.rsi : ''}</td>
                     <td>${log.fvResult && log.fvResult !== '-' ? log.fvResult : ''}</td>
                     <td>${sorenessHtml}</td>
@@ -948,15 +962,32 @@
             }
 
             let csvContent = '\uFEFF'; 
-            // 🆕 ヘッダーにスプリント項目を追加
-            const headers = ['日付', '選手名', '疲労度', 'ストレス', 'TrainingLoad', 'スプリント距離(m)', 'スプリントタイム(秒)', 'RSI', 'F-v診断', '筋肉痛', '体重(kg)', '心拍数', '歩数', '睡眠時間', '睡眠の質', 'ケガ', 'メニュー', '感想', 'できたこと', '課題', '実施したケア', 'AIアドバイス'];
+            const headers = [
+                '日付', '選手名', '疲労度', 'ストレス', 'TrainingLoad', 
+                'スプリント1_距離', 'スプリント1_タイム', 
+                'スプリント2_距離', 'スプリント2_タイム', 
+                'スプリント3_距離', 'スプリント3_タイム', 
+                'RSI', 'F-v診断', '筋肉痛', '体重(kg)', '心拍数', '歩数', '睡眠時間', '睡眠の質', 'ケガ', 'メニュー', '感想', 'できたこと', '課題', '実施したケア', 'AIアドバイス'
+            ];
             csvContent += headers.join(',') + '\n';
 
             const exportLogs = [...logs].reverse();
             exportLogs.forEach(log => {
+                // 🔥ここを修正：元のデータを書き換えないようにコピーを作成
+                let sLogs = log.sprintLogs ? [...log.sprintLogs] : [];
+                
+                if (log.sprintDistance && log.sprintDistance !== '未計測' && log.sprintTime) {
+                    sLogs.push({ distance: log.sprintDistance, time: log.sprintTime });
+                }
+                const s1 = sLogs[0] || { distance: '', time: '' };
+                const s2 = sLogs[1] || { distance: '', time: '' };
+                const s3 = sLogs[2] || { distance: '', time: '' };
+
                 const row = [
                     log.date, log.playerName, log.fatigue, log.stress, log.trainingLoad, 
-                    log.sprintDistance === '未計測' ? '' : log.sprintDistance, log.sprintTime, 
+                    s1.distance, s1.time,
+                    s2.distance, s2.time,
+                    s3.distance, s3.time,
                     log.rsi, log.fvResult, log.soreness, log.weight, log.heartRate, log.steps, log.sleep, log.sleepQuality, log.injury, log.menu, log.thoughts, log.good, log.bad, log.care, log.aiAdvice
                 ].map(item => {
                     let text = String(item || '').replace(/"/g, '""').replace(/\n/g, ' ');
