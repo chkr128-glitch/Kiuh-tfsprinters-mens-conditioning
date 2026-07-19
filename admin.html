@@ -30,7 +30,7 @@
         .card { background-color: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .section-title { font-size: 18px; font-weight: bold; color: #1e3a8a; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; margin-bottom: 15px; margin-top: 0; }
         
-        select, input[type="text"], input[type="date"] { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; margin-bottom: 10px; box-sizing: border-box; }
+        select, input[type="text"], input[type="date"], input[type="month"], textarea { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; margin-bottom: 10px; box-sizing: border-box; }
         
         /* 🔥 タブ用スタイル */
         .tab-nav { display: flex; background: white; border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
@@ -92,7 +92,7 @@
         .fv-player-ratio { font-size: 11px; color: #64748b; font-weight: normal; background: rgba(255,255,255,0.8); padding: 2px 6px; border-radius: 10px; }
 
         .analysis-container { display: flex; flex-wrap: wrap; gap: 20px; }
-        .chart-area { flex: 2; min-width: 300px; }
+        .chart-area { flex: 2; min-width: 300px; padding-top: 15px; }
         .stats-area { flex: 1; min-width: 200px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }
         .stat-box { margin-bottom: 15px; }
         .stat-box-title { font-size: 12px; color: #64748b; font-weight: bold; text-transform: uppercase; }
@@ -134,20 +134,39 @@
 
         .sprint-select-wrapper { text-align: center; margin-bottom: 10px; }
         .sprint-select-wrapper select { width: 150px; padding: 6px 12px; font-size: 14px; font-weight: bold; color: #1e3a8a; border: 2px solid #93c5fd; border-radius: 6px; cursor: pointer; }
+
+        /* 🔥 カウントダウンバナー */
+        .countdown-banner { background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; padding: 12px 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(234, 88, 12, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
+        .countdown-banner .days { font-size: 28px; background: white; color: #ea580c; padding: 2px 10px; border-radius: 8px; margin: 0 5px; }
+
+        /* 🔥 PDFレポート印刷用のスタイル設定 */
+        @media print {
+            body { background-color: white; margin: 0; padding: 0; }
+            body > * { display: none !important; }
+            #print-report-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; padding: 20px; box-sizing: border-box; }
+            #print-report-area * { visibility: visible; }
+            .no-print { display: none !important; }
+            @page { margin: 10mm; }
+        }
     </style>
 </head>
 <body>
 
-    <header>
+    <header class="no-print">
         AthleSense KIUH - Admin <span id="connection-status" class="status-badge status-local">ローカル</span>
     </header>
 
-    <div class="container">
+    <div class="container no-print">
 
         <!-- 🔥 タブナビゲーション -->
         <div class="tab-nav">
             <button class="tab-btn active" onclick="switchTab('today', this)">📅 指定日(本日)のログ</button>
             <button class="tab-btn" onclick="switchTab('history', this)">📊 過去のログ・詳細分析</button>
+        </div>
+
+        <!-- 🔥 カウントダウンバナー（全体共有） -->
+        <div id="countdown-banner" class="countdown-banner">
+            <!-- JSで動的挿入 -->
         </div>
 
         <!-- ==========================================
@@ -238,7 +257,6 @@
         =========================================== -->
         <div id="tab-history" class="tab-content">
             
-            <!-- 🔥 共通フィルター（期間ドロップダウンを追加） -->
             <div class="filter-area" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
                 <div class="filter-wrapper" style="flex: 2; margin-bottom: 0;">
                     <span style="font-size: 18px; margin-right: 10px;">🔍</span>
@@ -260,6 +278,15 @@
 
             <!-- タイル型 メニュー画面 -->
             <div id="history-menu" class="history-menu-grid">
+                <div class="menu-card" onclick="openHistoryView('goals')">
+                    <span style="font-size: 32px; margin-bottom: 5px;">🎯</span>
+                    選手目標・<br>テーマ管理
+                </div>
+                <!-- 🔥 追加：学びコンテンツ管理 -->
+                <div class="menu-card" onclick="openHistoryView('education')">
+                    <span style="font-size: 32px; margin-bottom: 5px;">📖</span>
+                    学び・動画<br>コンテンツ管理
+                </div>
                 <div class="menu-card" onclick="openHistoryView('heatmap')">
                     <span style="font-size: 32px; margin-bottom: 5px;">🔥</span>
                     ヒートマップ<br>部位別ランキング
@@ -280,6 +307,69 @@
                     <span style="font-size: 32px; margin-bottom: 5px;">📋</span>
                     全データ一覧履歴<br>
                 </div>
+            </div>
+
+            <!-- 🎯 目標管理 View -->
+            <div id="view-goals" class="history-view card table-responsive">
+                <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
+                
+                <!-- 🔥 大会設定フォーム -->
+                <div style="background-color: #fffbeb; border: 2px solid #fcd34d; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
+                    <h4 style="margin: 0 0 10px 0; color: #b45309; display: flex; align-items: center; gap: 5px;">🏆 チーム目標大会の設定</h4>
+                    <p style="font-size: 12px; color: #78350f; margin-top: 0;">ここで設定した大会までのカウントダウンが、全選手のスマホ画面のトップに表示されます。</p>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                        <input type="text" id="target-event-name" placeholder="大会名 (例: 県大会)" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+                        <input type="date" id="target-event-date" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+                        <button class="btn btn-success" onclick="saveTeamSettings()" style="margin-bottom: 0;">💾 設定を保存・同期</button>
+                    </div>
+                </div>
+
+                <h3 class="section-title">🎯 選手目標・テーマ管理</h3>
+                <p style="font-size: 12px; color: #64748b; margin-top: 0;">※面談等で決定した各選手の「シーズン目標」や「月間テーマ」を監督からも設定・編集できます。ここで編集した内容は選手のスマホ画面に同期されます。</p>
+                <table class="data-table" style="min-width: 800px;">
+                     <thead>
+                         <tr>
+                             <th style="width: 150px;">選手名</th>
+                             <th>🎯 今シーズンの目標</th>
+                             <th>🗓️ 今月の目標・テーマ</th>
+                         </tr>
+                     </thead>
+                     <tbody id="goals-table-body"></tbody>
+                </table>
+            </div>
+
+            <!-- 🔥 学び・動画コンテンツ管理 View -->
+            <div id="view-education" class="history-view card table-responsive">
+                <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
+                <h3 class="section-title">📖 学び・動画コンテンツ管理</h3>
+                <p style="font-size: 12px; color: #64748b; margin-top: 0;">※ここで追加したYouTube動画やアドバイス資料が、全選手の「学び」タブに配信されます。</p>
+                
+                <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
+                        <input type="text" id="edu-title" placeholder="タイトル (例: 正しいハムのケア)" style="flex: 2; min-width: 200px; margin-bottom: 0;">
+                        <select id="edu-category" style="flex: 1; min-width: 120px; margin-bottom: 0; padding: 12px;">
+                            <option value="ケア・リカバリー">ケア・リカバリー</option>
+                            <option value="トレーニング理論">トレーニング理論</option>
+                            <option value="栄養・食事">栄養・食事</option>
+                            <option value="メンタル">メンタル</option>
+                            <option value="その他">その他</option>
+                        </select>
+                    </div>
+                    <input type="text" id="edu-url" placeholder="YouTubeのURL (任意)" style="margin-bottom: 10px;">
+                    <textarea id="edu-desc" rows="3" placeholder="説明やアドバイス..." style="margin-bottom: 10px;"></textarea>
+                    <button class="btn btn-success" onclick="addEducation()">➕ コンテンツを追加・配信</button>
+                </div>
+
+                <table class="data-table">
+                     <thead>
+                         <tr>
+                             <th style="width: 130px;">カテゴリ</th>
+                             <th>タイトル / 説明</th>
+                             <th style="width: 80px;">操作</th>
+                         </tr>
+                     </thead>
+                     <tbody id="education-table-body"></tbody>
+                </table>
             </div>
 
             <!-- 1. ヒートマップ View -->
@@ -433,11 +523,17 @@
                 </div>
             </div>
 
-            <!-- 4. 選手別詳細 View -->
+            <!-- 4. 選手別詳細 View & レポート出力機能 -->
             <div id="view-individual" class="history-view card">
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 <h3 class="section-title">📈 選手別 詳細分析</h3>
-                <select id="chart-player-select" onchange="updateCharts(window.globalLogs)"></select>
+                
+                <!-- 🔥 レポート出力用コントロールの追加 -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;" class="no-print">
+                    <select id="chart-player-select" onchange="updateCharts(window.globalLogs)" style="flex:1; min-width:150px; margin-bottom:0;"></select>
+                    <input type="month" id="report-month-select" style="flex:1; min-width:120px; margin-bottom:0; padding:10px; border-color:#93c5fd;">
+                    <button class="btn btn-success" onclick="generateMonthlyReport()">📊 面談用レポート作成(PDF)</button>
+                </div>
                 
                 <div class="analysis-container">
                     <div class="chart-area">
@@ -503,19 +599,19 @@
                                         <circle id="player-heat-head-b" class="heat-spot" cx="50" cy="30" r="12" fill="#ef4444" opacity="0" /> 
                                         <circle id="player-heat-shoulder-l" class="heat-spot" cx="32" cy="55" r="10" fill="#ef4444" opacity="0" /> 
                                         <circle id="player-heat-shoulder-r" class="heat-spot" cx="68" cy="55" r="10" fill="#ef4444" opacity="0" /> 
-                                        <ellipse id="player-heat-back" class="heat-spot" cx="50" cy="85" rx="16" ry="20" fill="#ef4444" opacity="0" /> 
+                                        <ellipse id="heat-back" class="heat-spot" cx="50" cy="85" rx="16" ry="20" fill="#ef4444" opacity="0" /> 
                                         <ellipse id="player-heat-arm-l-b" class="heat-spot" cx="21" cy="80" rx="7" ry="25" fill="#ef4444" opacity="0" />
                                         <ellipse id="player-heat-arm-r-b" class="heat-spot" cx="79" cy="80" rx="7" ry="25" fill="#ef4444" opacity="0" />
                                         <circle id="player-heat-glutes-l" class="heat-spot" cx="39" cy="120" r="10" fill="#ef4444" opacity="0" /> 
                                         <circle id="player-heat-glutes-r" class="heat-spot" cx="61" cy="120" r="10" fill="#ef4444" opacity="0" /> 
-                                        <ellipse id="player-heat-hams-l" class="heat-spot" cx="41" cy="150" rx="9" ry="15" fill="#ef4444" opacity="0" /> 
-                                        <ellipse id="player-heat-hams-r" class="heat-spot" cx="59" cy="150" rx="9" ry="15" fill="#ef4444" opacity="0" /> 
-                                        <ellipse id="player-heat-calves-l" class="heat-spot" cx="41" cy="180" rx="8" ry="12" fill="#ef4444" opacity="0" /> 
-                                        <ellipse id="player-heat-calves-r" class="heat-spot" cx="59" cy="180" rx="8" ry="12" fill="#ef4444" opacity="0" /> 
-                                        <circle id="player-heat-achilles-l" class="heat-spot" cx="41" cy="200" r="5" fill="#ef4444" opacity="0" /> 
-                                        <circle id="player-heat-achilles-r" class="heat-spot" cx="59" cy="200" r="5" fill="#ef4444" opacity="0" /> 
-                                        <ellipse id="player-heat-sole-l" class="heat-spot" cx="41" cy="210" rx="6" ry="4" fill="#ef4444" opacity="0" /> 
-                                        <ellipse id="player-heat-sole-r" class="heat-spot" cx="59" cy="210" rx="6" ry="4" fill="#ef4444" opacity="0" /> 
+                                        <ellipse id="heat-hams-l" class="heat-spot" cx="41" cy="150" rx="9" ry="15" fill="#ef4444" opacity="0" /> 
+                                        <ellipse id="heat-hams-r" class="heat-spot" cx="59" cy="150" rx="9" ry="15" fill="#ef4444" opacity="0" /> 
+                                        <ellipse id="heat-calves-l" class="heat-spot" cx="41" cy="180" rx="8" ry="12" fill="#ef4444" opacity="0" /> 
+                                        <ellipse id="heat-calves-r" class="heat-spot" cx="59" cy="180" rx="8" ry="12" fill="#ef4444" opacity="0" /> 
+                                        <circle id="heat-achilles-l" class="heat-spot" cx="41" cy="200" r="5" fill="#ef4444" opacity="0" /> 
+                                        <circle id="heat-achilles-r" class="heat-spot" cx="59" cy="200" r="5" fill="#ef4444" opacity="0" /> 
+                                        <ellipse id="heat-sole-l" class="heat-spot" cx="41" cy="210" rx="6" ry="4" fill="#ef4444" opacity="0" /> 
+                                        <ellipse id="heat-sole-r" class="heat-spot" cx="59" cy="210" rx="6" ry="4" fill="#ef4444" opacity="0" /> 
                                     </svg>
                                 </div>
                             </div>
@@ -561,6 +657,61 @@
 
     </div>
 
+    <!-- 🔥 プリント(PDF)出力用の隠し領域 -->
+    <div id="print-report-area" style="display: none;">
+        <div style="text-align: center; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 20px;">
+            <h2 style="color: #1e3a8a; margin: 0;">AthleSense 個人マンスリーレポート</h2>
+            <div style="font-size: 18px; font-weight: bold; margin-top: 10px;">
+                対象月: <span id="report-month-display"></span> / 選手名: <span id="report-player-display"></span>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 20px;">
+            <!-- 左カラム：レーダーチャートと基本指標 -->
+            <div style="flex: 1;">
+                <h4 style="color: #1e3a8a; border-bottom: 1px solid #cbd5e1; margin-top: 0; padding-bottom: 5px;">🎯 コンディション・レーダー</h4>
+                <div style="width: 100%; max-width: 300px; margin: 0 auto;">
+                    <canvas id="reportRadarChart"></canvas>
+                </div>
+                
+                <h4 style="color: #1e3a8a; border-bottom: 1px solid #cbd5e1; margin-top: 20px; padding-bottom: 5px;">📊 月間サマリー</h4>
+                <ul style="line-height: 2; font-size: 14px; margin: 0; padding-left: 20px;">
+                    <li>今月の入力日数: <strong id="report-days">0</strong> 日</li>
+                    <li>月間 Total Load: <strong id="report-load">0</strong></li>
+                    <li>平均 睡眠時間: <strong id="report-sleep-time">0</strong> 時間</li>
+                    <li>平均 睡眠の質: <strong id="report-sleep-quality">0</strong> / 5</li>
+                    <li>RSI の平均値: <strong id="report-rsi">-</strong></li>
+                </ul>
+            </div>
+            
+            <!-- 右カラム：部位ヒートマップ、目標、コメント欄 -->
+            <div style="flex: 1;">
+                <h4 style="color: #1e3a8a; border-bottom: 1px solid #cbd5e1; margin-top: 0; padding-bottom: 5px;">⚠️ 張り・痛みの多かった部位 (Top 3)</h4>
+                <ul id="report-soreness-list" style="color: #dc2626; font-weight: bold; font-size: 14px; margin: 0; padding-left: 20px; min-height: 60px;"></ul>
+                
+                <h4 style="color: #1e3a8a; border-bottom: 1px solid #cbd5e1; margin-top: 20px; padding-bottom: 5px;">🎯 目標・テーマ</h4>
+                <div style="background: #fffbeb; padding: 10px; border: 1px solid #fde68a; border-radius: 8px; font-size: 14px;">
+                    <strong style="color: #b45309;">シーズン目標:</strong><br>
+                    <span id="report-season-goal"></span><br><br>
+                    <strong style="color: #b45309;">月間テーマ:</strong><br>
+                    <span id="report-month-goal"></span>
+                </div>
+                
+                <h4 style="color: #1e3a8a; border-bottom: 1px solid #cbd5e1; margin-top: 20px; padding-bottom: 5px;">📝 コーチからのフィードバック (面談用)</h4>
+                <div style="border: 1px solid #cbd5e1; border-radius: 8px; height: 180px; padding: 10px; color: #94a3b8; font-size: 12px;">
+                    この余白は、印刷後またはPDF編集アプリで面談時の手書きメモとしてお使いください。
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <h4 style="color: #1e3a8a; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px;">📈 今月の Training Load と 疲労度の推移</h4>
+            <div style="width: 100%; height: 250px;">
+                <canvas id="reportLineChart"></canvas>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -584,9 +735,56 @@
         
         let loadChartInstance = null;
         let rsiChartInstance = null;
+        let reportRadarChartInstance = null;
+        let reportLineChartInstance = null;
         
         let logColRef = null;
         let playersColRef = null; 
+        let goalsColRef = null; 
+        let settingsColRef = null;
+        let eduColRef = null; 
+
+        let teamGoals = {}; 
+        let teamSettings = {}; 
+        window.globalEducation = []; 
+
+        // 🔥 グラフに大会日の縦線を引くプラグイン
+        const targetDateLinePlugin = {
+            id: 'targetDateLinePlugin',
+            afterDraw: (chart) => {
+                if (!teamSettings || !teamSettings.targetEventDate) return;
+                
+                const targetObj = new Date(teamSettings.targetEventDate);
+                const targetLabel = String(targetObj.getMonth()+1).padStart(2,'0') + '/' + String(targetObj.getDate()).padStart(2,'0');
+                
+                const index = chart.data.labels.findIndex(l => l === targetLabel);
+                if (index !== -1) {
+                    const ctx = chart.ctx;
+                    const meta = chart.getDatasetMeta(0);
+                    if (!meta.data[index]) return;
+                    
+                    const x = meta.data[index].x;
+                    const topY = chart.chartArea.top;
+                    const bottomY = chart.chartArea.bottom;
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(x, topY);
+                    ctx.lineTo(x, bottomY);
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = '#ea580c';
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#ea580c';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.font = 'bold 12px sans-serif';
+                    ctx.fillText('🏆 ' + (teamSettings.targetEventName || '大会日'), x, topY - 5);
+                    ctx.restore();
+                }
+            }
+        };
 
         // ==========================================
         // 📱 タブとメニューのコントロール
@@ -610,6 +808,12 @@
             if(viewId === 'individual') {
                 updateCharts(window.globalLogs);
             }
+            if(viewId === 'goals') {
+                renderGoalsTable();
+            }
+            if(viewId === 'education') {
+                renderEducationTable(); 
+            }
         }
 
         function backToHistoryMenu() {
@@ -619,16 +823,26 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('target-date').value = getTodayString();
+            
+            const d = new Date();
+            const ym = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+            if(document.getElementById('report-month-select')) {
+                document.getElementById('report-month-select').value = ym;
+            }
         });
 
         async function initFirebase() {
             try {
                 firebase.initializeApp(myFirebaseConfig);
                 const db = firebase.firestore();
+                db.settings({ experimentalForceLongPolling: true }); 
                 await firebase.auth().signInAnonymously();
                 
                 logColRef = db.collection('team_condition_logs');
                 playersColRef = db.collection('team_players'); 
+                goalsColRef = db.collection('team_goals'); 
+                settingsColRef = db.collection('team_settings'); 
+                eduColRef = db.collection('team_education'); 
                 
                 document.getElementById('connection-status').textContent = 'クラウド同期中';
                 document.getElementById('connection-status').className = 'status-badge status-cloud';
@@ -642,6 +856,48 @@
                     window.globalRegisteredPlayers = players;
                     renderPlayersList();
                     updateTodayView(); 
+                });
+
+                goalsColRef.onSnapshot((snapshot) => {
+                    teamGoals = {};
+                    snapshot.forEach(doc => {
+                        teamGoals[doc.id] = doc.data();
+                    });
+                    if (document.getElementById('view-goals').style.display === 'block') {
+                        renderGoalsTable();
+                    }
+                });
+
+                settingsColRef.doc('general').onSnapshot((doc) => {
+                    if(doc.exists) {
+                        teamSettings = doc.data();
+                        document.getElementById('target-event-name').value = teamSettings.targetEventName || '';
+                        document.getElementById('target-event-date').value = teamSettings.targetEventDate || '';
+                        updateCountdownUI();
+                        if(loadChartInstance) loadChartInstance.update();
+                        if(rsiChartInstance) rsiChartInstance.update();
+                    }
+                });
+
+                eduColRef.onSnapshot((snapshot) => {
+                    window.globalEducation = [];
+                    if (snapshot.empty) {
+                        eduColRef.add({
+                            title: "【基本】練習後の正しいケア方法",
+                            category: "ケア・リカバリー",
+                            url: "",
+                            description: "練習後は30分以内の炭水化物・タンパク質摂取と、アイシング（または交代浴）を行うのが基本です。\nスポーツ科学的にも、このルーティンが怪我発生率を最も下げます。",
+                            createdAt: new Date().toISOString()
+                        });
+                    }
+                    snapshot.forEach(doc => {
+                        window.globalEducation.push({ id: doc.id, ...doc.data() });
+                    });
+                    window.globalEducation.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    
+                    if (document.getElementById('view-education').style.display === 'block') {
+                        renderEducationTable();
+                    }
                 });
 
                 logColRef.onSnapshot((snapshot) => {
@@ -658,10 +914,69 @@
                 document.getElementById('connection-status').className = 'status-badge status-local';
                 loadLocalPlayers();
                 
+                teamSettings = JSON.parse(localStorage.getItem('team_settings') || '{}');
+                document.getElementById('target-event-name').value = teamSettings.targetEventName || '';
+                document.getElementById('target-event-date').value = teamSettings.targetEventDate || '';
+                updateCountdownUI();
+
                 const logs = JSON.parse(localStorage.getItem('team_condition_logs') || '[]');
                 logs.sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt));
                 window.globalLogs = logs;
                 window.updateAdminUI(logs);
+            }
+        }
+
+        // 🔥 カウントダウンの計算とUI更新
+        function updateCountdownUI() {
+            const banner = document.getElementById('countdown-banner');
+            if (!teamSettings || !teamSettings.targetEventDate) {
+                banner.style.display = 'none';
+                return;
+            }
+
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const target = new Date(teamSettings.targetEventDate);
+            target.setHours(0,0,0,0);
+            
+            const diffTimeActual = target - today;
+            const diffDays = Math.ceil(diffTimeActual / (1000 * 60 * 60 * 24));
+
+            if (diffDays > 0) {
+                banner.style.display = 'flex';
+                banner.innerHTML = `🏆 ${teamSettings.targetEventName || '大会'}まで あと <span class="days">${diffDays}</span> 日！`;
+            } else if (diffDays === 0) {
+                banner.style.display = 'flex';
+                banner.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                banner.innerHTML = `🔥 本日は ${teamSettings.targetEventName || '大会'} 当日です！`;
+            } else {
+                banner.style.display = 'none'; 
+            }
+        }
+
+        // 🔥 大会設定を保存する関数
+        async function saveTeamSettings() {
+            const name = document.getElementById('target-event-name').value.trim();
+            const dateStr = document.getElementById('target-event-date').value;
+            
+            const updateData = {
+                targetEventName: name,
+                targetEventDate: dateStr,
+                updatedAt: new Date().toISOString()
+            };
+
+            try {
+                if (settingsColRef) {
+                    await settingsColRef.doc('general').set(updateData, { merge: true });
+                } else {
+                    teamSettings = updateData;
+                    localStorage.setItem('team_settings', JSON.stringify(teamSettings));
+                    updateCountdownUI();
+                    if(loadChartInstance) loadChartInstance.update();
+                }
+                alert('チームの目標大会を設定しました！全選手の画面にカウントダウンが表示されます。');
+            } catch(e) {
+                alert('保存に失敗しました。');
             }
         }
 
@@ -681,9 +996,67 @@
             return `${year}-${month}-${day}`;
         }
 
-        // ==========================================
-        // 📅 本日のログ (指定日タブ) の更新
-        // ==========================================
+        function renderGoalsTable() {
+            const tbody = document.getElementById('goals-table-body');
+            tbody.innerHTML = '';
+            
+            if (window.globalRegisteredPlayers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">選手が登録されていません。</td></tr>';
+                return;
+            }
+
+            window.globalRegisteredPlayers.forEach(player => {
+                const tr = document.createElement('tr');
+                const catBadge = getCategoryBadge(player.category || 'BLUE');
+                const goalData = teamGoals[player.name] || {};
+                const seasonGoal = goalData.seasonGoal || '<span style="color:#94a3b8;">未設定</span>';
+                const monthGoal = goalData.monthGoal || '<span style="color:#94a3b8;">未設定</span>';
+
+                tr.innerHTML = `
+                    <td style="font-weight:bold;">${catBadge}${player.name}</td>
+                    <td>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div style="white-space:pre-wrap; font-size:13px; color:#1e3a8a;">${seasonGoal}</div>
+                            <button onclick="editGoalAdmin('${player.name}', 'season')" style="background:none; border:none; color:#2563eb; cursor:pointer; font-size:16px;">✎</button>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div style="white-space:pre-wrap; font-size:13px; color:#b45309;">${monthGoal}</div>
+                            <button onclick="editGoalAdmin('${player.name}', 'month')" style="background:none; border:none; color:#2563eb; cursor:pointer; font-size:16px;">✎</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function editGoalAdmin(playerName, type) {
+            const goalData = teamGoals[playerName] || {};
+            const currentGoal = type === 'season' ? (goalData.seasonGoal || "") : (goalData.monthGoal || "");
+            const title = type === 'season' ? "今シーズンの目標" : "今月の目標・テーマ";
+            
+            const newGoal = prompt(`【${playerName}】選手の ${title} を設定・編集します：`, currentGoal);
+            
+            if (newGoal !== null) {
+                const updateData = { updatedAt: new Date().toISOString() };
+                if (type === 'season') updateData.seasonGoal = newGoal;
+                else updateData.monthGoal = newGoal;
+
+                try {
+                    if (goalsColRef) {
+                        await goalsColRef.doc(playerName).set(updateData, { merge: true });
+                    } else {
+                        teamGoals[playerName] = { ...goalData, ...updateData };
+                        localStorage.setItem('team_goals', JSON.stringify(teamGoals));
+                        renderGoalsTable();
+                    }
+                } catch (e) {
+                    alert("保存に失敗しました。");
+                }
+            }
+        }
+
         function updateTodayView() {
             const targetDateStr = document.getElementById('target-date').value || getTodayString();
             const todayLogs = (window.globalLogs || []).filter(log => log.date === targetDateStr);
@@ -776,6 +1149,7 @@
         function loadLocalPlayers() {
             const players = JSON.parse(localStorage.getItem('team_players') || '[]');
             window.globalRegisteredPlayers = players;
+            teamGoals = JSON.parse(localStorage.getItem('team_goals') || '{}'); 
             renderPlayersList();
             updateTodayView();
         }
@@ -956,7 +1330,27 @@
                 "首": 0, "腰": 0, "胸筋": 0, "臀部(お尻)": 0, "ふくらはぎ": 0
             };
             
-            logs.forEach(log => {
+            let recentLogsForHeatmap = [];
+            if (logs.length > 0) {
+                const validDates = logs.map(l => l.date).filter(d => d);
+                if (validDates.length > 0) {
+                    const latestDateStr = validDates.reduce((a, b) => a > b ? a : b);
+                    const latestDate = new Date(latestDateStr);
+                    latestDate.setHours(0, 0, 0, 0); 
+                    
+                    const limitDate = new Date(latestDate);
+                    limitDate.setDate(limitDate.getDate() - 2); 
+                    
+                    recentLogsForHeatmap = logs.filter(log => {
+                        if (!log.date) return false;
+                        const d = new Date(log.date);
+                        d.setHours(0, 0, 0, 0);
+                        return d >= limitDate && d <= latestDate;
+                    });
+                }
+            }
+
+            recentLogsForHeatmap.forEach(log => {
                 const combinedSoreness = new Set();
                 if(log.soreness) log.soreness.split(',').forEach(p => { if(p.trim()) combinedSoreness.add(p.trim()); });
                 if(log.sorenessPost) log.sorenessPost.split(',').forEach(p => { if(p.trim()) combinedSoreness.add(p.trim()); });
@@ -1238,7 +1632,13 @@
                         { label: '疲労度', data: fatigueData, borderColor: '#dc2626', backgroundColor: '#dc2626', type: 'line', borderDash: [5, 5], yAxisID: 'y1', tension: 0.1, order: 1 }
                     ]
                 },
-                options: { responsive: true, plugins: { title: { display: true, text: 'Training Load と 疲労度の推移 (直近30回)' } }, scales: { y: { beginAtZero: true }, y1: { position: 'right', min: 0, max: 10, grid: { drawOnChartArea: false } } } }
+                plugins: [targetDateLinePlugin],
+                options: { 
+                    responsive: true, 
+                    layout: { padding: { top: 20 } },
+                    plugins: { title: { display: true, text: 'Training Load と 疲労度の推移 (直近30回)' } }, 
+                    scales: { y: { beginAtZero: true }, y1: { position: 'right', min: 0, max: 10, grid: { drawOnChartArea: false } } } 
+                }
             });
 
             const ctxRsi = document.getElementById('rsiChart').getContext('2d');
@@ -1252,7 +1652,247 @@
                         { label: 'RSI 平均', data: rsiAvgLine, borderColor: '#9ca3af', borderDash: [5, 5], pointRadius: 0, borderWidth: 1 }
                     ] 
                 },
-                options: { responsive: true, plugins: { title: { display: true, text: '神経筋疲労: RSI の推移と平均' } }, scales: { y: { beginAtZero: true } } }
+                plugins: [targetDateLinePlugin],
+                options: { 
+                    responsive: true, 
+                    layout: { padding: { top: 20 } },
+                    plugins: { title: { display: true, text: '神経筋疲労: RSI の推移と平均' } }, 
+                    scales: { y: { beginAtZero: true } } 
+                }
+            });
+        }
+
+        // ==========================================
+        // 🔥 PDF面談レポートの生成処理
+        // ==========================================
+        function generateMonthlyReport() {
+            const playerName = document.getElementById('chart-player-select').value;
+            const monthStr = document.getElementById('report-month-select').value; 
+            
+            if (!playerName) {
+                alert("レポートを作成する選手を選択してください。");
+                return;
+            }
+            if (!monthStr) {
+                alert("レポートの対象月を選択してください。");
+                return;
+            }
+
+            const reportLogs = window.globalLogs.filter(log => log.playerName === playerName && log.date && log.date.startsWith(monthStr));
+            
+            if (reportLogs.length === 0) {
+                alert(`${playerName} 選手の ${monthStr} のデータが見つかりません。`);
+                return;
+            }
+
+            document.getElementById('report-month-display').textContent = monthStr.replace('-', '年') + '月';
+            document.getElementById('report-player-display').textContent = playerName;
+
+            const days = reportLogs.length;
+            let totalLoad = 0;
+            let totalSleep = 0, countSleep = 0;
+            let totalQuality = 0, countQuality = 0;
+            let totalFatigue = 0;
+            let totalStress = 0;
+            let totalCare = 0;
+            let totalRsi = 0, countRsi = 0;
+            const sorenessCounts = {};
+
+            reportLogs.forEach(log => {
+                totalLoad += parseFloat(log.trainingLoad) || 0;
+                
+                if (parseFloat(log.sleep) > 0) { totalSleep += parseFloat(log.sleep); countSleep++; }
+                if (parseInt(log.sleepQuality) > 0) { totalQuality += parseInt(log.sleepQuality); countQuality++; }
+                
+                totalFatigue += parseInt(log.fatigue) || 1;
+                totalStress += parseInt(log.stress) || 1;
+                
+                let cares = log.care ? log.care.split('/') : [];
+                totalCare += cares.length;
+
+                if (parseFloat(log.rsi) > 0) { totalRsi += parseFloat(log.rsi); countRsi++; }
+
+                const combinedSoreness = new Set();
+                if(log.soreness) log.soreness.split(',').forEach(p => { if(p.trim()) combinedSoreness.add(p.trim()); });
+                if(log.sorenessPost) log.sorenessPost.split(',').forEach(p => { if(p.trim()) combinedSoreness.add(p.trim()); });
+                combinedSoreness.forEach(part => {
+                    if(!sorenessCounts[part]) sorenessCounts[part] = 0;
+                    sorenessCounts[part]++;
+                });
+            });
+
+            const avgSleep = countSleep > 0 ? (totalSleep / countSleep) : 0;
+            const avgQuality = countQuality > 0 ? (totalQuality / countQuality) : 0;
+            const avgFatigue = totalFatigue / days;
+            const avgStress = totalStress / days;
+            const avgCare = totalCare / days;
+            const avgRsi = countRsi > 0 ? (totalRsi / countRsi) : 0;
+
+            document.getElementById('report-days').textContent = days;
+            document.getElementById('report-load').textContent = totalLoad.toFixed(1);
+            document.getElementById('report-sleep-time').textContent = avgSleep.toFixed(1);
+            document.getElementById('report-sleep-quality').textContent = avgQuality.toFixed(1);
+            document.getElementById('report-rsi').textContent = countRsi > 0 ? avgRsi.toFixed(2) : '-';
+
+            const sortedSoreness = Object.entries(sorenessCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+            const slist = document.getElementById('report-soreness-list');
+            slist.innerHTML = '';
+            if(sortedSoreness.length === 0) {
+                slist.innerHTML = '<li style="color:#64748b; list-style:none;">特に訴えなし</li>';
+            } else {
+                sortedSoreness.forEach(item => {
+                    slist.innerHTML += `<li>${item[0]} (${item[1]}回)</li>`;
+                });
+            }
+
+            const goalData = teamGoals[playerName] || {};
+            document.getElementById('report-season-goal').textContent = goalData.seasonGoal || "未設定";
+            document.getElementById('report-month-goal').textContent = goalData.monthGoal || "未設定";
+
+            const scoreSleep = Math.min(100, (avgSleep / 8) * 100);
+            const scoreQuality = (avgQuality / 5) * 100;
+            const scoreRecovery = Math.max(0, (10 - avgFatigue) / 9 * 100);
+            const scoreMental = Math.max(0, (10 - avgStress) / 9 * 100);
+            const scoreCare = Math.min(100, (avgCare / 3) * 100); 
+
+            const radarCtx = document.getElementById('reportRadarChart').getContext('2d');
+            if(reportRadarChartInstance) reportRadarChartInstance.destroy();
+            reportRadarChartInstance = new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['睡眠時間', '睡眠の質', '疲労の抜け', 'メンタル', 'ケア意識'],
+                    datasets: [{
+                        label: 'コンディションスコア',
+                        data: [scoreSleep, scoreQuality, scoreRecovery, scoreMental, scoreCare],
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                        borderColor: 'rgba(37, 99, 235, 1)',
+                        pointBackgroundColor: 'rgba(37, 99, 235, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    animation: false, 
+                    scales: { r: { beginAtZero: true, max: 100, ticks: { display: false } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            const labels = reportLogs.map(log => {
+                const parts = log.date.split('-');
+                return `${parts[1]}/${parts[2]}`;
+            });
+            const loadData = reportLogs.map(log => parseFloat(log.trainingLoad) || 0);
+            const fatigueData = reportLogs.map(log => parseInt(log.fatigue) || 0);
+
+            const lineCtx = document.getElementById('reportLineChart').getContext('2d');
+            if(reportLineChartInstance) reportLineChartInstance.destroy();
+            reportLineChartInstance = new Chart(lineCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Training Load', data: loadData, backgroundColor: '#93c5fd', yAxisID: 'y', order: 2 },
+                        { label: '疲労度', data: fatigueData, borderColor: '#ef4444', backgroundColor: '#ef4444', type: 'line', borderDash: [5, 5], yAxisID: 'y1', order: 1 }
+                    ]
+                },
+                options: {
+                    animation: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true },
+                        y1: { position: 'right', min: 0, max: 10, grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
+
+            const printArea = document.getElementById('print-report-area');
+            printArea.style.display = 'block';
+            
+            setTimeout(() => {
+                window.print();
+                printArea.style.display = 'none';
+            }, 500); 
+        }
+
+        // ==========================================
+        // 🔥 学びコンテンツ管理ロジック
+        // ==========================================
+        async function addEducation() {
+            const title = document.getElementById('edu-title').value.trim();
+            const category = document.getElementById('edu-category').value;
+            const url = document.getElementById('edu-url').value.trim();
+            const desc = document.getElementById('edu-desc').value.trim();
+            
+            if (!title) {
+                alert('タイトルを入力してください。');
+                return;
+            }
+
+            const data = {
+                title: title,
+                category: category,
+                url: url,
+                description: desc,
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                if (eduColRef) {
+                    await eduColRef.add(data);
+                } else {
+                    const id = Date.now().toString();
+                    window.globalEducation = JSON.parse(localStorage.getItem('team_education') || '[]');
+                    window.globalEducation.push({ id, ...data });
+                    localStorage.setItem('team_education', JSON.stringify(window.globalEducation));
+                    renderEducationTable();
+                }
+                document.getElementById('edu-title').value = '';
+                document.getElementById('edu-url').value = '';
+                document.getElementById('edu-desc').value = '';
+                alert('コンテンツを追加しました！選手の画面に反映されます。');
+            } catch (e) {
+                alert('追加に失敗しました。');
+            }
+        }
+
+        async function deleteEducation(id) {
+            if(!confirm("このコンテンツを削除しますか？")) return;
+            try {
+                if (eduColRef) {
+                    await eduColRef.doc(id).delete();
+                } else {
+                    window.globalEducation = window.globalEducation.filter(item => item.id !== id);
+                    localStorage.setItem('team_education', JSON.stringify(window.globalEducation));
+                    renderEducationTable();
+                }
+            } catch (e) {
+                alert('削除に失敗しました。');
+            }
+        }
+
+        function renderEducationTable() {
+            const tbody = document.getElementById('education-table-body');
+            tbody.innerHTML = '';
+            
+            if (!window.globalEducation || window.globalEducation.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">コンテンツがありません。</td></tr>';
+                return;
+            }
+
+            window.globalEducation.forEach(item => {
+                const tr = document.createElement('tr');
+                const ytLink = item.url ? `<a href="${item.url}" target="_blank" style="color:#2563eb; font-size:12px; display:inline-block; margin-top:5px; font-weight:bold;">🔗 リンクを開く</a>` : '';
+                tr.innerHTML = `
+                    <td><span class="stat-badge" style="background:#e0f2fe; color:#1e40af; font-size:11px;">${item.category}</span></td>
+                    <td>
+                        <strong style="color:#1e3a8a; font-size:14px;">${item.title}</strong><br>
+                        <span style="font-size:12px; color:#475569; white-space:pre-wrap;">${item.description}</span><br>
+                        ${ytLink}
+                    </td>
+                    <td style="text-align:center;"><button class="btn btn-danger" style="padding: 6px 10px; font-size:12px;" onclick="deleteEducation('${item.id}')">削除</button></td>
+                `;
+                tbody.appendChild(tr);
             });
         }
 

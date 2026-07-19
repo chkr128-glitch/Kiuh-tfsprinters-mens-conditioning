@@ -22,7 +22,10 @@
         }
     </script>
 
+    <!-- グラフ用と、紙吹雪（自己ベスト演出用）のライブラリ -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <style>
         /* ☀️ ライトモード（通常）のカラー変数 */
         :root { 
@@ -83,9 +86,9 @@
         body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; line-height: 1.6; transition: background-color 0.3s, color 0.3s; }
         .container { max-width: 600px; margin: 0 auto; padding: 15px; padding-bottom: 80px; }
         
-        /* ヘッダーは青で固定（見やすさのため） */
         header { background-color: #1e3a8a; color: white; padding: 15px 20px; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .theme-toggle-btn { background: none; border: none; font-size: 22px; cursor: pointer; padding: 0; color: white; }
+        .theme-toggle-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); font-size: 13px; cursor: pointer; padding: 6px 12px; color: white; border-radius: 20px; font-weight: bold; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
+        .theme-toggle-btn:hover { background: rgba(255,255,255,0.3); }
         
         .weather-widget { background: var(--weather-bg); border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px; border-left: 5px solid var(--primary); transition: all 0.3s; }
         .weather-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: var(--weather-text); }
@@ -97,7 +100,10 @@
         .form-group { margin-bottom: 15px; }
         .form-label-flex { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
         .form-label-flex label { font-size: 14px; font-weight: bold; color: var(--text-muted); margin: 0; transition: color 0.3s; }
-        .emoji-display { font-size: 22px; font-weight: bold; color: var(--primary-dark); transition: color 0.3s; }
+        
+        /* 🔥 アニメーションする顔文字メーター */
+        .emoji-display { font-size: 24px; font-weight: bold; color: var(--primary-dark); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: inline-block; }
+        .emoji-display.pop { transform: scale(1.4); }
         
         select, input[type="text"], input[type="date"], input[type="number"], textarea { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; font-size: 16px; background-color: var(--input-bg); color: var(--text-main); appearance: none; transition: all 0.3s; }
         select:focus, input:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
@@ -109,7 +115,6 @@
         .result-box { background-color: var(--result-bg); border-radius: 8px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border: 1px solid var(--border-color); transition: all 0.3s; }
         .result-label { font-size: 14px; font-weight: bold; color: var(--primary-dark); transition: color 0.3s; }
         .result-value { font-size: 20px; font-weight: bold; color: var(--primary); text-align: right; transition: color 0.3s; }
-        .result-sub { font-size: 12px; color: var(--primary); display: block; }
         
         .submit-btn { background-color: var(--primary); color: white; border: none; border-radius: 8px; padding: 15px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: background-color 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .submit-btn:hover { filter: brightness(1.1); }
@@ -118,10 +123,13 @@
         .tag-btn { background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
         .tag-btn.selected { background-color: var(--tag-sel-bg); border-color: var(--tag-sel-border); color: var(--tag-sel-text); font-weight: bold; }
 
+        /* 🔥 新しいケア選択用のボタンスタイル */
+        .care-tag.selected { background-color: #dbeafe; border-color: #3b82f6; color: #1d4ed8; font-weight: bold; }
+        body.dark-mode .care-tag.selected { background-color: #1e3a8a; border-color: #60a5fa; color: #bfdbfe; }
+
         .ai-card { background: var(--ai-card-bg); border: 2px solid var(--ai-card-border); transition: all 0.3s; }
         .ai-box { background-color: var(--ai-box-bg); border-radius: 8px; padding: 15px; border-left: 4px solid #10b981; font-size: 13.5px; color: var(--ai-box-text); line-height: 1.5; transition: all 0.3s; }
 
-        /* IRS メーター */
         .irs-container { background-color: var(--card-bg); border-radius: 8px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: all 0.3s; }
         .irs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .irs-title { font-size: 15px; font-weight: bold; margin: 0; display: flex; align-items: center; gap: 5px; color: var(--text-main); transition: color 0.3s; }
@@ -166,14 +174,45 @@
         .no-data { text-align: center; color: var(--text-muted); font-size: 14px; padding: 20px; }
         
         .sprint-dist-input, .sprint-time-input { border-color: var(--primary) !important; }
+
+        .sync-btn { background-color: #f1f5f9; border: 1px solid #cbd5e1; color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold; margin-left: 10px; transition: all 0.2s; }
+        .sync-btn:hover { background-color: #e0f2fe; border-color: #93c5fd; }
+        
+        .goal-card { background-color: #fffbeb; border: 2px solid #fcd34d; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .goal-section-inner { margin-bottom: 15px; }
+        .goal-section-inner:last-child { margin-bottom: 0; }
+        .goal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #fde68a; padding-bottom: 8px; margin-bottom: 10px; }
+        .goal-title { margin: 0; color: #b45309; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .goal-edit-btn { background: #fef3c7; border: 1px solid #fde68a; color: #d97706; font-size: 11px; font-weight: bold; cursor: pointer; padding: 3px 8px; border-radius: 12px; transition: all 0.2s; }
+        .goal-edit-btn:hover { background: #fde68a; }
+        .goal-text { font-weight: bold; color: #78350f; font-size: 15px; white-space: pre-wrap; line-height: 1.4; padding: 5px; }
+
+        /* 🔥 カウントダウンバナーのスタイル */
+        .countdown-banner { background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; padding: 12px 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(234, 88, 12, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .countdown-banner .days { font-size: 28px; background: white; color: #ea580c; padding: 2px 10px; border-radius: 8px; margin: 0 5px; }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* 🔥 追加：「学び」タブ用スタイル */
+        .edu-cat-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+        .edu-cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .edu-category-badge { background: #e0f2fe; color: #1e40af; font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: bold; display: inline-block; margin-bottom: 8px; }
+        body.dark-mode .edu-category-badge { background: #1e3a8a; color: #bfdbfe; }
+        .edu-title { font-size: 16px; font-weight: bold; color: var(--primary-dark); margin: 0 0 10px 0; }
+        .edu-desc { font-size: 13px; color: var(--text-main); white-space: pre-wrap; line-height: 1.5; margin-bottom: 10px; }
+        .yt-container { position: relative; width: 100%; padding-bottom: 56.25%; border-radius: 8px; overflow: hidden; background: #000; margin-top: 10px; }
+        .yt-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        
+        /* 🔥 タブの幅を4等分に調整 */
+        .tab-btn { flex: 1; padding: 12px 0; text-align: center; font-weight: bold; font-size: 13px; color: var(--text-muted); background: none; border: none; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
     </style>
 </head>
 <body>
 
     <header>
-        <span style="visibility: hidden; font-size: 22px;">🌙</span>
+        <span style="visibility: hidden; width: 80px;"></span>
         <span>AthleSense KIUH</span>
-        <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" title="ダークモード切替">🌙</button>
+        <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" title="画面の明るさ切替">🌙 ダーク</button>
     </header>
 
     <div class="container">
@@ -189,6 +228,11 @@
             <button onclick="fetchWeather()" style="background:none; border:none; color:var(--primary); font-size:12px; text-align:right; cursor:pointer; padding:0; font-weight:bold;">🔄 天気を更新</button>
         </div>
 
+        <!-- 🔥 追加：カウントダウンバナー -->
+        <div id="countdown-banner" class="countdown-banner">
+            <!-- JSで動的に中身が入ります -->
+        </div>
+
         <div class="profile-section">
             <div class="form-label-flex"><label>👤 選手名と日付を選択 <span style="color:var(--warning-text);">*</span></label></div>
             <div class="flex-row-gap">
@@ -200,10 +244,29 @@
             <div id="player-warning" style="font-size: 11px; color: var(--warning-text); display: none; margin-top: 5px;">※監督が名簿に選手を登録すると選択できるようになります。</div>
         </div>
 
+        <div class="goal-card" id="goal-container" style="display: none;">
+            <div class="goal-section-inner">
+                <div class="goal-header">
+                    <h3 class="goal-title">🎯 今シーズンの目標</h3>
+                    <button class="goal-edit-btn" onclick="editGoal('season')">✎ 編集</button>
+                </div>
+                <div id="season-goal-text" class="goal-text">目標を設定してください</div>
+            </div>
+            <div class="goal-section-inner" style="border-top: 1px dashed #fde68a; padding-top: 15px;">
+                <div class="goal-header">
+                    <h3 class="goal-title">🗓️ 今月の目標・テーマ</h3>
+                    <button class="goal-edit-btn" onclick="editGoal('month')">✎ 編集</button>
+                </div>
+                <div id="month-goal-text" class="goal-text">目標を設定してください</div>
+            </div>
+        </div>
+
+        <!-- 🔥 改修：タブに「📖 学び」を追加（全4つ） -->
         <div class="tab-nav">
-            <button class="tab-btn active" onclick="switchTab('pre')">🌅 練習前</button>
-            <button class="tab-btn" onclick="switchTab('post')">🏃‍♂️ 練習後</button>
-            <button class="tab-btn" onclick="switchTab('history')">🏆 履歴・設定</button>
+            <button class="tab-btn active" onclick="switchTab('pre')">🌅 朝</button>
+            <button class="tab-btn" onclick="switchTab('post')">🌙 夜</button>
+            <button class="tab-btn" onclick="switchTab('education')">📖 学び</button>
+            <button class="tab-btn" onclick="switchTab('history')">🏆 履歴</button>
         </div>
 
         <!-- ==========================================
@@ -216,7 +279,10 @@
                      <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">※練習前に体の状態をチェックし、怪我のリスクを減らしましょう。</p>
                      
                      <div class="form-group">
-                         <div class="form-label-flex"><label>睡眠時間 (時間) <span style="font-size:12px; font-weight:normal;">任意</span></label></div>
+                         <div class="form-label-flex">
+                             <label>睡眠時間 (時間) <span style="font-size:12px; font-weight:normal;">任意</span></label>
+                             <button type="button" class="sync-btn" onclick="syncDeviceData('睡眠時間')">⌚️ 同期</button>
+                         </div>
                          <input type="number" id="sleep" step="0.5" placeholder="例: 7.5">
                      </div>
                      
@@ -237,7 +303,10 @@
                              <input type="number" id="weight" step="0.1" placeholder="例: 65.5">
                          </div>
                          <div class="form-group">
-                             <div class="form-label-flex"><label>起床時心拍数</label></div>
+                             <div class="form-label-flex">
+                                 <label>起床時心拍数</label>
+                                 <button type="button" class="sync-btn" onclick="syncDeviceData('心拍数')">⌚️ 同期</button>
+                             </div>
                              <input type="number" id="heart-rate" placeholder="例: 60">
                          </div>
                      </div>
@@ -278,7 +347,6 @@
                      </div>
                 </div>
 
-                <!-- 🔥 IRSメーター（練習前） -->
                 <div class="irs-container">
                     <div class="irs-header">
                         <h4 class="irs-title">⚠️ Injury Risk Score (怪我リスク)</h4>
@@ -296,7 +364,7 @@
                      </div>
                 </div>
 
-                <button type="button" class="submit-btn" onclick="saveData('pre')">練習前データを保存</button>
+                <button type="button" class="submit-btn" onclick="saveData('pre')">朝のデータを保存</button>
             </form>
         </div>
 
@@ -311,7 +379,7 @@
                      <div class="form-group">
                          <div class="form-label-flex">
                              <label>RPE: 主観的きつさ (0:楽 〜 10:限界)</label>
-                             <div class="emoji-display" id="rpe-display">😐 5.0</div>
+                             <div class="emoji-display" id="rpe-display">🏃‍♂️ 5.0</div>
                          </div>
                          <input type="range" id="rpe" min="0" max="10" step="0.5" value="5">
                      </div>
@@ -351,7 +419,6 @@
                      <div class="form-group"><div class="form-label-flex"><label style="color: var(--warning-text);">🔥 ケガ・痛みの詳細</label></div><textarea id="bad" rows="2" placeholder="痛みや怪我の状況があれば詳しく..."></textarea></div>
                 </div>
 
-                <!-- 🔥 IRSメーター（練習後：明日に向けてのリスク） -->
                 <div class="irs-container">
                     <div class="irs-header">
                         <h4 class="irs-title">⚠️ 明日の Injury Risk Score (怪我リスク)</h4>
@@ -365,11 +432,29 @@
                 <div class="card">
                      <h2 class="section-title">📝 練習の振り返り・ケア</h2>
                      <div class="form-group"><div class="form-label-flex"><label>練習メニュー</label></div><textarea id="menu" rows="2"></textarea></div>
-                     <div class="form-group"><div class="form-label-flex"><label>歩数 (歩)</label></div><input type="number" id="steps" placeholder="例: 8000"></div>
-                     <div class="form-group"><div class="form-label-flex"><label style="color: var(--good-text);">👍 できたこと</label></div><textarea id="good" rows="2"></textarea></div>
                      <div class="form-group">
-                         <div class="form-label-flex"><label style="color: var(--primary-dark);">🛁 今夜実施するケア (重要)</label></div>
-                         <textarea id="care" rows="2" placeholder="例: 湯船に15分、ハムの交代浴、ストレッチ..."></textarea>
+                         <div class="form-label-flex">
+                             <label>歩数 (歩)</label>
+                             <button type="button" class="sync-btn" onclick="syncDeviceData('歩数')">⌚️ 同期</button>
+                         </div>
+                         <input type="number" id="steps" placeholder="例: 8000">
+                     </div>
+                     <div class="form-group"><div class="form-label-flex"><label style="color: var(--good-text);">👍 できたこと</label></div><textarea id="good" rows="2"></textarea></div>
+                     
+                     <!-- 🔥 改修：ケア内容のチェックボタン化 -->
+                     <div class="form-group">
+                         <div class="form-label-flex"><label style="color: var(--primary-dark);">🛁 今夜実施するケア (複数選択可)</label></div>
+                         <div class="tags-container" id="care-tags" style="margin-bottom: 10px;">
+                             <button type="button" class="tag-btn care-tag" data-care="🍚 栄養補給(30分以内)">🍚 栄養補給(30分以内)</button>
+                             <button type="button" class="tag-btn care-tag" data-care="🧊 アイシング(急性炎症抑制)">🧊 アイシング</button>
+                             <button type="button" class="tag-btn care-tag" data-care="🛁 交代浴(血流促進)">🛁 交代浴</button>
+                             <button type="button" class="tag-btn care-tag" data-care="🧘‍♂️ 静的ストレッチ(副交感神経優位)">🧘‍♂️ 静的ストレッチ</button>
+                             <button type="button" class="tag-btn care-tag" data-care="💆‍♂️ フォームローラー(筋膜リリース)">💆‍♂️ フォームローラー</button>
+                             <button type="button" class="tag-btn care-tag" data-care="✋ マッサージ・マッサージガン">✋ マッサージ/ガン</button>
+                             <button type="button" class="tag-btn care-tag" data-care="🧦 圧縮ウエア・足の挙上">🧦 圧縮ウエア/挙上</button>
+                             <button type="button" class="tag-btn care-tag" data-care="💤 8時間以上の睡眠">💤 8時間以上の睡眠</button>
+                         </div>
+                         <textarea id="care" rows="2" placeholder="その他、独自のケアがあれば自由記述..."></textarea>
                      </div>
                 </div>
 
@@ -380,17 +465,40 @@
                      </div>
                 </div>
 
-                <button type="button" class="submit-btn" onclick="saveData('post')">練習後データを保存</button>
+                <button type="button" class="submit-btn" onclick="saveData('post')">夜のデータを保存</button>
             </form>
         </div>
 
         <!-- ==========================================
-             タブ3: 履歴・設定 (History & Settings)
+             🔥 タブ3: 学び・動画 (Education) - NEW!!
+        =========================================== -->
+        <div id="tab-education" class="tab-content">
+            <div class="card" style="background: linear-gradient(135deg, #e0f2fe, #bfdbfe); border: none;">
+                <h2 class="section-title" style="border: none; margin-bottom: 5px;">📖 チームの学び・資料</h2>
+                <p style="font-size: 13px; color: #1e3a8a; margin: 0;">監督からのアドバイスや、正しいケア・トレーニングの動画ライブラリです。</p>
+            </div>
+            
+            <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: none;">
+                <button class="edu-cat-btn active" onclick="filterEducation('すべて', this)">すべて</button>
+                <button class="edu-cat-btn" onclick="filterEducation('ケア・リカバリー', this)">ケア</button>
+                <button class="edu-cat-btn" onclick="filterEducation('トレーニング理論', this)">理論</button>
+                <button class="edu-cat-btn" onclick="filterEducation('栄養・食事', this)">栄養</button>
+                <button class="edu-cat-btn" onclick="filterEducation('メンタル', this)">メンタル</button>
+            </div>
+
+            <div id="education-list-container">
+                <!-- JSでコンテンツカードが挿入される -->
+                <div style="text-align: center; padding: 20px; color: var(--text-muted);">読み込み中...</div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             タブ4: 履歴・設定 (History & Settings)
         =========================================== -->
         <div id="tab-history" class="tab-content">
             <div class="card">
                 <h2 class="section-title">⏰ リマインダー設定</h2>
-                <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">練習前・練習後の入力を忘れないように、ブラウザの通知でお知らせします。</p>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">朝・夜の入力を忘れないように、ブラウザの通知でお知らせします。</p>
                 <div class="reminder-box">
                     <div class="flex-between">
                         <span style="font-weight: bold; color: var(--text-main);">🔔 通知機能をオンにする</span>
@@ -483,18 +591,59 @@
         
         let selectedSorenessPre = [];
         let selectedSorenessPost = [];
+        
+        let teamGoals = {}; 
+        let teamSettings = {}; 
+        
+        let globalEducation = []; // 🔥 学びコンテンツ保存用
+        let currentEduCategory = 'すべて';
 
-        // ==========================================
-        // 🌙 テーマ切替機能 (Dark Mode)
-        // ==========================================
+        // 🔥 グラフに大会日の縦線を引くプラグイン
+        const targetDateLinePlugin = {
+            id: 'targetDateLinePlugin',
+            afterDraw: (chart) => {
+                if (!teamSettings || !teamSettings.targetEventDate) return;
+                
+                const targetObj = new Date(teamSettings.targetEventDate);
+                const targetLabel = String(targetObj.getMonth()+1).padStart(2,'0') + '/' + String(targetObj.getDate()).padStart(2,'0');
+                
+                const index = chart.data.labels.findIndex(l => l === targetLabel);
+                if (index !== -1) {
+                    const ctx = chart.ctx;
+                    const meta = chart.getDatasetMeta(0);
+                    if (!meta.data[index]) return;
+                    
+                    const x = meta.data[index].x;
+                    const topY = chart.chartArea.top;
+                    const bottomY = chart.chartArea.bottom;
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(x, topY);
+                    ctx.lineTo(x, bottomY);
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = '#ea580c';
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#ea580c';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    const isDark = document.body.classList.contains('dark-mode');
+                    ctx.font = 'bold 12px sans-serif';
+                    ctx.fillText('🏆 ' + (teamSettings.targetEventName || '大会日'), x, topY - 5);
+                    ctx.restore();
+                }
+            }
+        };
+
         function toggleTheme() {
             const body = document.body;
             body.classList.toggle('dark-mode');
             const isDark = body.classList.contains('dark-mode');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            document.getElementById('theme-toggle').textContent = isDark ? '☀️' : '🌙';
+            document.getElementById('theme-toggle').innerHTML = isDark ? '☀️ ライト' : '🌙 ダーク';
             
-            // グラフがある場合は文字色を更新
             if(playerChartInstance) {
                 const tickColor = isDark ? '#94a3b8' : '#64748b';
                 const gridColor = isDark ? '#334155' : '#e2e8f0';
@@ -510,16 +659,12 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // 保存されたテーマの読み込み
             if (localStorage.getItem('theme') === 'dark') {
                 document.body.classList.add('dark-mode');
-                document.getElementById('theme-toggle').textContent = '☀️';
+                document.getElementById('theme-toggle').innerHTML = '☀️ ライト';
             }
         });
 
-        // ==========================================
-        // 🌤️ 天気・位置情報システム 
-        // ==========================================
         function fetchWeather() {
             const locText = document.getElementById('location-text');
             const tempText = document.getElementById('temp-text');
@@ -591,7 +736,7 @@
                 }
                 Notification.requestPermission().then(function (permission) {
                     if (permission === "granted") {
-                        statusText.textContent = "✅ 通知が許可されました！練習前と練習後に通知でお知らせします。";
+                        statusText.textContent = "✅ 通知が許可されました！朝と夜に通知でお知らせします。";
                         localStorage.setItem('reminder_enabled', 'true');
                         new Notification("AthleSense", { body: "通知設定が完了しました！", icon: "icon.png" });
                     } else {
@@ -616,15 +761,12 @@
                 const today = new Date().getDate().toString();
                 
                 if(hour >= 20 && lastReminded !== today + "_post") {
-                    new Notification("AthleSense", { body: "夜になりました。今日の「練習後」の記録とケアを入力しましょう！" });
+                    new Notification("AthleSense", { body: "夜になりました。今日の「夜」の記録とケアを入力しましょう！" });
                     localStorage.setItem('last_reminder_day', today + "_post");
                 }
             }
         }
 
-        // ==========================================
-        // 🧬 IRS (Injury Risk Score) 算出ロジック
-        // ==========================================
         function calculateIRS(type) {
             let score = 10; 
             
@@ -703,9 +845,6 @@
             }
         }
 
-        // ==========================================
-        // ✨ AIアドバイザー
-        // ==========================================
         function updateAIAdvicePre() {
             calculateIRS('pre');
 
@@ -784,6 +923,58 @@
             return arr;
         }
 
+        // 🔥 自己ベスト更新の判定関数
+        function checkPersonalBest(newSprints, playerName) {
+            let isBest = false;
+            const bestTimes = {};
+            allTeamLogs.forEach(log => {
+                if (log.playerName !== playerName) return;
+                let sLogs = log.sprintLogs || [];
+                sLogs.forEach(s => {
+                    const t = parseFloat(s.time);
+                    if (t > 0 && (!bestTimes[s.distance] || t < bestTimes[s.distance])) {
+                        bestTimes[s.distance] = t;
+                    }
+                });
+            });
+
+            newSprints.forEach(ns => {
+                const t = parseFloat(ns.time);
+                if (t > 0) {
+                    if (bestTimes[ns.distance] && t < bestTimes[ns.distance]) {
+                        isBest = true;
+                    }
+                }
+            });
+            return isBest;
+        }
+
+        // 🔥 紙吹雪（お祝い）演出をトリガーする関数
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                var duration = 3 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+                function randomInRange(min, max) {
+                    return Math.random() * (max - min) + min;
+                }
+
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) return clearInterval(interval);
+
+                    var particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount,
+                        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+                    }));
+                    confetti(Object.assign({}, defaults, { particleCount,
+                        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+                    }));
+                }, 250);
+            }
+        }
+
         async function initFirebase() {
             try {
                 firebase.initializeApp(myFirebaseConfig);
@@ -791,11 +982,40 @@
                 await firebase.auth().signInAnonymously();
                 colRef = db.collection('team_condition_logs');
                 playersColRef = db.collection('team_players');
+                let goalsColRefLocal = db.collection('team_goals'); 
+                let settingsColRef = db.collection('team_settings'); 
+                let eduColRefLocal = db.collection('team_education'); // 🔥 学びコレクション
 
                 playersColRef.onSnapshot(snapshot => {
                     const players = [];
                     snapshot.forEach(doc => players.push({name: doc.data().name}));
                     updatePlayerSelect(players);
+                });
+
+                goalsColRefLocal.onSnapshot(snapshot => {
+                    teamGoals = {};
+                    snapshot.forEach(doc => {
+                        teamGoals[doc.id] = doc.data();
+                    });
+                    renderPlayerGoal(); 
+                });
+
+                settingsColRef.doc('general').onSnapshot(doc => {
+                    if(doc.exists) {
+                        teamSettings = doc.data();
+                        updateCountdownUI();
+                        if (playerChartInstance) playerChartInstance.update();
+                    }
+                });
+
+                // 🔥 学びコンテンツの取得と描画
+                eduColRefLocal.onSnapshot(snapshot => {
+                    globalEducation = [];
+                    snapshot.forEach(doc => {
+                        globalEducation.push({ id: doc.id, ...doc.data() });
+                    });
+                    globalEducation.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    renderEducationList();
                 });
 
                 colRef.onSnapshot(snapshot => {
@@ -816,6 +1036,98 @@
             updatePlayerSelect(players);
             allTeamLogs = JSON.parse(localStorage.getItem('team_condition_logs') || '[]');
             allTeamLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+            teamGoals = JSON.parse(localStorage.getItem('team_goals') || '{}');
+            teamSettings = JSON.parse(localStorage.getItem('team_settings') || '{}'); 
+            
+            // ローカルから学びコンテンツ復元
+            globalEducation = JSON.parse(localStorage.getItem('team_education') || '[]');
+            renderEducationList();
+
+            renderPlayerGoal();
+            updateCountdownUI();
+        }
+
+        // ==========================================
+        // 🔥 学び・動画コンテンツの処理
+        // ==========================================
+        function getYouTubeEmbedUrl(url) {
+            if(!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
+        }
+
+        function renderEducationList() {
+            const container = document.getElementById('education-list-container');
+            container.innerHTML = '';
+            
+            const filtered = currentEduCategory === 'すべて' 
+                ? globalEducation 
+                : globalEducation.filter(item => item.category === currentEduCategory || 
+                  (currentEduCategory === 'ケア' && item.category === 'ケア・リカバリー') || 
+                  (currentEduCategory === '理論' && item.category === 'トレーニング理論') || 
+                  (currentEduCategory === '栄養' && item.category === '栄養・食事'));
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 30px; color: var(--text-muted); font-size: 14px;">このカテゴリのコンテンツはまだありません。<br>監督からの追加をお待ちください！</div>';
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'edu-card';
+                
+                let ytHtml = '';
+                const embedUrl = getYouTubeEmbedUrl(item.url);
+                if (embedUrl) {
+                    ytHtml = `<div class="yt-container"><iframe src="${embedUrl}" allowfullscreen></iframe></div>`;
+                } else if (item.url) {
+                    ytHtml = `<a href="${item.url}" target="_blank" style="display:inline-block; margin-top:10px; color:var(--primary); font-weight:bold; font-size:13px; text-decoration:none;">🔗 リンクを開く</a>`;
+                }
+
+                card.innerHTML = `
+                    <span class="edu-category-badge">${item.category}</span>
+                    <h3 class="edu-title">${item.title}</h3>
+                    <div class="edu-desc">${item.description}</div>
+                    ${ytHtml}
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        function filterEducation(cat, btn) {
+            document.querySelectorAll('.edu-cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentEduCategory = cat;
+            renderEducationList();
+        }
+
+        // 🔥 カウントダウンバナーの描画
+        function updateCountdownUI() {
+            const banner = document.getElementById('countdown-banner');
+            if (!teamSettings || !teamSettings.targetEventDate) {
+                banner.style.display = 'none';
+                return;
+            }
+
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const target = new Date(teamSettings.targetEventDate);
+            target.setHours(0,0,0,0);
+            
+            const diffTime = target - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays > 0) {
+                banner.style.display = 'flex';
+                banner.innerHTML = `🏆 ${teamSettings.targetEventName || '大会'}まで あと <span class="days">${diffDays}</span> 日！`;
+            } else if (diffDays === 0) {
+                banner.style.display = 'flex';
+                banner.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                banner.innerHTML = `🔥 本日は ${teamSettings.targetEventName || '大会'} 当日です！健闘を祈ります！`;
+            } else {
+                banner.style.display = 'none'; // 過ぎたら消す
+            }
         }
 
         function updatePlayerSelect(players) {
@@ -829,6 +1141,61 @@
                 select.appendChild(opt);
             });
             document.getElementById('player-warning').style.display = players.length === 0 ? 'block' : 'none';
+        }
+
+        document.getElementById('player-name').addEventListener('change', function() {
+            renderPlayerGoal();
+        });
+
+        function renderPlayerGoal() {
+            const playerName = document.getElementById('player-name').value;
+            const container = document.getElementById('goal-container');
+            
+            if (!playerName) {
+                container.style.display = 'none';
+                return;
+            }
+            container.style.display = 'block';
+            
+            const goalData = teamGoals[playerName] || {};
+            document.getElementById('season-goal-text').textContent = goalData.seasonGoal || "目標を設定して、日々のモチベーションを高めよう！";
+            document.getElementById('month-goal-text').textContent = goalData.monthGoal || "今月の具体的なテーマや目標を設定しましょう！";
+        }
+
+        async function editGoal(type) {
+            const playerName = document.getElementById('player-name').value;
+            if (!playerName) {
+                alert("先に一番上で自分の名前を選択してください！");
+                return;
+            }
+            
+            const goalData = teamGoals[playerName] || {};
+            const currentGoal = type === 'season' ? (goalData.seasonGoal || "") : (goalData.monthGoal || "");
+            const title = type === 'season' ? "今シーズンの目標" : "今月の目標・テーマ";
+            
+            const newGoal = prompt(`${title}を入力してください：\n（例：県大会決勝進出！ / スタートの改善 など）`, currentGoal);
+            
+            if (newGoal !== null) {
+                const updateData = { updatedAt: new Date().toISOString() };
+                if (type === 'season') updateData.seasonGoal = newGoal;
+                else updateData.monthGoal = newGoal;
+
+                try {
+                    if (db) {
+                        await db.collection('team_goals').doc(playerName).set(updateData, { merge: true });
+                    } else {
+                        teamGoals[playerName] = { ...goalData, ...updateData };
+                        localStorage.setItem('team_goals', JSON.stringify(teamGoals));
+                        renderPlayerGoal();
+                    }
+                } catch (e) {
+                    alert("目標の保存に失敗しました。");
+                }
+            }
+        }
+
+        function syncDeviceData(itemName) {
+            alert(`【デバイス連携機能について】\n\n現在、Webブラウザのセキュリティ制限により、Apple HealthやGoogle Fit、スマートウォッチから「${itemName}」を直接取得する機能は開発準備中です。\n\nお手数ですが、現在はお手持ちのデバイスやアプリの数値を確認して、直接入力してください！`);
         }
 
         async function saveData(type) {
@@ -847,6 +1214,8 @@
                 date: date,
                 updatedAt: new Date().toISOString()
             };
+
+            let isPB = false;
 
             if(type === 'pre') {
                 const sqNode = document.querySelector('input[name="sleep-quality"]:checked');
@@ -869,9 +1238,23 @@
                 partialData.good = document.getElementById('good').value;
                 partialData.bad = document.getElementById('bad').value;
                 partialData.sorenessPost = selectedSorenessPost.join(', ');
-                partialData.care = document.getElementById('care').value;
+                
+                // 🔥 ケア内容：選択されたタグと自由記述を結合して保存
+                let selectedCares = [];
+                document.querySelectorAll('.care-tag.selected').forEach(btn => {
+                    selectedCares.push(btn.getAttribute('data-care'));
+                });
+                const freeTextCare = document.getElementById('care').value;
+                partialData.care = selectedCares.length > 0 ? selectedCares.join(' / ') + (freeTextCare ? ' / ' + freeTextCare : '') : freeTextCare;
+                
                 partialData.aiAdvicePost = document.getElementById('ai-advice-post').innerHTML;
                 partialData.irsPost = document.getElementById('irs-value-post').textContent;
+
+                // 🔥 自己ベスト更新判定
+                const myLogs = allTeamLogs.filter(l => l.playerName === playerName);
+                if (myLogs.length > 0) {
+                    isPB = checkPersonalBest(partialData.sprintLogs, playerName);
+                }
             }
 
             try {
@@ -888,22 +1271,66 @@
                     localStorage.setItem('team_condition_logs', JSON.stringify(savedLogs));
                     loadLocalData();
                 }
-                alert(type === 'pre' ? '🌅 練習前のデータを保存しました！' : '🏃‍♂️ 練習後のデータを保存しました！お疲れ様でした。');
+                
+                // 🔥 アラートと自己ベストお祝い演出
+                if(type === 'pre') {
+                    alert('🌅 朝のデータを保存しました！今日も一日頑張りましょう！');
+                } else {
+                    alert('🌙 夜のデータを保存しました！お疲れ様でした。');
+                    if (isPB) {
+                        triggerConfetti();
+                        setTimeout(() => alert('🎉 自己ベスト更新おめでとうございます！！\n日々の努力の成果ですね！'), 300);
+                    }
+                }
                 
             } catch (error) {
                 alert("保存に失敗しました: " + error.message);
             }
         }
 
+        // 🔥 新しい顔文字メーターの更新関数
+        function updateFaceMeter(id, value, type) {
+            const el = document.getElementById(id);
+            let emoji = "";
+            let color = "";
+            const v = parseFloat(value);
+            
+            if (type === 'fatigue') {
+                if (v <= 2) { emoji = "😆"; color = "var(--good-text)"; }
+                else if (v <= 4) { emoji = "🙂"; color = "var(--primary)"; }
+                else if (v <= 6) { emoji = "😐"; color = "var(--text-muted)"; }
+                else if (v <= 8) { emoji = "🥵"; color = "var(--warning-text)"; }
+                else { emoji = "💀"; color = "#991b1b"; }
+            } else if (type === 'stress') {
+                if (v <= 2) { emoji = "😌"; color = "var(--good-text)"; }
+                else if (v <= 4) { emoji = "🙂"; color = "var(--primary)"; }
+                else if (v <= 6) { emoji = "😐"; color = "var(--text-muted)"; }
+                else if (v <= 8) { emoji = "😫"; color = "var(--warning-text)"; }
+                else { emoji = "🤯"; color = "#991b1b"; }
+            } else if (type === 'rpe') {
+                if (v <= 2) { emoji = "🚶‍♂️"; color = "var(--good-text)"; }
+                else if (v <= 4) { emoji = "🏃‍♂️"; color = "var(--primary)"; }
+                else if (v <= 6) { emoji = "💦"; color = "var(--text-muted)"; }
+                else if (v <= 8) { emoji = "🥵"; color = "var(--warning-text)"; }
+                else { emoji = "🤮"; color = "#991b1b"; }
+            }
+            
+            el.textContent = `${emoji} ${type === 'rpe' ? v.toFixed(1) : v}`;
+            el.style.color = color;
+            
+            el.classList.add('pop');
+            setTimeout(() => el.classList.remove('pop'), 200);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('date').valueAsDate = new Date();
             
             document.getElementById('fatigue').addEventListener('input', function() {
-                document.getElementById('fatigue-display').textContent = `${getEmojiForFatigue(this.value)} ${this.value}`;
+                updateFaceMeter('fatigue-display', this.value, 'fatigue');
                 updateAIAdvicePre();
             });
             document.getElementById('stress').addEventListener('input', function() {
-                document.getElementById('stress-display').textContent = `${getEmojiForStress(this.value)} ${this.value}`;
+                updateFaceMeter('stress-display', this.value, 'stress');
                 updateAIAdvicePre();
             });
             
@@ -917,7 +1344,7 @@
             function calcLoad() {
                 const d = parseFloat(durationInput.value) || 0;
                 const r = parseFloat(rpeSlider.value) || 0;
-                document.getElementById('rpe-display').textContent = `😐 ${r.toFixed(1)}`;
+                updateFaceMeter('rpe-display', r, 'rpe');
                 document.getElementById('load-result').textContent = (d > 0 && r > 0) ? (d * r).toFixed(1) : '-';
                 updateAIAdvicePost();
             }
@@ -952,13 +1379,22 @@
                     updateAIAdvicePost();
                 });
             });
+
+            // 🔥 追加：ケア選択タグのクリックイベント
+            document.querySelectorAll('.care-tag').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                });
+            });
             
+            // 初期状態の顔文字メーターをセット
+            updateFaceMeter('fatigue-display', document.getElementById('fatigue').value, 'fatigue');
+            updateFaceMeter('stress-display', document.getElementById('stress').value, 'stress');
+            updateFaceMeter('rpe-display', document.getElementById('rpe').value, 'rpe');
+
             updateAIAdvicePre();
             updateAIAdvicePost();
         });
-
-        function getEmojiForFatigue(val) { return val<=3?"😃":val<=6?"😐":val<=8?"🥵":"💀"; }
-        function getEmojiForStress(val) { return val<=3?"😌":val<=6?"😐":val<=8?"😫":"🤯"; }
 
         function renderPlayerHistory(playerName) {
             document.getElementById('history-section').style.display = 'block';
@@ -1019,7 +1455,6 @@
                 </div>`;
             });
 
-            // グラフの描画
             if (typeof Chart !== 'undefined') {
                 const ctx = document.getElementById('player-chart');
                 if (ctx) {
@@ -1043,12 +1478,14 @@
                         data: {
                             labels: labels,
                             datasets: [
-                                { label: 'Training Load', data: loadData, borderColor: '#3b82f6', backgroundColor: '#3b82f6', yAxisID: 'y', tension: 0.2 },
-                                { label: '疲労度', data: fatigueData, borderColor: '#ef4444', backgroundColor: '#ef4444', borderDash: [5, 5], yAxisID: 'y1', tension: 0.2 }
+                                { label: 'Training Load', data: loadData, backgroundColor: '#3b82f6', yAxisID: 'y', type: 'bar', order: 2 },
+                                { label: '疲労度', data: fatigueData, borderColor: '#ef4444', backgroundColor: '#ef4444', borderDash: [5, 5], yAxisID: 'y1', tension: 0.2, order: 1 }
                             ]
                         },
+                        plugins: [targetDateLinePlugin], // 🔥 プラグイン登録
                         options: {
                             responsive: true,
+                            layout: { padding: { top: 20 } }, // 文字が切れないように余白
                             plugins: { 
                                 title: { display: true, text: '最近のコンディション推移 (最大7日間)', color: tickColor },
                                 legend: { labels: { color: tickColor } }
