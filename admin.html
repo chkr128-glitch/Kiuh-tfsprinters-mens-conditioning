@@ -1961,24 +1961,35 @@
         }
 
         // 🔥 個別ログ削除関数
-        async function deleteLog(playerName, date) {
+        window.deleteLog = async function(playerName, date) {
             if (!confirm(`本当に ${playerName} 選手の ${date} の記録を削除しますか？\n（この操作は元に戻せません）`)) return;
 
             const docId = `${playerName}_${date}`;
             try {
                 if (logColRef) {
+                    // クラウド上のデータを削除
                     await logColRef.doc(docId).delete();
-                } else {
-                    let savedLogs = JSON.parse(localStorage.getItem('team_condition_logs') || '[]');
-                    savedLogs = savedLogs.filter(log => !(log.playerName === playerName && log.date === date));
-                    localStorage.setItem('team_condition_logs', JSON.stringify(savedLogs));
-                    window.globalLogs = savedLogs;
-                    window.updateAdminUI(savedLogs);
-                }
+                } 
+                
+                // 🔥 クラウドの同期遅延対策：画面のデータからも即座に消して強制再描画する
+                let savedLogs = window.globalLogs || [];
+                savedLogs = savedLogs.filter(log => !(log.playerName === playerName && log.date === date));
+                
+                // ローカルのバックアップデータからも削除
+                let localStoreLogs = JSON.parse(localStorage.getItem('team_condition_logs') || '[]');
+                localStoreLogs = localStoreLogs.filter(log => !(log.playerName === playerName && log.date === date));
+                localStorage.setItem('team_condition_logs', JSON.stringify(localStoreLogs));
+
+                window.globalLogs = savedLogs;
+                window.updateAdminUI(savedLogs);
+                
+                // 削除完了をポップアップで通知
+                setTimeout(() => alert("記録を削除しました！"), 100);
+
             } catch (error) {
                 alert("削除に失敗しました: " + error.message);
             }
-        }
+        };
 
         function renderTableData(logsToRender, tbodyId, showDate) {
             const tableBody = document.getElementById(tbodyId);
