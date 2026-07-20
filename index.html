@@ -416,7 +416,7 @@
                              <button type="button" class="tag-btn tag-btn-post" data-part="足裏">足裏</button>
                          </div>
                      </div>
-                     <div class="form-group"><div class="form-label-flex"><label style="color: var(--warning-text);">🔥 ケガ・痛みの詳細</label></div><textarea id="bad" rows="2" placeholder="痛みや怪我の状況があれば詳しく..."></textarea></div>
+                     <div class="form-group"><div class="form-label-flex"><label style="color: var(--warning-text);">🔥 ケガ・痛みの詳細</label></div><textarea id="injury" rows="2" placeholder="痛みや怪我の状況があれば詳しく..."></textarea></div>
                 </div>
 
                 <div class="irs-container">
@@ -440,6 +440,7 @@
                          <input type="number" id="steps" placeholder="例: 8000">
                      </div>
                      <div class="form-group"><div class="form-label-flex"><label style="color: var(--good-text);">👍 できたこと</label></div><textarea id="good" rows="2"></textarea></div>
+                     <div class="form-group"><div class="form-label-flex"><label style="color: var(--warning-text);">👎 できなかったこと・課題</label></div><textarea id="bad" rows="2"></textarea></div>
                      
                      <!-- 🔥 改修：ケア内容のチェックボタン化 -->
                      <div class="form-group">
@@ -894,8 +895,9 @@
             if (selectedSorenessPost.includes('臀部')) advices.push("💡 <b>【お尻のケア】</b><br>推進力を生む大きな筋肉が疲労しています。テニスボールをお尻の下に置いて自重でリリースしたり、仰向けで膝を胸に抱えるストレッチで張りをとりましょう。");
             if (selectedSorenessPost.includes('背中') || selectedSorenessPost.includes('肩') || selectedSorenessPost.includes('腕')) advices.push("💡 <b>【上半身のケア】</b><br>腕振りや体幹の固定による疲労です。フォームローラーでの胸椎の伸展や、肩甲骨周りのストレッチを行い、上半身の力みをリセットしましょう。");
 
+            const injuryText = document.getElementById('injury').value;
             const badText = document.getElementById('bad').value;
-            if(badText.includes('痛') || badText.includes('違和感')) advices.push("🚑 <b>【痛みへの対処】</b><br>痛みを伴う違和感がある場合、無理なストレッチはかえって炎症を悪化させます。様子を見て安静にしてください。");
+            if(injuryText.length > 0 || badText.includes('痛') || badText.includes('違和感')) advices.push("🚑 <b>【痛みへの対処】</b><br>痛みを伴う違和感がある場合、無理なストレッチはかえって炎症を悪化させます。様子を見て安静にしてください。");
 
             const box = document.getElementById('ai-advice-post');
             if (advices.length === 0) {
@@ -1237,6 +1239,7 @@
                 partialData.steps = document.getElementById('steps').value;
                 partialData.good = document.getElementById('good').value;
                 partialData.bad = document.getElementById('bad').value;
+                partialData.injury = document.getElementById('injury').value;
                 partialData.sorenessPost = selectedSorenessPost.join(', ');
                 
                 // 🔥 ケア内容：選択されたタグと自由記述を結合して保存
@@ -1350,6 +1353,7 @@
             }
             durationInput.addEventListener('input', calcLoad);
             rpeSlider.addEventListener('input', calcLoad);
+            document.getElementById('injury').addEventListener('input', updateAIAdvicePost);
             document.getElementById('bad').addEventListener('input', updateAIAdvicePost);
             
             document.querySelectorAll('.tag-btn-pre').forEach(btn => {

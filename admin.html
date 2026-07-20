@@ -244,6 +244,7 @@
                              <th>睡眠(時間/質)</th>
                              <th>ケガ・違和感</th>
                              <th>ケア・処置</th>
+                             <th>操作</th>
                          </tr>
                      </thead>
                      <tbody id="today-table-body"></tbody>
@@ -647,6 +648,7 @@
                              <th>睡眠(時間/質)</th>
                              <th>ケガ・違和感</th>
                              <th>ケア・処置</th>
+                             <th>操作</th>
                          </tr>
                      </thead>
                      <tbody id="history-table-body"></tbody>
@@ -1958,11 +1960,31 @@
             }
         }
 
+        // 🔥 個別ログ削除関数
+        async function deleteLog(playerName, date) {
+            if (!confirm(`本当に ${playerName} 選手の ${date} の記録を削除しますか？\n（この操作は元に戻せません）`)) return;
+
+            const docId = `${playerName}_${date}`;
+            try {
+                if (logColRef) {
+                    await logColRef.doc(docId).delete();
+                } else {
+                    let savedLogs = JSON.parse(localStorage.getItem('team_condition_logs') || '[]');
+                    savedLogs = savedLogs.filter(log => !(log.playerName === playerName && log.date === date));
+                    localStorage.setItem('team_condition_logs', JSON.stringify(savedLogs));
+                    window.globalLogs = savedLogs;
+                    window.updateAdminUI(savedLogs);
+                }
+            } catch (error) {
+                alert("削除に失敗しました: " + error.message);
+            }
+        }
+
         function renderTableData(logsToRender, tbodyId, showDate) {
             const tableBody = document.getElementById(tbodyId);
             tableBody.innerHTML = '';
             if (!logsToRender || logsToRender.length === 0) {
-                 const colspan = showDate ? 17 : 16;
+                 const colspan = showDate ? 18 : 17;
                  tableBody.innerHTML = `<tr><td colspan="${colspan}" style="text-align:center;">記録が見つかりません。</td></tr>`;
                  return;
             }
@@ -2034,6 +2056,9 @@
                     <td>${sleepText}</td>
                     <td style="color:#dc2626; max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${log.injury || ''}">${log.injury || ''}</td>
                     <td style="color:#1d4ed8; max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${log.care || ''}">${log.care || ''}</td>
+                    <td style="text-align:center;">
+                        <button class="btn btn-danger" style="padding: 4px 8px; font-size:11px;" onclick="deleteLog('${log.playerName}', '${log.date}')">削除</button>
+                    </td>
                 `;
                 tr.innerHTML = html;
                 tableBody.appendChild(tr);
