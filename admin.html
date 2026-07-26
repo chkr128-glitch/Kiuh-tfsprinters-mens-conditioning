@@ -6,7 +6,7 @@
     <title>AthleSense KIUH - Admin</title>
 
     <link rel="manifest" href="manifest-admin.json">
-    <meta name="theme-color" content="#1e3a8a">
+    <meta name="theme-color" content="#121212">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AthleSense Admin">
@@ -24,127 +24,141 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6; color: #333; margin: 0; padding: 0; line-height: 1.6; }
+        /* 🔥 黒基調のダークテーマベース */
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #121212; color: #e5e7eb; margin: 0; padding: 0; line-height: 1.6; }
         .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
-        header { background-color: #1e3a8a; color: white; padding: 15px 20px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .card { background-color: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .section-title { font-size: 18px; font-weight: bold; color: #1e3a8a; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; margin-bottom: 15px; margin-top: 0; }
         
-        select, input[type="text"], input[type="date"], input[type="month"], textarea { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; margin-bottom: 10px; box-sizing: border-box; }
+        /* ヘッダー：黒グラデーション＋ピンクのアンダーライン */
+        header { background: linear-gradient(135deg, #000000, #1a1a1a); color: white; padding: 15px 20px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border-bottom: 2px solid #ec4899; }
+        
+        /* カード：ダークグレー＋黒ボーダー */
+        .card { background-color: #1e1e1e; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.4); border: 1px solid #333; }
+        .section-title { font-size: 18px; font-weight: bold; color: #f97316; border-bottom: 2px solid #333; padding-bottom: 8px; margin-bottom: 15px; margin-top: 0; }
+        
+        /* 入力フォーム */
+        select, input[type="text"], input[type="date"], input[type="month"], textarea { width: 100%; padding: 12px; border: 1px solid #444; border-radius: 8px; font-size: 16px; margin-bottom: 10px; box-sizing: border-box; background-color: #2c2c2c; color: #fff; transition: all 0.2s; }
+        select:focus, input:focus, textarea:focus { outline: none; border-color: #ec4899; box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2); }
         
         /* 🔥 タブ用スタイル */
-        .tab-nav { display: flex; background: white; border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
-        .tab-btn { flex: 1; padding: 15px 0; text-align: center; font-weight: bold; font-size: 15px; color: #64748b; background: none; border: none; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
-        .tab-btn.active { color: #1e3a8a; border-bottom-color: #1e3a8a; background-color: #eff6ff; }
+        .tab-nav { display: flex; background: #1e1e1e; border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); border: 1px solid #333; }
+        .tab-btn { flex: 1; padding: 15px 0; text-align: center; font-weight: bold; font-size: 15px; color: #9ca3af; background: none; border: none; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
+        .tab-btn.active { color: #ec4899; border-bottom-color: #ec4899; background-color: rgba(236, 72, 153, 0.1); }
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* 🔥 履歴メニュー（タイル型）のスタイル */
         .history-menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .menu-card { background: white; border-radius: 12px; padding: 25px 15px; text-align: center; font-weight: bold; font-size: 15px; color: #1e3a8a; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
-        .menu-card:hover { background: #eff6ff; border-color: #93c5fd; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        .menu-card { background: #1e1e1e; border-radius: 12px; padding: 25px 15px; text-align: center; font-weight: bold; font-size: 15px; color: #e5e7eb; box-shadow: 0 4px 6px rgba(0,0,0,0.4); border: 2px solid #333; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+        .menu-card:hover { background: #2c2c2c; border-color: #f97316; transform: translateY(-3px); box-shadow: 0 6px 12px rgba(249, 115, 22, 0.2); }
         .history-view { display: none; animation: fadeIn 0.3s ease; }
-        .back-btn { background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s; font-size: 13px; text-decoration: none; }
-        .back-btn:hover { background: #e2e8f0; color: #1e293b; }
+        .back-btn { background: #2c2c2c; border: 1px solid #444; color: #e5e7eb; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s; font-size: 13px; text-decoration: none; }
+        .back-btn:hover { background: #3f3f46; color: #fff; }
 
+        /* サマリーカード */
         .dashboard-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .summary-card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid #d1d5db; }
-        .summary-title { font-size: 12px; font-weight: bold; color: #6b7280; margin-bottom: 5px; }
-        .summary-value { font-size: 28px; font-weight: bold; }
+        .summary-card { background: #1e1e1e; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.4); border-top: 4px solid #555; }
+        .summary-title { font-size: 12px; font-weight: bold; color: #9ca3af; margin-bottom: 5px; }
+        .summary-value { font-size: 28px; font-weight: bold; color: #fff; }
         
-        .alert-card { border-top-color: #dc2626; } .alert-card .summary-value { color: #dc2626; } 
-        .warning-card { border-top-color: #d97706; } .warning-card .summary-value { color: #d97706; } 
-        .danger-card { border-top-color: #991b1b; background-color: #fef2f2; } .danger-card .summary-value { color: #991b1b; }
-        .info-card { border-top-color: #2563eb; } .info-card .summary-value { color: #2563eb; } 
+        .alert-card { border-top-color: #ef4444; } .alert-card .summary-value { color: #ef4444; } 
+        .warning-card { border-top-color: #f97316; } .warning-card .summary-value { color: #f97316; } 
+        .danger-card { border-top-color: #ec4899; background-color: rgba(236, 72, 153, 0.05); } .danger-card .summary-value { color: #ec4899; }
+        .info-card { border-top-color: #3b82f6; } .info-card .summary-value { color: #60a5fa; } 
         
-        .missing-list { font-size: 12px; color: #6b7280; margin-top: 5px; min-height: 18px; }
-        .danger-list { font-size: 12px; color: #991b1b; margin-top: 5px; font-weight: bold; }
+        .missing-list { font-size: 12px; color: #9ca3af; margin-top: 5px; min-height: 18px; }
+        .danger-list { font-size: 12px; color: #ec4899; margin-top: 5px; font-weight: bold; }
 
         .team-analytics-container { display: flex; flex-direction: column; gap: 30px; margin-bottom: 10px; }
         
-        .heatmap-container { display: flex; justify-content: center; gap: 40px; align-items: center; padding: 20px 10px; background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+        /* ヒートマップ */
+        .heatmap-container { display: flex; justify-content: center; gap: 40px; align-items: center; padding: 20px 10px; background-color: #1e1e1e; border-radius: 8px; border: 1px solid #333; }
         .human-body { width: 110px; flex-shrink: 0; }
         .human-body svg { width: 100%; height: auto; display: block; }
-        .heat-spot { transition: opacity 0.4s ease; mix-blend-mode: multiply; }
+        .heat-spot { transition: opacity 0.4s ease; mix-blend-mode: normal; } /* 暗い背景用に通常ブレンド */
         
-        .ranking-table { margin: 10px auto; border-collapse: collapse; font-size: 12px; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); table-layout: fixed; }
-        .ranking-table th, .ranking-table td { padding: 6px 4px; border-bottom: 1px solid #e2e8f0; text-align: center; word-wrap: break-word; overflow-wrap: break-word; }
-        .ranking-table th { background-color: #f1f5f9; color: #475569; }
+        /* テーブル */
+        .ranking-table { margin: 10px auto; border-collapse: collapse; font-size: 12px; background: #1e1e1e; border-radius: 8px; overflow: hidden; border: 1px solid #333; box-shadow: 0 1px 2px rgba(0,0,0,0.5); table-layout: fixed; }
+        .ranking-table th, .ranking-table td { padding: 6px 4px; border-bottom: 1px solid #333; text-align: center; word-wrap: break-word; overflow-wrap: break-word; color: #e5e7eb; }
+        .ranking-table th { background-color: #2c2c2c; color: #ec4899; } /* ピンクヘッダー */
         .ranking-table tr:last-child td { border-bottom: none; }
-        .ranking-title { font-size: 14px; font-weight: bold; color: #334155; margin-top: 15px; margin-bottom: 10px; text-align: center; }
+        .ranking-title { font-size: 14px; font-weight: bold; color: #f97316; margin-top: 15px; margin-bottom: 10px; text-align: center; }
 
         .fv-groups-container { display: flex; flex-direction: column; gap: 15px; }
-        .fv-group-row { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; }
-        .fv-group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid #cbd5e1; }
+        .fv-group-row { background-color: #1e1e1e; border: 1px solid #444; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; }
+        .fv-group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid #444; }
         .fv-group-title { font-size: 15px; font-weight: bold; }
-        .fv-group-desc { font-size: 11px; color: #64748b; }
+        .fv-group-desc { font-size: 11px; color: #9ca3af; }
         
-        .fv-force .fv-group-title { color: #c2410c; }
-        .fv-force .fv-group-header { border-bottom-color: #fed7aa; }
-        .fv-balanced .fv-group-title { color: #15803d; }
-        .fv-balanced .fv-group-header { border-bottom-color: #bbf7d0; }
-        .fv-velocity .fv-group-title { color: #1d4ed8; }
-        .fv-velocity .fv-group-header { border-bottom-color: #bfdbfe; }
+        .fv-force .fv-group-title { color: #f97316; }
+        .fv-force .fv-group-header { border-bottom-color: #f97316; }
+        .fv-balanced .fv-group-title { color: #10b981; }
+        .fv-balanced .fv-group-header { border-bottom-color: #10b981; }
+        .fv-velocity .fv-group-title { color: #60a5fa; }
+        .fv-velocity .fv-group-header { border-bottom-color: #60a5fa; }
         
         .fv-player-list { display: flex; flex-wrap: wrap; gap: 8px; }
-        .fv-player-tag { padding: 6px 12px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 6px; font-weight: bold; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .fv-player-ratio { font-size: 11px; color: #64748b; font-weight: normal; background: rgba(255,255,255,0.8); padding: 2px 6px; border-radius: 10px; }
+        .fv-player-tag { padding: 6px 12px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 6px; font-weight: bold; box-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .fv-player-ratio { font-size: 11px; color: #fff; font-weight: normal; background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 10px; }
 
+        /* アナリティクスエリア */
         .analysis-container { display: flex; flex-wrap: wrap; gap: 20px; }
         .chart-area { flex: 2; min-width: 300px; padding-top: 15px; }
-        .stats-area { flex: 1; min-width: 200px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }
+        .stats-area { flex: 1; min-width: 200px; background-color: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 15px; }
         .stat-box { margin-bottom: 15px; }
-        .stat-box-title { font-size: 12px; color: #64748b; font-weight: bold; text-transform: uppercase; }
-        .stat-box-value { font-size: 20px; font-weight: bold; color: #0f172a; }
-        .stat-box-desc { font-size: 11px; color: #64748b; }
+        .stat-box-title { font-size: 12px; color: #ec4899; font-weight: bold; text-transform: uppercase; }
+        .stat-box-value { font-size: 20px; font-weight: bold; color: #fff; }
+        .stat-box-desc { font-size: 11px; color: #9ca3af; }
 
+        /* データテーブル */
         .table-responsive { overflow-x: auto; }
         table.data-table { width: 100%; border-collapse: collapse; min-width: 1600px; font-size: 13px; }
-        table.data-table th, table.data-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-        table.data-table th { background-color: #f3f4f6; color: #4b5563; font-weight: bold; white-space: nowrap; }
-        table.data-table tr:hover { background-color: #f9fafb; }
-        .alert-text { color: #dc2626; font-weight: bold; }
+        table.data-table th, table.data-table td { padding: 10px; text-align: left; border-bottom: 1px solid #333; color: #e5e7eb; }
+        table.data-table th { background-color: #2c2c2c; color: #f97316; font-weight: bold; white-space: nowrap; }
+        table.data-table tr:hover { background-color: rgba(255,255,255,0.05); }
+        .alert-text { color: #ef4444; font-weight: bold; }
         
-        .tag-text { background-color: #fef08a; color: #b45309; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 4px; display: inline-block; margin-bottom: 2px;}
-        .tag-text-post { background-color: #ffedd5; color: #c2410c; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 4px; display: inline-block; margin-bottom: 2px;}
+        .tag-text { background-color: rgba(249, 115, 22, 0.2); color: #f97316; border: 1px solid #f97316; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 4px; display: inline-block; margin-bottom: 2px;}
+        .tag-text-post { background-color: rgba(236, 72, 153, 0.2); color: #ec4899; border: 1px solid #ec4899; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 4px; display: inline-block; margin-bottom: 2px;}
         
         .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .status-badge { font-size: 12px; padding: 4px 8px; border-radius: 12px; font-weight: normal; margin-left: 10px; vertical-align: middle; }
-        .status-local { background-color: #6b7280; color: white; }
-        .status-cloud { background-color: #10b981; color: white; }
+        .status-local { background-color: #444; color: white; border: 1px solid #666; }
+        .status-cloud { background-color: #ec4899; color: white; border: 1px solid #fbcfe8; }
 
+        /* ボタン（オレンジ＆赤） */
         .btn { padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; border: none; transition: background-color 0.2s; font-size: 14px; }
         .btn-danger { background-color: #ef4444; color: white; }
         .btn-danger:hover { background-color: #dc2626; }
-        .btn-success { background-color: #10b981; color: white; display: flex; align-items: center; gap: 5px; }
-        .btn-success:hover { background-color: #059669; }
+        .btn-success { background-color: #f97316; color: white; display: flex; align-items: center; gap: 5px; }
+        .btn-success:hover { background-color: #ea580c; }
 
         .filter-area { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
-        .filter-area input { flex: 1; min-width: 200px; margin-bottom: 0; border: none; background: transparent; padding: 0;}
-        .filter-wrapper { flex: 1; min-width: 200px; display: flex; align-items: center; background: white; border: 1px solid #93c5fd; border-radius: 8px; padding: 10px 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 0;}
+        .filter-area input { flex: 1; min-width: 200px; margin-bottom: 0; border: none; background: transparent; padding: 0; color: #fff;}
+        .filter-wrapper { flex: 1; min-width: 200px; display: flex; align-items: center; background: #2c2c2c; border: 1px solid #ec4899; border-radius: 8px; padding: 10px 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 0;}
 
+        /* 名簿用タグ */
         .roster-container { display: flex; flex-wrap: wrap; gap: 8px; }
-        .player-tag-blue { background-color: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
-        .player-tag-red { background-color: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; }
-        .player-tag-yellow { background-color: #fefce8; border: 1px solid #fde68a; color: #b45309; }
-        .player-tag-default { background-color: #f3f4f6; border: 1px solid #d1d5db; color: #4b5563; }
+        .player-tag-blue { background-color: rgba(96, 165, 250, 0.1); border: 1px solid #60a5fa; color: #93c5fd; }
+        .player-tag-red { background-color: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #fca5a5; }
+        .player-tag-yellow { background-color: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; color: #fde68a; }
+        .player-tag-default { background-color: rgba(255, 255, 255, 0.1); border: 1px solid #666; color: #ccc; }
         .delete-player-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 18px; padding: 0; line-height: 1; margin-left: 4px; }
-        .delete-player-btn:hover { color: #b91c1c; }
+        .delete-player-btn:hover { color: #fca5a5; }
 
         .sprint-select-wrapper { text-align: center; margin-bottom: 10px; }
-        .sprint-select-wrapper select { width: 150px; padding: 6px 12px; font-size: 14px; font-weight: bold; color: #1e3a8a; border: 2px solid #93c5fd; border-radius: 6px; cursor: pointer; }
+        .sprint-select-wrapper select { width: 150px; padding: 6px 12px; font-size: 14px; font-weight: bold; color: #f97316; border: 2px solid #f97316; border-radius: 6px; cursor: pointer; background: #2c2c2c; }
 
         /* 🔥 カウントダウンバナー */
-        .countdown-banner { background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; padding: 12px 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(234, 88, 12, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; }
-        .countdown-banner .days { font-size: 28px; background: white; color: #ea580c; padding: 2px 10px; border-radius: 8px; margin: 0 5px; }
+        .countdown-banner { background: linear-gradient(135deg, #ec4899, #f97316); color: white; padding: 12px 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(236, 72, 153, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; border: 1px solid rgba(255,255,255,0.2); }
+        .countdown-banner .days { font-size: 28px; background: rgba(0,0,0,0.5); color: #fff; padding: 2px 10px; border-radius: 8px; margin: 0 5px; border: 1px solid rgba(255,255,255,0.2); }
 
-        /* 🔥 PDFレポート印刷用のスタイル設定 */
+        /* 🔥 PDFレポート印刷用のスタイル設定（印刷時は白背景で見やすく） */
         @media print {
-            body { background-color: white; margin: 0; padding: 0; }
+            body { background-color: white; margin: 0; padding: 0; color: #333; }
             body > * { display: none !important; }
             #print-report-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; padding: 20px; box-sizing: border-box; }
-            #print-report-area * { visibility: visible; }
+            #print-report-area * { visibility: visible; color: #333; }
             .no-print { display: none !important; }
             @page { margin: 10mm; }
         }
@@ -158,13 +172,11 @@
 
     <div class="container no-print">
 
-        <!-- 🔥 タブナビゲーション -->
         <div class="tab-nav">
             <button class="tab-btn active" onclick="switchTab('today', this)">📅 指定日(本日)のログ</button>
             <button class="tab-btn" onclick="switchTab('history', this)">📊 過去のログ・詳細分析</button>
         </div>
 
-        <!-- 🔥 カウントダウンバナー（全体共有） -->
         <div id="countdown-banner" class="countdown-banner">
             <!-- JSで動的挿入 -->
         </div>
@@ -174,11 +186,11 @@
         =========================================== -->
         <div id="tab-today" class="tab-content active">
             
-            <div class="card" style="background-color: #eff6ff; border: 1px solid #bfdbfe;">
+            <div class="card" style="background-color: #2c2c2c; border: 1px solid #ec4899;">
                 <div class="flex-between">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <h3 class="section-title" style="margin: 0; border: none; color: #1e3a8a;">📅 表示する日付:</h3>
-                        <input type="date" id="target-date" style="width: auto; margin: 0; border-color: #93c5fd; font-weight: bold; color: #1e3a8a;" onchange="updateTodayView()">
+                        <h3 class="section-title" style="margin: 0; border: none; color: #ec4899;">📅 表示する日付:</h3>
+                        <input type="date" id="target-date" style="width: auto; margin: 0; border-color: #ec4899; font-weight: bold; color: #fff;" onchange="updateTodayView()">
                     </div>
                     <button class="btn btn-danger" onclick="clearAllData()">全データをリセット</button>
                 </div>
@@ -186,13 +198,13 @@
 
             <div class="card">
                 <h3 class="section-title">📋 選手名簿の管理</h3>
-                <p style="font-size: 12px; color: #6b7280; margin-top: 0;">ここで登録した選手が「未入力者」のチェック対象になり、選手の入力画面にも選択肢として表示されます。</p>
+                <p style="font-size: 12px; color: #9ca3af; margin-top: 0;">ここで登録した選手が「未入力者」のチェック対象になり、選手の入力画面にも選択肢として表示されます。</p>
                 <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
                      <input type="text" id="new-player-name" placeholder="新しい選手名を入力..." style="margin-bottom: 0; flex: 1;">
                      <select id="new-player-category" style="width: 120px; margin-bottom: 0; font-weight: bold;">
-                         <option value="BLUE" style="color: #1d4ed8;">🟦 BLUE</option>
-                         <option value="RED" style="color: #b91c1c;">🟥 RED</option>
-                         <option value="YELLOW" style="color: #b45309;">🟨 YELLOW</option>
+                         <option value="BLUE" style="color: #60a5fa;">🟦 BLUE</option>
+                         <option value="RED" style="color: #fca5a5;">🟥 RED</option>
+                         <option value="YELLOW" style="color: #fde68a;">🟨 YELLOW</option>
                      </select>
                      <button class="btn btn-success" onclick="addPlayer()" style="white-space: nowrap;">➕ 追加</button>
                 </div>
@@ -230,19 +242,19 @@
                          <tr>
                              <th>選手名</th>
                              <th>IRS(朝)</th>
-                             <th>IRS(後)</th>
+                             <th>IRS(夜)</th>
                              <th>疲労/ｽﾄﾚｽ</th>
                              <th>Load</th>
                              <th>スプリント記録</th>
                              <th>RSI</th>
                              <th>F-v診断</th>
                              <th>張り(朝)</th>
-                             <th>張り(後)</th>
+                             <th>張り(夜)</th>
                              <th>体重</th>
                              <th>心拍数</th>
                              <th>歩数</th>
                              <th>睡眠(時間/質)</th>
-                             <th>ケガ・違和感</th>
+                             <th>ケガ・痛みの詳細</th>
                              <th>ケア・処置</th>
                              <th>操作</th>
                          </tr>
@@ -263,7 +275,7 @@
                     <span style="font-size: 18px; margin-right: 10px;">🔍</span>
                     <input type="text" id="search-input" placeholder="選手名やキーワードで絞り込み..." oninput="filterAndRenderTable()">
                 </div>
-                <select id="period-filter" onchange="filterAndRenderTable()" style="flex: 1; min-width: 200px; padding: 10px 15px; border: 1px solid #93c5fd; border-radius: 8px; font-weight: bold; color: #1e3a8a; background: white; margin-bottom: 0; cursor: pointer;">
+                <select id="period-filter" onchange="filterAndRenderTable()" style="flex: 1; min-width: 200px; padding: 10px 15px; border: 1px solid #ec4899; border-radius: 8px; font-weight: bold; color: #fff; background: #2c2c2c; margin-bottom: 0; cursor: pointer;">
                     <option value="all">📅 すべての期間</option>
                     <optgroup label="クイック選択">
                         <option value="this_week">今週 (月〜日)</option>
@@ -283,7 +295,6 @@
                     <span style="font-size: 32px; margin-bottom: 5px;">🎯</span>
                     選手目標・<br>テーマ管理
                 </div>
-                <!-- 🔥 追加：学びコンテンツ管理 -->
                 <div class="menu-card" onclick="openHistoryView('education')">
                     <span style="font-size: 32px; margin-bottom: 5px;">📖</span>
                     学び・動画<br>コンテンツ管理
@@ -314,10 +325,9 @@
             <div id="view-goals" class="history-view card table-responsive">
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 
-                <!-- 🔥 大会設定フォーム -->
-                <div style="background-color: #fffbeb; border: 2px solid #fcd34d; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
-                    <h4 style="margin: 0 0 10px 0; color: #b45309; display: flex; align-items: center; gap: 5px;">🏆 チーム目標大会の設定</h4>
-                    <p style="font-size: 12px; color: #78350f; margin-top: 0;">ここで設定した大会までのカウントダウンが、全選手のスマホ画面のトップに表示されます。</p>
+                <div style="background-color: #2c2c2c; border: 2px solid #f97316; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
+                    <h4 style="margin: 0 0 10px 0; color: #f97316; display: flex; align-items: center; gap: 5px;">🏆 チーム目標大会の設定</h4>
+                    <p style="font-size: 12px; color: #e5e7eb; margin-top: 0;">ここで設定した大会までのカウントダウンが、全選手のスマホ画面のトップに表示されます。</p>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
                         <input type="text" id="target-event-name" placeholder="大会名 (例: 県大会)" style="flex: 1; min-width: 150px; margin-bottom: 0;">
                         <input type="date" id="target-event-date" style="flex: 1; min-width: 150px; margin-bottom: 0;">
@@ -326,7 +336,7 @@
                 </div>
 
                 <h3 class="section-title">🎯 選手目標・テーマ管理</h3>
-                <p style="font-size: 12px; color: #64748b; margin-top: 0;">※面談等で決定した各選手の「シーズン目標」や「月間テーマ」を監督からも設定・編集できます。ここで編集した内容は選手のスマホ画面に同期されます。</p>
+                <p style="font-size: 12px; color: #9ca3af; margin-top: 0;">※面談等で決定した各選手の「シーズン目標」や「月間テーマ」を監督からも設定・編集できます。ここで編集した内容は選手のスマホ画面に同期されます。</p>
                 <table class="data-table" style="min-width: 800px;">
                      <thead>
                          <tr>
@@ -339,13 +349,13 @@
                 </table>
             </div>
 
-            <!-- 🔥 学び・動画コンテンツ管理 View -->
+            <!-- 📖 学び・動画コンテンツ管理 View -->
             <div id="view-education" class="history-view card table-responsive">
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 <h3 class="section-title">📖 学び・動画コンテンツ管理</h3>
-                <p style="font-size: 12px; color: #64748b; margin-top: 0;">※ここで追加したYouTube動画やアドバイス資料が、全選手の「学び」タブに配信されます。</p>
+                <p style="font-size: 12px; color: #9ca3af; margin-top: 0;">※ここで追加したYouTube動画やアドバイス資料が、全選手の「学び」タブに配信されます。</p>
                 
-                <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
+                <div style="background-color: #2c2c2c; border: 1px solid #333; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
                     <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
                         <input type="text" id="edu-title" placeholder="タイトル (例: 正しいハムのケア)" style="flex: 2; min-width: 200px; margin-bottom: 0;">
                         <select id="edu-category" style="flex: 1; min-width: 120px; margin-bottom: 0; padding: 12px;">
@@ -377,19 +387,19 @@
             <div id="view-heatmap" class="history-view card">
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 <h3 class="section-title">🔥 チーム全体の傾向分析 (筋肉痛・張り)</h3>
-                <p style="font-size:11px; color:#64748b; text-align:center; margin-bottom: 10px;">※指定された期間の「朝の張り」と「練習後のダメージ」を統合して算出しています。</p>
+                <p style="font-size:11px; color:#9ca3af; text-align:center; margin-bottom: 10px;">※指定された期間の「朝の張り」と「夜のダメージ」を統合して算出しています。</p>
                 <div class="heatmap-container">
                     <div class="human-body">
                         <svg viewBox="0 0 100 225" width="100%" height="100%">
-                            <text x="50" y="12" font-size="10" font-weight="bold" text-anchor="middle" fill="#6b7280">【 前 】</text>
-                            <circle cx="50" cy="30" r="12" fill="#e5e7eb" /> 
-                            <rect x="32" y="45" width="36" height="65" rx="8" fill="#e5e7eb" /> 
-                            <rect x="14" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
-                            <rect x="72" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
-                            <rect x="34" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
-                            <rect x="52" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
-                            <ellipse cx="41" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
-                            <ellipse cx="59" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
+                            <text x="50" y="12" font-size="10" font-weight="bold" text-anchor="middle" fill="#9ca3af">【 前 】</text>
+                            <circle cx="50" cy="30" r="12" fill="#333333" /> 
+                            <rect x="32" y="45" width="36" height="65" rx="8" fill="#333333" /> 
+                            <rect x="14" y="50" width="14" height="60" rx="7" fill="#333333" /> 
+                            <rect x="72" y="50" width="14" height="60" rx="7" fill="#333333" /> 
+                            <rect x="34" y="115" width="14" height="90" rx="7" fill="#333333" /> 
+                            <rect x="52" y="115" width="14" height="90" rx="7" fill="#333333" /> 
+                            <ellipse cx="41" cy="210" rx="8" ry="5" fill="#333333" /> 
+                            <ellipse cx="59" cy="210" rx="8" ry="5" fill="#333333" /> 
                             
                             <circle id="heat-head-f" class="heat-spot" cx="50" cy="30" r="12" fill="#ef4444" opacity="0" /> 
                             <circle id="heat-chest" class="heat-spot" cx="50" cy="65" r="14" fill="#ef4444" opacity="0" /> 
@@ -407,20 +417,22 @@
                     
                     <div class="human-body">
                         <svg viewBox="0 0 100 225" width="100%" height="100%">
-                            <text x="50" y="12" font-size="10" font-weight="bold" text-anchor="middle" fill="#6b7280">【 後 】</text>
-                            <circle cx="50" cy="30" r="12" fill="#e5e7eb" /> 
-                            <rect x="32" y="45" width="36" height="65" rx="8" fill="#e5e7eb" /> 
-                            <rect x="14" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
-                            <rect x="72" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
-                            <rect x="34" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
-                            <rect x="52" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
-                            <ellipse cx="41" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
-                            <ellipse cx="59" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
+                            <text x="50" y="12" font-size="10" font-weight="bold" text-anchor="middle" fill="#9ca3af">【 後 】</text>
+                            <circle cx="50" cy="30" r="12" fill="#333333" /> 
+                            <rect x="32" y="45" width="36" height="65" rx="8" fill="#333333" /> 
+                            <rect x="14" y="50" width="14" height="60" rx="7" fill="#333333" /> 
+                            <rect x="72" y="50" width="14" height="60" rx="7" fill="#333333" /> 
+                            <rect x="34" y="115" width="14" height="90" rx="7" fill="#333333" /> 
+                            <rect x="52" y="115" width="14" height="90" rx="7" fill="#333333" /> 
+                            <ellipse cx="41" cy="210" rx="8" ry="5" fill="#333333" /> 
+                            <ellipse cx="59" cy="210" rx="8" ry="5" fill="#333333" /> 
                             
                             <circle id="heat-head-b" class="heat-spot" cx="50" cy="30" r="12" fill="#ef4444" opacity="0" /> 
                             <circle id="heat-shoulder-l" class="heat-spot" cx="32" cy="55" r="10" fill="#ef4444" opacity="0" /> 
                             <circle id="heat-shoulder-r" class="heat-spot" cx="68" cy="55" r="10" fill="#ef4444" opacity="0" /> 
                             <ellipse id="heat-back" class="heat-spot" cx="50" cy="85" rx="16" ry="20" fill="#ef4444" opacity="0" /> 
+                            <!-- 🔥 腰 -->
+                            <ellipse id="heat-lower-back" class="heat-spot" cx="50" cy="110" rx="14" ry="8" fill="#ef4444" opacity="0" /> 
                             
                             <ellipse id="heat-arm-l-b" class="heat-spot" cx="21" cy="80" rx="7" ry="25" fill="#ef4444" opacity="0" />
                             <ellipse id="heat-arm-r-b" class="heat-spot" cx="79" cy="80" rx="7" ry="25" fill="#ef4444" opacity="0" />
@@ -461,7 +473,7 @@
             <div id="view-sprint" class="history-view card">
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 <h3 class="section-title">🏃‍♂️ スプリント ベストタイム・ランキング</h3>
-                <p style="font-size:11px; color:#64748b; text-align:center; margin-bottom: 15px;">※検索枠で指定された期間内の「自己ベストタイム」を抽出してランキング化します。</p>
+                <p style="font-size:11px; color:#9ca3af; text-align:center; margin-bottom: 15px;">※検索枠で指定された期間内の「自己ベストタイム」を抽出してランキング化します。</p>
                 <div class="sprint-select-wrapper">
                     <select id="sprint-ranking-distance" onchange="updateSprintRanking(window.filteredLogs)">
                         <option value="30">30m</option>
@@ -498,7 +510,7 @@
             <div id="view-fv" class="history-view card">
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 <h3 class="section-title">🔬 F-v プロファイル グループ編成表</h3>
-                <p style="font-size:11px; color:#64748b; text-align:center; margin-bottom: 10px;">※表示されている期間内の、各選手の「最新の記録」をもとにグループ分けしています。</p>
+                <p style="font-size:11px; color:#9ca3af; text-align:center; margin-bottom: 10px;">※表示されている期間内の、各選手の「最新の記録」をもとにグループ分けしています。</p>
                 <div class="fv-groups-container">
                     <div class="fv-group-row fv-force">
                         <div class="fv-group-header">
@@ -529,10 +541,9 @@
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 <h3 class="section-title">📈 選手別 詳細分析</h3>
                 
-                <!-- 🔥 レポート出力用コントロールの追加 -->
                 <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;" class="no-print">
                     <select id="chart-player-select" onchange="updateCharts(window.globalLogs)" style="flex:1; min-width:150px; margin-bottom:0;"></select>
-                    <input type="month" id="report-month-select" style="flex:1; min-width:120px; margin-bottom:0; padding:10px; border-color:#93c5fd;">
+                    <input type="month" id="report-month-select" style="flex:1; min-width:120px; margin-bottom:0; padding:10px; border-color:#ec4899;">
                     <button class="btn btn-success" onclick="generateMonthlyReport()">📊 面談用レポート作成(PDF)</button>
                 </div>
                 
@@ -542,7 +553,7 @@
                         <div><canvas id="rsiChart"></canvas></div>
                     </div>
                     <div class="stats-area">
-                        <h4 style="margin-top: 0; color: #1e3a8a; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px;">直近7日間の指標</h4>
+                        <h4 style="margin-top: 0; color: #ec4899; border-bottom: 1px solid #333; padding-bottom: 5px;">直近7日間の指標</h4>
                         <div class="stat-box">
                             <div class="stat-box-title">Total Load</div>
                             <div class="stat-box-value" id="stat-total-load">-</div>
@@ -551,7 +562,7 @@
                         <div class="stat-box">
                             <div class="stat-box-title">Training Monotony</div>
                             <div class="stat-box-value" id="stat-monotony">-</div>
-                            <div class="stat-box-desc">負荷の単調さ (Mean / SD)。<br><span style="color:#dc2626; font-weight:bold;">2.0以上</span>でオーバートレーニングや病気のリスク増。</div>
+                            <div class="stat-box-desc">負荷の単調さ (Mean / SD)。<br><span style="color:#ef4444; font-weight:bold;">2.0以上</span>でオーバートレーニングや病気のリスク増。</div>
                         </div>
                         <div class="stat-box">
                             <div class="stat-box-title">Training Strain</div>
@@ -559,20 +570,20 @@
                             <div class="stat-box-desc">総合的な負担 (Total Load × Monotony)。この値の急増に注意。</div>
                         </div>
 
-                        <div style="margin-top: 25px; padding-top: 20px; border-top: 2px dashed #cbd5e1;">
-                            <h4 style="margin-top: 0; color: #1e3a8a; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; font-size: 13px;">痛み・張り (直近7回分)</h4>
+                        <div style="margin-top: 25px; padding-top: 20px; border-top: 2px dashed #333;">
+                            <h4 style="margin-top: 0; color: #ec4899; border-bottom: 1px solid #333; padding-bottom: 5px; font-size: 13px;">痛み・張り (直近7回分)</h4>
                             <div class="heatmap-container" style="gap: 15px; padding: 10px 5px; margin-bottom: 10px; background-color: transparent; border: none;">
                                 <div class="human-body" style="width: 70px;">
                                     <svg viewBox="0 0 100 225" width="100%" height="100%">
-                                        <text x="50" y="12" font-size="12" font-weight="bold" text-anchor="middle" fill="#6b7280">前</text>
-                                        <circle cx="50" cy="30" r="12" fill="#e5e7eb" /> 
-                                        <rect x="32" y="45" width="36" height="65" rx="8" fill="#e5e7eb" /> 
-                                        <rect x="14" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
-                                        <rect x="72" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
-                                        <rect x="34" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
-                                        <rect x="52" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
-                                        <ellipse cx="41" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
-                                        <ellipse cx="59" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
+                                        <text x="50" y="12" font-size="12" font-weight="bold" text-anchor="middle" fill="#9ca3af">前</text>
+                                        <circle cx="50" cy="30" r="12" fill="#333333" /> 
+                                        <rect x="32" y="45" width="36" height="65" rx="8" fill="#333333" /> 
+                                        <rect x="14" y="50" width="14" height="60" rx="7" fill="#333333" /> 
+                                        <rect x="72" y="50" width="14" height="60" rx="7" fill="#333333" /> 
+                                        <rect x="34" y="115" width="14" height="90" rx="7" fill="#333333" /> 
+                                        <rect x="52" y="115" width="14" height="90" rx="7" fill="#333333" /> 
+                                        <ellipse cx="41" cy="210" rx="8" ry="5" fill="#333333" /> 
+                                        <ellipse cx="59" cy="210" rx="8" ry="5" fill="#333333" /> 
                                         
                                         <circle id="player-heat-head-f" class="heat-spot" cx="50" cy="30" r="12" fill="#ef4444" opacity="0" /> 
                                         <circle id="player-heat-chest" class="heat-spot" cx="50" cy="65" r="14" fill="#ef4444" opacity="0" /> 
@@ -587,36 +598,39 @@
                                 </div>
                                 <div class="human-body" style="width: 70px;">
                                     <svg viewBox="0 0 100 225" width="100%" height="100%">
-                                        <text x="50" y="12" font-size="12" font-weight="bold" text-anchor="middle" fill="#6b7280">後</text>
-                                        <circle cx="50" cy="30" r="12" fill="#e5e7eb" /> 
-                                        <rect x="32" y="45" width="36" height="65" rx="8" fill="#e5e7eb" /> 
-                                        <rect x="14" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
-                                        <rect x="72" y="50" width="14" height="60" rx="7" fill="#e5e7eb" /> 
-                                        <rect x="34" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
-                                        <rect x="52" y="115" width="14" height="90" rx="7" fill="#e5e7eb" /> 
-                                        <ellipse cx="41" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
-                                        <ellipse cx="59" cy="210" rx="8" ry="5" fill="#e5e7eb" /> 
+                                        <text x="50" y="12" font-size="12" font-weight="bold" text-anchor="middle" fill="#9ca3af">後</text>
+                                        <circle cx="50" cy="30" r="12" fill="#333333" /> 
+                                        <rect x="32" y="45" width="36" height="65" rx="8" fill="#333333" /> 
+                                        <rect x="14" y="50" width="14" height="60" rx="7" fill="#333333" /> 
+                                        <rect x="72" y="50" width="14" height="60" rx="7" fill="#333333" /> 
+                                        <rect x="34" y="115" width="14" height="90" rx="7" fill="#333333" /> 
+                                        <rect x="52" y="115" width="14" height="90" rx="7" fill="#333333" /> 
+                                        <ellipse cx="41" cy="210" rx="8" ry="5" fill="#333333" /> 
+                                        <ellipse cx="59" cy="210" rx="8" ry="5" fill="#333333" /> 
                                         
                                         <circle id="player-heat-head-b" class="heat-spot" cx="50" cy="30" r="12" fill="#ef4444" opacity="0" /> 
                                         <circle id="player-heat-shoulder-l" class="heat-spot" cx="32" cy="55" r="10" fill="#ef4444" opacity="0" /> 
                                         <circle id="player-heat-shoulder-r" class="heat-spot" cx="68" cy="55" r="10" fill="#ef4444" opacity="0" /> 
-                                        <ellipse id="heat-back" class="heat-spot" cx="50" cy="85" rx="16" ry="20" fill="#ef4444" opacity="0" /> 
+                                        <ellipse id="player-heat-back" class="heat-spot" cx="50" cy="85" rx="16" ry="20" fill="#ef4444" opacity="0" /> 
+                                        <!-- 🔥 腰 -->
+                                        <ellipse id="player-heat-lower-back" class="heat-spot" cx="50" cy="110" rx="14" ry="8" fill="#ef4444" opacity="0" /> 
+                                        
                                         <ellipse id="player-heat-arm-l-b" class="heat-spot" cx="21" cy="80" rx="7" ry="25" fill="#ef4444" opacity="0" />
                                         <ellipse id="player-heat-arm-r-b" class="heat-spot" cx="79" cy="80" rx="7" ry="25" fill="#ef4444" opacity="0" />
                                         <circle id="player-heat-glutes-l" class="heat-spot" cx="39" cy="120" r="10" fill="#ef4444" opacity="0" /> 
                                         <circle id="player-heat-glutes-r" class="heat-spot" cx="61" cy="120" r="10" fill="#ef4444" opacity="0" /> 
-                                        <ellipse id="heat-hams-l" class="heat-spot" cx="41" cy="150" rx="9" ry="15" fill="#ef4444" opacity="0" /> 
-                                        <ellipse id="heat-hams-r" class="heat-spot" cx="59" cy="150" rx="9" ry="15" fill="#ef4444" opacity="0" /> 
-                                        <ellipse id="heat-calves-l" class="heat-spot" cx="41" cy="180" rx="8" ry="12" fill="#ef4444" opacity="0" /> 
-                                        <ellipse id="heat-calves-r" class="heat-spot" cx="59" cy="180" rx="8" ry="12" fill="#ef4444" opacity="0" /> 
-                                        <circle id="heat-achilles-l" class="heat-spot" cx="41" cy="200" r="5" fill="#ef4444" opacity="0" /> 
-                                        <circle id="heat-achilles-r" class="heat-spot" cx="59" cy="200" r="5" fill="#ef4444" opacity="0" /> 
-                                        <ellipse id="heat-sole-l" class="heat-spot" cx="41" cy="210" rx="6" ry="4" fill="#ef4444" opacity="0" /> 
-                                        <ellipse id="heat-sole-r" class="heat-spot" cx="59" cy="210" rx="6" ry="4" fill="#ef4444" opacity="0" /> 
+                                        <ellipse id="player-heat-hams-l" class="heat-spot" cx="41" cy="150" rx="9" ry="15" fill="#ef4444" opacity="0" /> 
+                                        <ellipse id="player-heat-hams-r" class="heat-spot" cx="59" cy="150" rx="9" ry="15" fill="#ef4444" opacity="0" /> 
+                                        <ellipse id="player-heat-calves-l" class="heat-spot" cx="41" cy="180" rx="8" ry="12" fill="#ef4444" opacity="0" /> 
+                                        <ellipse id="player-heat-calves-r" class="heat-spot" cx="59" cy="180" rx="8" ry="12" fill="#ef4444" opacity="0" /> 
+                                        <circle id="player-heat-achilles-l" class="heat-spot" cx="41" cy="200" r="5" fill="#ef4444" opacity="0" /> 
+                                        <circle id="player-heat-achilles-r" class="heat-spot" cx="59" cy="200" r="5" fill="#ef4444" opacity="0" /> 
+                                        <ellipse id="player-heat-sole-l" class="heat-spot" cx="41" cy="210" rx="6" ry="4" fill="#ef4444" opacity="0" /> 
+                                        <ellipse id="player-heat-sole-r" class="heat-spot" cx="59" cy="210" rx="6" ry="4" fill="#ef4444" opacity="0" /> 
                                     </svg>
                                 </div>
                             </div>
-                            <ul id="player-soreness-list" style="font-size: 12px; padding-left: 20px; margin: 0; color: #475569; min-height: 40px;"></ul>
+                            <ul id="player-soreness-list" style="font-size: 12px; padding-left: 20px; margin: 0; color: #e5e7eb; min-height: 40px;"></ul>
                         </div>
                     </div>
                 </div>
@@ -634,19 +648,19 @@
                              <th>日付</th>
                              <th>選手名</th>
                              <th>IRS(朝)</th>
-                             <th>IRS(後)</th>
+                             <th>IRS(夜)</th>
                              <th>疲労/ｽﾄﾚｽ</th>
                              <th>Load</th>
                              <th>スプリント記録</th>
                              <th>RSI</th>
                              <th>F-v診断</th>
                              <th>張り(朝)</th>
-                             <th>張り(後)</th>
+                             <th>張り(夜)</th>
                              <th>体重</th>
                              <th>心拍数</th>
                              <th>歩数</th>
                              <th>睡眠(時間/質)</th>
-                             <th>ケガ・違和感</th>
+                             <th>ケガ・痛みの詳細</th>
                              <th>ケア・処置</th>
                              <th>操作</th>
                          </tr>
@@ -661,22 +675,21 @@
 
     <!-- 🔥 プリント(PDF)出力用の隠し領域 -->
     <div id="print-report-area" style="display: none;">
-        <div style="text-align: center; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 20px;">
-            <h2 style="color: #1e3a8a; margin: 0;">AthleSense 個人マンスリーレポート</h2>
+        <div style="text-align: center; border-bottom: 2px solid #f97316; padding-bottom: 10px; margin-bottom: 20px;">
+            <h2 style="color: #ec4899; margin: 0;">AthleSense 個人マンスリーレポート</h2>
             <div style="font-size: 18px; font-weight: bold; margin-top: 10px;">
                 対象月: <span id="report-month-display"></span> / 選手名: <span id="report-player-display"></span>
             </div>
         </div>
         
         <div style="display: flex; gap: 20px;">
-            <!-- 左カラム：レーダーチャートと基本指標 -->
             <div style="flex: 1;">
-                <h4 style="color: #1e3a8a; border-bottom: 1px solid #cbd5e1; margin-top: 0; padding-bottom: 5px;">🎯 コンディション・レーダー</h4>
+                <h4 style="color: #f97316; border-bottom: 1px solid #cbd5e1; margin-top: 0; padding-bottom: 5px;">🎯 コンディション・レーダー</h4>
                 <div style="width: 100%; max-width: 300px; margin: 0 auto;">
                     <canvas id="reportRadarChart"></canvas>
                 </div>
                 
-                <h4 style="color: #1e3a8a; border-bottom: 1px solid #cbd5e1; margin-top: 20px; padding-bottom: 5px;">📊 月間サマリー</h4>
+                <h4 style="color: #f97316; border-bottom: 1px solid #cbd5e1; margin-top: 20px; padding-bottom: 5px;">📊 月間サマリー</h4>
                 <ul style="line-height: 2; font-size: 14px; margin: 0; padding-left: 20px;">
                     <li>今月の入力日数: <strong id="report-days">0</strong> 日</li>
                     <li>月間 Total Load: <strong id="report-load">0</strong></li>
@@ -686,12 +699,11 @@
                 </ul>
             </div>
             
-            <!-- 右カラム：部位ヒートマップ、目標、コメント欄 -->
             <div style="flex: 1;">
-                <h4 style="color: #1e3a8a; border-bottom: 1px solid #cbd5e1; margin-top: 0; padding-bottom: 5px;">⚠️ 張り・痛みの多かった部位 (Top 3)</h4>
-                <ul id="report-soreness-list" style="color: #dc2626; font-weight: bold; font-size: 14px; margin: 0; padding-left: 20px; min-height: 60px;"></ul>
+                <h4 style="color: #f97316; border-bottom: 1px solid #cbd5e1; margin-top: 0; padding-bottom: 5px;">⚠️ 張り・痛みの多かった部位 (Top 3)</h4>
+                <ul id="report-soreness-list" style="color: #ef4444; font-weight: bold; font-size: 14px; margin: 0; padding-left: 20px; min-height: 60px;"></ul>
                 
-                <h4 style="color: #1e3a8a; border-bottom: 1px solid #cbd5e1; margin-top: 20px; padding-bottom: 5px;">🎯 目標・テーマ</h4>
+                <h4 style="color: #f97316; border-bottom: 1px solid #cbd5e1; margin-top: 20px; padding-bottom: 5px;">🎯 目標・テーマ</h4>
                 <div style="background: #fffbeb; padding: 10px; border: 1px solid #fde68a; border-radius: 8px; font-size: 14px;">
                     <strong style="color: #b45309;">シーズン目標:</strong><br>
                     <span id="report-season-goal"></span><br><br>
@@ -699,7 +711,7 @@
                     <span id="report-month-goal"></span>
                 </div>
                 
-                <h4 style="color: #1e3a8a; border-bottom: 1px solid #cbd5e1; margin-top: 20px; padding-bottom: 5px;">📝 コーチからのフィードバック (面談用)</h4>
+                <h4 style="color: #f97316; border-bottom: 1px solid #cbd5e1; margin-top: 20px; padding-bottom: 5px;">📝 コーチからのフィードバック (面談用)</h4>
                 <div style="border: 1px solid #cbd5e1; border-radius: 8px; height: 180px; padding: 10px; color: #94a3b8; font-size: 12px;">
                     この余白は、印刷後またはPDF編集アプリで面談時の手書きメモとしてお使いください。
                 </div>
@@ -707,7 +719,7 @@
         </div>
         
         <div style="margin-top: 30px;">
-            <h4 style="color: #1e3a8a; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px;">📈 今月の Training Load と 疲労度の推移</h4>
+            <h4 style="color: #f97316; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px;">📈 今月の Training Load と 疲労度の推移</h4>
             <div style="width: 100%; height: 250px;">
                 <canvas id="reportLineChart"></canvas>
             </div>
@@ -720,7 +732,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // 🔑 埋め込み済みFirebase設定
         const myFirebaseConfig = {
           apiKey: "AIzaSyAQoESOlZIGJfOgfIwpkL0r0YcYu4tl8ZQ",
           authDomain: "team-conditioning-controling.firebaseapp.com",
@@ -750,7 +761,6 @@
         let teamSettings = {}; 
         window.globalEducation = []; 
 
-        // 🔥 グラフに大会日の縦線を引くプラグイン
         const targetDateLinePlugin = {
             id: 'targetDateLinePlugin',
             afterDraw: (chart) => {
@@ -774,11 +784,11 @@
                     ctx.moveTo(x, topY);
                     ctx.lineTo(x, bottomY);
                     ctx.lineWidth = 2;
-                    ctx.strokeStyle = '#ea580c';
+                    ctx.strokeStyle = '#f97316';
                     ctx.setLineDash([5, 5]);
                     ctx.stroke();
 
-                    ctx.fillStyle = '#ea580c';
+                    ctx.fillStyle = '#f97316';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'bottom';
                     ctx.font = 'bold 12px sans-serif';
@@ -788,9 +798,6 @@
             }
         };
 
-        // ==========================================
-        // 📱 タブとメニューのコントロール
-        // ==========================================
         function switchTab(tabId, btnElement) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -928,7 +935,6 @@
             }
         }
 
-        // 🔥 カウントダウンの計算とUI更新
         function updateCountdownUI() {
             const banner = document.getElementById('countdown-banner');
             if (!teamSettings || !teamSettings.targetEventDate) {
@@ -956,7 +962,6 @@
             }
         }
 
-        // 🔥 大会設定を保存する関数
         async function saveTeamSettings() {
             const name = document.getElementById('target-event-name').value.trim();
             const dateStr = document.getElementById('target-event-date').value;
@@ -1011,21 +1016,21 @@
                 const tr = document.createElement('tr');
                 const catBadge = getCategoryBadge(player.category || 'BLUE');
                 const goalData = teamGoals[player.name] || {};
-                const seasonGoal = goalData.seasonGoal || '<span style="color:#94a3b8;">未設定</span>';
-                const monthGoal = goalData.monthGoal || '<span style="color:#94a3b8;">未設定</span>';
+                const seasonGoal = goalData.seasonGoal || '<span style="color:#9ca3af;">未設定</span>';
+                const monthGoal = goalData.monthGoal || '<span style="color:#9ca3af;">未設定</span>';
 
                 tr.innerHTML = `
                     <td style="font-weight:bold;">${catBadge}${player.name}</td>
                     <td>
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div style="white-space:pre-wrap; font-size:13px; color:#1e3a8a;">${seasonGoal}</div>
-                            <button onclick="editGoalAdmin('${player.name}', 'season')" style="background:none; border:none; color:#2563eb; cursor:pointer; font-size:16px;">✎</button>
+                            <div style="white-space:pre-wrap; font-size:13px; color:#f97316;">${seasonGoal}</div>
+                            <button onclick="editGoalAdmin('${player.name}', 'season')" style="background:none; border:none; color:#ec4899; cursor:pointer; font-size:16px;">✎</button>
                         </div>
                     </td>
                     <td>
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div style="white-space:pre-wrap; font-size:13px; color:#b45309;">${monthGoal}</div>
-                            <button onclick="editGoalAdmin('${player.name}', 'month')" style="background:none; border:none; color:#2563eb; cursor:pointer; font-size:16px;">✎</button>
+                            <div style="white-space:pre-wrap; font-size:13px; color:#ec4899;">${monthGoal}</div>
+                            <button onclick="editGoalAdmin('${player.name}', 'month')" style="background:none; border:none; color:#f97316; cursor:pointer; font-size:16px;">✎</button>
                         </div>
                     </td>
                 `;
@@ -1057,6 +1062,85 @@
                     alert("保存に失敗しました。");
                 }
             }
+        }
+
+        // 🔥 学びコンテンツ管理ロジック
+        async function addEducation() {
+            const title = document.getElementById('edu-title').value.trim();
+            const category = document.getElementById('edu-category').value;
+            const url = document.getElementById('edu-url').value.trim();
+            const desc = document.getElementById('edu-desc').value.trim();
+            
+            if (!title) {
+                alert('タイトルを入力してください。');
+                return;
+            }
+
+            const data = {
+                title: title,
+                category: category,
+                url: url,
+                description: desc,
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                if (eduColRef) {
+                    await eduColRef.add(data);
+                } else {
+                    const id = Date.now().toString();
+                    window.globalEducation = JSON.parse(localStorage.getItem('team_education') || '[]');
+                    window.globalEducation.push({ id, ...data });
+                    localStorage.setItem('team_education', JSON.stringify(window.globalEducation));
+                    renderEducationTable();
+                }
+                document.getElementById('edu-title').value = '';
+                document.getElementById('edu-url').value = '';
+                document.getElementById('edu-desc').value = '';
+                alert('コンテンツを追加しました！選手の画面に反映されます。');
+            } catch (e) {
+                alert('追加に失敗しました。');
+            }
+        }
+
+        async function deleteEducation(id) {
+            if(!confirm("このコンテンツを削除しますか？")) return;
+            try {
+                if (eduColRef) {
+                    await eduColRef.doc(id).delete();
+                } else {
+                    window.globalEducation = window.globalEducation.filter(item => item.id !== id);
+                    localStorage.setItem('team_education', JSON.stringify(window.globalEducation));
+                    renderEducationTable();
+                }
+            } catch (e) {
+                alert('削除に失敗しました。');
+            }
+        }
+
+        function renderEducationTable() {
+            const tbody = document.getElementById('education-table-body');
+            tbody.innerHTML = '';
+            
+            if (!window.globalEducation || window.globalEducation.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">コンテンツがありません。</td></tr>';
+                return;
+            }
+
+            window.globalEducation.forEach(item => {
+                const tr = document.createElement('tr');
+                const ytLink = item.url ? `<a href="${item.url}" target="_blank" style="color:#ec4899; font-size:12px; display:inline-block; margin-top:5px; font-weight:bold;">🔗 リンクを開く</a>` : '';
+                tr.innerHTML = `
+                    <td><span class="stat-badge" style="background:rgba(249,115,22,0.2); color:#f97316; font-size:11px;">${item.category}</span></td>
+                    <td>
+                        <strong style="color:#f97316; font-size:14px;">${item.title}</strong><br>
+                        <span style="font-size:12px; color:#9ca3af; white-space:pre-wrap;">${item.description}</span><br>
+                        ${ytLink}
+                    </td>
+                    <td style="text-align:center;"><button class="btn btn-danger" style="padding: 6px 10px; font-size:12px;" onclick="deleteEducation('${item.id}')">削除</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
         function updateTodayView() {
@@ -1160,15 +1244,15 @@
             const list = document.getElementById('registered-players-list');
             list.innerHTML = `
                 <div style="margin-bottom: 15px;">
-                    <span style="font-size: 12px; font-weight: bold; color: #1d4ed8; display: block; margin-bottom: 6px;">🟦 BLUE</span>
+                    <span style="font-size: 12px; font-weight: bold; color: #60a5fa; display: block; margin-bottom: 6px;">🟦 BLUE</span>
                     <div class="roster-container" id="roster-blue"></div>
                 </div>
                 <div style="margin-bottom: 15px;">
-                    <span style="font-size: 12px; font-weight: bold; color: #b91c1c; display: block; margin-bottom: 6px;">🟥 RED</span>
+                    <span style="font-size: 12px; font-weight: bold; color: #fca5a5; display: block; margin-bottom: 6px;">🟥 RED</span>
                     <div class="roster-container" id="roster-red"></div>
                 </div>
                 <div style="margin-bottom: 10px;">
-                    <span style="font-size: 12px; font-weight: bold; color: #b45309; display: block; margin-bottom: 6px;">🟨 YELLOW</span>
+                    <span style="font-size: 12px; font-weight: bold; color: #fde68a; display: block; margin-bottom: 6px;">🟨 YELLOW</span>
                     <div class="roster-container" id="roster-yellow"></div>
                 </div>
             `;
@@ -1242,14 +1326,14 @@
         }
 
         function getIrsBadgeHtml(irsStr) {
-            if (!irsStr || irsStr === '-' || irsStr === '未計測') return '<span style="color:#94a3b8;">-</span>';
+            if (!irsStr || irsStr === '-' || irsStr === '未計測') return '<span style="color:#9ca3af;">-</span>';
             const val = parseInt(irsStr.replace('%', ''));
             if (isNaN(val)) return irsStr;
             
-            let color = '#10b981'; let bg = '#d1fae5';
-            if (val > 75) { color = '#dc2626'; bg = '#fee2e2'; }
-            else if (val > 50) { color = '#ea580c'; bg = '#ffedd5'; }
-            else if (val > 30) { color = '#d97706'; bg = '#fef3c7'; }
+            let color = '#fff'; let bg = '#10b981';
+            if (val > 75) { bg = '#ef4444'; }
+            else if (val > 50) { bg = '#f97316'; }
+            else if (val > 30) { bg = '#f59e0b'; }
             
             return `<span style="background-color: ${bg}; color: ${color}; padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: bold;">${val}%</span>`;
         }
@@ -1293,7 +1377,7 @@
             const sortedPlayers = Object.entries(bestTimes).sort((a, b) => a[1] - b[1]);
 
             if (sortedPlayers.length === 0) {
-                rankingBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8; padding: 15px;">この距離の記録はありません</td></tr>';
+                rankingBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#9ca3af; padding: 15px;">この距離の記録はありません</td></tr>';
                 return;
             }
 
@@ -1314,9 +1398,9 @@
 
                 rankingBody.innerHTML += `
                     <tr>
-                        <td style="font-weight:bold; color:#64748b;">${displayRank}</td>
-                        <td style="font-weight:bold; color:#334155; font-size:13px; text-align:left; padding-left:20px;">${catBadge}${playerName}</td>
-                        <td style="font-weight:bold; color:#1d4ed8; font-size:15px;">${time.toFixed(2)}</td>
+                        <td style="font-weight:bold; color:#9ca3af;">${displayRank}</td>
+                        <td style="font-weight:bold; color:#e5e7eb; font-size:13px; text-align:left; padding-left:20px;">${catBadge}${playerName}</td>
+                        <td style="font-weight:bold; color:#f97316; font-size:15px;">${time.toFixed(2)}</td>
                     </tr>
                 `;
                 previousTime = time;
@@ -1326,10 +1410,10 @@
 
         function updateTeamAnalytics(logs) {
             const sorenessCounts = {
-                "頭部": 0, "肩": 0, "背中": 0, "腹筋": 0, "胸部": 0, "腕": 0,
+                "頭部": 0, "肩": 0, "背中": 0, "腰": 0, "腹筋": 0, "胸部": 0, "腕": 0,
                 "腸腰筋": 0, "臀部": 0, "大腿四頭筋": 0, 
                 "ハムストリングス": 0, "カーフ": 0, "アキレス腱": 0, "足裏": 0,
-                "首": 0, "腰": 0, "胸筋": 0, "臀部(お尻)": 0, "ふくらはぎ": 0
+                "首": 0, "胸筋": 0, "臀部(お尻)": 0, "ふくらはぎ": 0
             };
             
             let recentLogsForHeatmap = [];
@@ -1363,13 +1447,12 @@
             });
 
             if(sorenessCounts["首"] > 0) sorenessCounts["頭部"] += sorenessCounts["首"];
-            if(sorenessCounts["腰"] > 0) sorenessCounts["背中"] += sorenessCounts["腰"];
             if(sorenessCounts["胸筋"] > 0) sorenessCounts["胸部"] += sorenessCounts["胸筋"];
             if(sorenessCounts["臀部(お尻)"] > 0) sorenessCounts["臀部"] += sorenessCounts["臀部(お尻)"];
             if(sorenessCounts["ふくらはぎ"] > 0) sorenessCounts["カーフ"] += sorenessCounts["ふくらはぎ"];
 
             const counts = [
-                sorenessCounts["頭部"], sorenessCounts["肩"], sorenessCounts["背中"], 
+                sorenessCounts["頭部"], sorenessCounts["肩"], sorenessCounts["背中"], sorenessCounts["腰"],
                 sorenessCounts["腹筋"], sorenessCounts["胸部"], sorenessCounts["腕"], sorenessCounts["腸腰筋"], 
                 sorenessCounts["臀部"], sorenessCounts["大腿四頭筋"], sorenessCounts["ハムストリングス"], 
                 sorenessCounts["カーフ"], sorenessCounts["アキレス腱"], sorenessCounts["足裏"]
@@ -1398,6 +1481,7 @@
             updateHeatSpot('heat-shoulder-l', sorenessCounts['肩']);
             updateHeatSpot('heat-shoulder-r', sorenessCounts['肩']);
             updateHeatSpot('heat-back', sorenessCounts['背中']);
+            updateHeatSpot('heat-lower-back', sorenessCounts['腰']); 
             updateHeatSpot('heat-arm-l-b', sorenessCounts['腕']);
             updateHeatSpot('heat-arm-r-b', sorenessCounts['腕']);
             updateHeatSpot('heat-glutes-l', sorenessCounts['臀部']);
@@ -1414,21 +1498,21 @@
             const rankingBody = document.getElementById('soreness-ranking-body');
             rankingBody.innerHTML = '';
             
-            const displayKeys = ["頭部", "肩", "背中", "腹筋", "胸部", "腕", "腸腰筋", "臀部", "大腿四頭筋", "ハムストリングス", "カーフ", "アキレス腱", "足裏"];
+            const displayKeys = ["頭部", "肩", "背中", "腰", "腹筋", "胸部", "腕", "腸腰筋", "臀部", "大腿四頭筋", "ハムストリングス", "カーフ", "アキレス腱", "足裏"];
             const sortedSoreness = Object.entries(sorenessCounts)
                 .filter(item => item[1] > 0 && displayKeys.includes(item[0]))
                 .sort((a, b) => b[1] - a[1]); 
             
             if(sortedSoreness.length === 0) {
-                rankingBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8; padding: 15px;">期間中に訴えのある部位はありません</td></tr>';
+                rankingBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#9ca3af; padding: 15px;">期間中に訴えのある部位はありません</td></tr>';
             } else {
                 sortedSoreness.forEach((item, index) => {
                     let badge = (index === 0 && item[1] >= 3) ? '<br><span style="color:#ef4444; font-size:10px; font-weight:bold;">⚠️多発</span>' : '';
                     rankingBody.innerHTML += `
                         <tr>
-                            <td style="font-weight:bold; color:#64748b;">${index + 1}</td>
-                            <td style="font-weight:bold; color:#334155; font-size:11px;">${item[0]}${badge}</td>
-                            <td style="font-weight:bold; color:#dc2626;">${item[1]}</td>
+                            <td style="font-weight:bold; color:#9ca3af;">${index + 1}</td>
+                            <td style="font-weight:bold; color:#e5e7eb; font-size:11px;">${item[0]}${badge}</td>
+                            <td style="font-weight:bold; color:#ec4899;">${item[1]}</td>
                         </tr>
                     `;
                 });
@@ -1467,9 +1551,9 @@
                 }
             });
 
-            if (countF === 0) listForce.innerHTML = '<div style="color:#94a3b8; font-size:12px; padding: 5px;">該当なし</div>';
-            if (countB === 0) listBalanced.innerHTML = '<div style="color:#94a3b8; font-size:12px; padding: 5px;">該当なし</div>';
-            if (countV === 0) listVelocity.innerHTML = '<div style="color:#94a3b8; font-size:12px; padding: 5px;">該当なし</div>';
+            if (countF === 0) listForce.innerHTML = '<div style="color:#9ca3af; font-size:12px; padding: 5px;">該当なし</div>';
+            if (countB === 0) listBalanced.innerHTML = '<div style="color:#9ca3af; font-size:12px; padding: 5px;">該当なし</div>';
+            if (countV === 0) listVelocity.innerHTML = '<div style="color:#9ca3af; font-size:12px; padding: 5px;">該当なし</div>';
         }
 
         function updatePlayerSelect(logs) {
@@ -1495,7 +1579,7 @@
             if (!playerName) {
                 document.getElementById('stat-total-load').textContent = '-';
                 document.getElementById('stat-monotony').textContent = '-';
-                document.getElementById('stat-monotony').style.color = '#0f172a';
+                document.getElementById('stat-monotony').style.color = '#fff';
                 document.getElementById('stat-strain').textContent = '-';
                 if (loadChartInstance) loadChartInstance.destroy();
                 if (rsiChartInstance) rsiChartInstance.destroy();
@@ -1514,18 +1598,18 @@
             const monotonyEl = document.getElementById('stat-monotony');
             monotonyEl.textContent = metrics.monotony;
             if (parseFloat(metrics.monotony) >= 2.0) {
-                monotonyEl.style.color = '#dc2626'; 
+                monotonyEl.style.color = '#ef4444'; 
             } else {
-                monotonyEl.style.color = '#0f172a';
+                monotonyEl.style.color = '#fff';
             }
             
             document.getElementById('stat-strain').textContent = metrics.strain;
 
             const pSorenessCounts = {
-                "頭部": 0, "肩": 0, "背中": 0, "腹筋": 0, "胸部": 0, "腕": 0,
+                "頭部": 0, "肩": 0, "背中": 0, "腰": 0, "腹筋": 0, "胸部": 0, "腕": 0,
                 "腸腰筋": 0, "臀部": 0, "大腿四頭筋": 0, 
                 "ハムストリングス": 0, "カーフ": 0, "アキレス腱": 0, "足裏": 0,
-                "首": 0, "腰": 0, "胸筋": 0, "臀部(お尻)": 0, "ふくらはぎ": 0
+                "首": 0, "胸筋": 0, "臀部(お尻)": 0, "ふくらはぎ": 0
             };
 
             const recentLogsForPlayerHeatmap = playerLogs.slice(-7); 
@@ -1541,13 +1625,12 @@
             });
 
             if(pSorenessCounts["首"] > 0) pSorenessCounts["頭部"] += pSorenessCounts["首"];
-            if(pSorenessCounts["腰"] > 0) pSorenessCounts["背中"] += pSorenessCounts["腰"];
             if(pSorenessCounts["胸筋"] > 0) pSorenessCounts["胸部"] += pSorenessCounts["胸筋"];
             if(pSorenessCounts["臀部(お尻)"] > 0) pSorenessCounts["臀部"] += pSorenessCounts["臀部(お尻)"];
             if(pSorenessCounts["ふくらはぎ"] > 0) pSorenessCounts["カーフ"] += pSorenessCounts["ふくらはぎ"];
 
             const pCounts = [
-                pSorenessCounts["頭部"], pSorenessCounts["肩"], pSorenessCounts["背中"], 
+                pSorenessCounts["頭部"], pSorenessCounts["肩"], pSorenessCounts["背中"], pSorenessCounts["腰"],
                 pSorenessCounts["腹筋"], pSorenessCounts["胸部"], pSorenessCounts["腕"], pSorenessCounts["腸腰筋"], 
                 pSorenessCounts["臀部"], pSorenessCounts["大腿四頭筋"], pSorenessCounts["ハムストリングス"], 
                 pSorenessCounts["カーフ"], pSorenessCounts["アキレス腱"], pSorenessCounts["足裏"]
@@ -1576,6 +1659,7 @@
             updatePlayerHeatSpot('player-heat-shoulder-l', pSorenessCounts['肩']);
             updatePlayerHeatSpot('player-heat-shoulder-r', pSorenessCounts['肩']);
             updatePlayerHeatSpot('player-heat-back', pSorenessCounts['背中']);
+            updatePlayerHeatSpot('player-heat-lower-back', pSorenessCounts['腰']); 
             updatePlayerHeatSpot('player-heat-arm-l-b', pSorenessCounts['腕']);
             updatePlayerHeatSpot('player-heat-arm-r-b', pSorenessCounts['腕']);
             updatePlayerHeatSpot('player-heat-glutes-l', pSorenessCounts['臀部']);
@@ -1592,16 +1676,16 @@
             const pRankingBody = document.getElementById('player-soreness-list');
             pRankingBody.innerHTML = '';
             
-            const pDisplayKeys = ["頭部", "肩", "背中", "腹筋", "胸部", "腕", "腸腰筋", "臀部", "大腿四頭筋", "ハムストリングス", "カーフ", "アキレス腱", "足裏"];
+            const pDisplayKeys = ["頭部", "肩", "背中", "腰", "腹筋", "胸部", "腕", "腸腰筋", "臀部", "大腿四頭筋", "ハムストリングス", "カーフ", "アキレス腱", "足裏"];
             const pSortedSoreness = Object.entries(pSorenessCounts)
                 .filter(item => item[1] > 0 && pDisplayKeys.includes(item[0]))
                 .sort((a, b) => b[1] - a[1]); 
             
             if(pSortedSoreness.length === 0) {
-                pRankingBody.innerHTML = '<li style="list-style:none; color:#94a3b8; margin-left:-20px; text-align:center;">直近の訴えなし</li>';
+                pRankingBody.innerHTML = '<li style="list-style:none; color:#9ca3af; margin-left:-20px; text-align:center;">直近の訴えなし</li>';
             } else {
                 pSortedSoreness.forEach((item) => {
-                    pRankingBody.innerHTML += `<li><span style="font-weight:bold; color:#334155;">${item[0]}</span> <span style="color:#dc2626;">(${item[1]}回)</span></li>`;
+                    pRankingBody.innerHTML += `<li><span style="font-weight:bold; color:#e5e7eb;">${item[0]}</span> <span style="color:#ec4899;">(${item[1]}回)</span></li>`;
                 });
             }
 
@@ -1623,6 +1707,10 @@
             const rsiData = rsiRawData.map(val => (isNaN(val) || val <= 0) ? null : val);
             const rsiAvgLine = labels.map(() => rsiAvg);
 
+            // 🔥 グラフのカラー設定
+            const tickColor = '#9ca3af';
+            const gridColor = '#333333';
+
             const ctxLoad = document.getElementById('loadChart').getContext('2d');
             if (loadChartInstance) loadChartInstance.destroy(); 
             loadChartInstance = new Chart(ctxLoad, {
@@ -1630,16 +1718,23 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Training Load', data: loadData, backgroundColor: '#3b82f6', yAxisID: 'y', order: 2 },
-                        { label: '疲労度', data: fatigueData, borderColor: '#dc2626', backgroundColor: '#dc2626', type: 'line', borderDash: [5, 5], yAxisID: 'y1', tension: 0.1, order: 1 }
+                        { label: 'Training Load', data: loadData, backgroundColor: '#f97316', yAxisID: 'y', order: 2 },
+                        { label: '疲労度', data: fatigueData, borderColor: '#ec4899', backgroundColor: '#ec4899', type: 'line', borderDash: [5, 5], yAxisID: 'y1', tension: 0.1, order: 1 }
                     ]
                 },
                 plugins: [targetDateLinePlugin],
                 options: { 
                     responsive: true, 
-                    layout: { padding: { top: 20 } },
-                    plugins: { title: { display: true, text: 'Training Load と 疲労度の推移 (直近30回)' } }, 
-                    scales: { y: { beginAtZero: true }, y1: { position: 'right', min: 0, max: 10, grid: { drawOnChartArea: false } } } 
+                    layout: { padding: { top: 20 } }, 
+                    plugins: { 
+                        title: { display: true, text: 'Training Load と 疲労度の推移 (直近30回)', color: tickColor },
+                        legend: { labels: { color: tickColor } }
+                    }, 
+                    scales: { 
+                        x: { ticks: { color: tickColor }, grid: { color: gridColor } },
+                        y: { beginAtZero: true, ticks: { color: tickColor }, grid: { color: gridColor } }, 
+                        y1: { position: 'right', min: 0, max: 10, grid: { drawOnChartArea: false }, ticks: { color: tickColor } } 
+                    } 
                 }
             });
 
@@ -1650,16 +1745,22 @@
                 data: { 
                     labels: labels, 
                     datasets: [
-                        { label: 'RSI', data: rsiData, borderColor: '#10b981', backgroundColor: '#10b981', tension: 0.2, spanGaps: true },
-                        { label: 'RSI 平均', data: rsiAvgLine, borderColor: '#9ca3af', borderDash: [5, 5], pointRadius: 0, borderWidth: 1 }
+                        { label: 'RSI', data: rsiData, borderColor: '#ec4899', backgroundColor: '#ec4899', tension: 0.2, spanGaps: true },
+                        { label: 'RSI 平均', data: rsiAvgLine, borderColor: '#e5e7eb', borderDash: [5, 5], pointRadius: 0, borderWidth: 1 }
                     ] 
                 },
                 plugins: [targetDateLinePlugin],
                 options: { 
                     responsive: true, 
                     layout: { padding: { top: 20 } },
-                    plugins: { title: { display: true, text: '神経筋疲労: RSI の推移と平均' } }, 
-                    scales: { y: { beginAtZero: true } } 
+                    plugins: { 
+                        title: { display: true, text: '神経筋疲労: RSI の推移と平均', color: tickColor },
+                        legend: { labels: { color: tickColor } }
+                    }, 
+                    scales: { 
+                        x: { ticks: { color: tickColor }, grid: { color: gridColor } },
+                        y: { beginAtZero: true, ticks: { color: tickColor }, grid: { color: gridColor } } 
+                    } 
                 }
             });
         }
@@ -1736,7 +1837,16 @@
             document.getElementById('report-sleep-quality').textContent = avgQuality.toFixed(1);
             document.getElementById('report-rsi').textContent = countRsi > 0 ? avgRsi.toFixed(2) : '-';
 
-            const sortedSoreness = Object.entries(sorenessCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+            if(sorenessCounts["首"] > 0) sorenessCounts["頭部"] = (sorenessCounts["頭部"]||0) + sorenessCounts["首"];
+            if(sorenessCounts["胸筋"] > 0) sorenessCounts["胸部"] = (sorenessCounts["胸部"]||0) + sorenessCounts["胸筋"];
+            if(sorenessCounts["臀部(お尻)"] > 0) sorenessCounts["臀部"] = (sorenessCounts["臀部"]||0) + sorenessCounts["臀部(お尻)"];
+            if(sorenessCounts["ふくらはぎ"] > 0) sorenessCounts["カーフ"] = (sorenessCounts["カーフ"]||0) + sorenessCounts["ふくらはぎ"];
+
+            const displayKeys = ["頭部", "肩", "背中", "腰", "腹筋", "胸部", "腕", "腸腰筋", "臀部", "大腿四頭筋", "ハムストリングス", "カーフ", "アキレス腱", "足裏"];
+            const filteredCounts = {};
+            displayKeys.forEach(k => { if(sorenessCounts[k]) filteredCounts[k] = sorenessCounts[k]; });
+
+            const sortedSoreness = Object.entries(filteredCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
             const slist = document.getElementById('report-soreness-list');
             slist.innerHTML = '';
             if(sortedSoreness.length === 0) {
@@ -1766,9 +1876,9 @@
                     datasets: [{
                         label: 'コンディションスコア',
                         data: [scoreSleep, scoreQuality, scoreRecovery, scoreMental, scoreCare],
-                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
-                        borderColor: 'rgba(37, 99, 235, 1)',
-                        pointBackgroundColor: 'rgba(37, 99, 235, 1)',
+                        backgroundColor: 'rgba(236, 72, 153, 0.2)', // ピンク
+                        borderColor: '#ec4899',
+                        pointBackgroundColor: '#ec4899',
                         borderWidth: 2
                     }]
                 },
@@ -1793,8 +1903,8 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Training Load', data: loadData, backgroundColor: '#93c5fd', yAxisID: 'y', order: 2 },
-                        { label: '疲労度', data: fatigueData, borderColor: '#ef4444', backgroundColor: '#ef4444', type: 'line', borderDash: [5, 5], yAxisID: 'y1', order: 1 }
+                        { label: 'Training Load', data: loadData, backgroundColor: '#f97316', yAxisID: 'y', order: 2 }, // オレンジ
+                        { label: '疲労度', data: fatigueData, borderColor: '#ef4444', backgroundColor: '#ef4444', type: 'line', borderDash: [5, 5], yAxisID: 'y1', order: 1 } // 赤
                     ]
                 },
                 options: {
@@ -1817,86 +1927,31 @@
             }, 500); 
         }
 
-        // ==========================================
-        // 🔥 学びコンテンツ管理ロジック
-        // ==========================================
-        async function addEducation() {
-            const title = document.getElementById('edu-title').value.trim();
-            const category = document.getElementById('edu-category').value;
-            const url = document.getElementById('edu-url').value.trim();
-            const desc = document.getElementById('edu-desc').value.trim();
-            
-            if (!title) {
-                alert('タイトルを入力してください。');
-                return;
-            }
+        window.deleteLog = async function(playerName, date) {
+            if (!confirm(`本当に ${playerName} 選手の ${date} の記録を削除しますか？\n（この操作は元に戻せません）`)) return;
 
-            const data = {
-                title: title,
-                category: category,
-                url: url,
-                description: desc,
-                createdAt: new Date().toISOString()
-            };
-
+            const docId = `${playerName}_${date}`;
             try {
-                if (eduColRef) {
-                    await eduColRef.add(data);
-                } else {
-                    const id = Date.now().toString();
-                    window.globalEducation = JSON.parse(localStorage.getItem('team_education') || '[]');
-                    window.globalEducation.push({ id, ...data });
-                    localStorage.setItem('team_education', JSON.stringify(window.globalEducation));
-                    renderEducationTable();
-                }
-                document.getElementById('edu-title').value = '';
-                document.getElementById('edu-url').value = '';
-                document.getElementById('edu-desc').value = '';
-                alert('コンテンツを追加しました！選手の画面に反映されます。');
-            } catch (e) {
-                alert('追加に失敗しました。');
-            }
-        }
+                if (logColRef) {
+                    await logColRef.doc(docId).delete();
+                } 
+                
+                let savedLogs = window.globalLogs || [];
+                savedLogs = savedLogs.filter(log => !(log.playerName === playerName && log.date === date));
+                
+                let localStoreLogs = JSON.parse(localStorage.getItem('team_condition_logs') || '[]');
+                localStoreLogs = localStoreLogs.filter(log => !(log.playerName === playerName && log.date === date));
+                localStorage.setItem('team_condition_logs', JSON.stringify(localStoreLogs));
 
-        async function deleteEducation(id) {
-            if(!confirm("このコンテンツを削除しますか？")) return;
-            try {
-                if (eduColRef) {
-                    await eduColRef.doc(id).delete();
-                } else {
-                    window.globalEducation = window.globalEducation.filter(item => item.id !== id);
-                    localStorage.setItem('team_education', JSON.stringify(window.globalEducation));
-                    renderEducationTable();
-                }
-            } catch (e) {
-                alert('削除に失敗しました。');
-            }
-        }
+                window.globalLogs = savedLogs;
+                window.updateAdminUI(savedLogs);
+                
+                setTimeout(() => alert("記録を削除しました！"), 100);
 
-        function renderEducationTable() {
-            const tbody = document.getElementById('education-table-body');
-            tbody.innerHTML = '';
-            
-            if (!window.globalEducation || window.globalEducation.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">コンテンツがありません。</td></tr>';
-                return;
+            } catch (error) {
+                alert("削除に失敗しました: " + error.message);
             }
-
-            window.globalEducation.forEach(item => {
-                const tr = document.createElement('tr');
-                const ytLink = item.url ? `<a href="${item.url}" target="_blank" style="color:#2563eb; font-size:12px; display:inline-block; margin-top:5px; font-weight:bold;">🔗 リンクを開く</a>` : '';
-                tr.innerHTML = `
-                    <td><span class="stat-badge" style="background:#e0f2fe; color:#1e40af; font-size:11px;">${item.category}</span></td>
-                    <td>
-                        <strong style="color:#1e3a8a; font-size:14px;">${item.title}</strong><br>
-                        <span style="font-size:12px; color:#475569; white-space:pre-wrap;">${item.description}</span><br>
-                        ${ytLink}
-                    </td>
-                    <td style="text-align:center;"><button class="btn btn-danger" style="padding: 6px 10px; font-size:12px;" onclick="deleteEducation('${item.id}')">削除</button></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+        };
 
         function filterAndRenderTable() {
             const searchText = document.getElementById('search-input').value.toLowerCase();
@@ -1960,37 +2015,6 @@
             }
         }
 
-        // 🔥 個別ログ削除関数
-        window.deleteLog = async function(playerName, date) {
-            if (!confirm(`本当に ${playerName} 選手の ${date} の記録を削除しますか？\n（この操作は元に戻せません）`)) return;
-
-            const docId = `${playerName}_${date}`;
-            try {
-                if (logColRef) {
-                    // クラウド上のデータを削除
-                    await logColRef.doc(docId).delete();
-                } 
-                
-                // 🔥 クラウドの同期遅延対策：画面のデータからも即座に消して強制再描画する
-                let savedLogs = window.globalLogs || [];
-                savedLogs = savedLogs.filter(log => !(log.playerName === playerName && log.date === date));
-                
-                // ローカルのバックアップデータからも削除
-                let localStoreLogs = JSON.parse(localStorage.getItem('team_condition_logs') || '[]');
-                localStoreLogs = localStoreLogs.filter(log => !(log.playerName === playerName && log.date === date));
-                localStorage.setItem('team_condition_logs', JSON.stringify(localStoreLogs));
-
-                window.globalLogs = savedLogs;
-                window.updateAdminUI(savedLogs);
-                
-                // 削除完了をポップアップで通知
-                setTimeout(() => alert("記録を削除しました！"), 100);
-
-            } catch (error) {
-                alert("削除に失敗しました: " + error.message);
-            }
-        };
-
         function renderTableData(logsToRender, tbodyId, showDate) {
             const tableBody = document.getElementById(tbodyId);
             tableBody.innerHTML = '';
@@ -2022,7 +2046,7 @@
                 } else { sorenessPostHtml = '-'; }
 
                 const sleepQualityStars = log.sleepQuality ? '★'.repeat(log.sleepQuality) : '';
-                const sleepText = log.sleep ? `${log.sleep}h ${sleepQualityStars ? '<span style="color:#d97706;">('+sleepQualityStars+')</span>' : ''}` : '-';
+                const sleepText = log.sleep ? `${log.sleep}h ${sleepQualityStars ? '<span style="color:#f59e0b;">('+sleepQualityStars+')</span>' : ''}` : '-';
 
                 let sprintDisplayHtml = '';
                 let sLogs = log.sprintLogs ? [...log.sprintLogs] : [];
@@ -2033,7 +2057,7 @@
                 
                 if (sLogs.length > 0) {
                     sLogs.forEach(s => {
-                        sprintDisplayHtml += `<span style="color: #6b21a8; font-weight: bold; display: block; margin-bottom: 2px;">${s.distance}m : ${s.time}s</span>`;
+                        sprintDisplayHtml += `<span style="color: #60a5fa; font-weight: bold; display: block; margin-bottom: 2px;">${s.distance}m : ${s.time}s</span>`;
                     });
                 } else {
                     sprintDisplayHtml = '-';
@@ -2065,8 +2089,8 @@
                     <td>${log.heartRate || '-'}</td>
                     <td>${log.steps || '-'}</td>
                     <td>${sleepText}</td>
-                    <td style="color:#dc2626; max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${log.injury || ''}">${log.injury || ''}</td>
-                    <td style="color:#1d4ed8; max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${log.care || ''}">${log.care || ''}</td>
+                    <td style="color:#fca5a5; max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${log.injury || ''}">${log.injury || ''}</td>
+                    <td style="color:#93c5fd; max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${log.care || ''}">${log.care || ''}</td>
                     <td style="text-align:center;">
                         <button class="btn btn-danger" style="padding: 4px 8px; font-size:11px;" onclick="deleteLog('${log.playerName}', '${log.date}')">削除</button>
                     </td>
@@ -2085,13 +2109,13 @@
 
             let csvContent = '\uFEFF'; 
             const headers = [
-                '日付', '選手名', 'IRS(朝)', 'IRS(練習後)', '疲労度', 'ストレス', 'TrainingLoad', 
+                '日付', '選手名', 'IRS(朝)', 'IRS(夜)', '疲労度', 'ストレス', 'TrainingLoad', 
                 'スプリント1_距離', 'スプリント1_タイム', 
                 'スプリント2_距離', 'スプリント2_タイム', 
                 'スプリント3_距離', 'スプリント3_タイム', 
-                'RSI', 'F-v診断', '朝の筋肉痛・張り', '練習後の筋肉痛・張り', 
+                'RSI', 'F-v診断', '朝の筋肉痛・張り', '夜の筋肉痛・張り', 
                 '体重(kg)', '心拍数', '歩数', '睡眠時間', '睡眠の質', 
-                'ケガ', 'メニュー', '感想', 'できたこと', '課題', '実施したケア', 'AI事前アドバイス', 'AIリカバリーアドバイス'
+                'ケガ・痛みの詳細', 'メニュー', 'できたこと', '課題', '実施したケア', 'AI事前アドバイス', 'AIリカバリーアドバイス'
             ];
             csvContent += headers.join(',') + '\n';
 
@@ -2113,7 +2137,7 @@
                     s3.distance, s3.time,
                     log.rsi, log.fvResult, log.soreness, log.sorenessPost, 
                     log.weight, log.heartRate, log.steps, log.sleep, log.sleepQuality, 
-                    log.injury, log.menu, log.thoughts, log.good, log.bad, log.care, 
+                    log.injury, log.menu, log.good, log.bad, log.care, 
                     log.aiAdvicePre, log.aiAdvicePost
                 ].map(item => {
                     let text = String(item || '').replace(/"/g, '""').replace(/\n/g, ' ');

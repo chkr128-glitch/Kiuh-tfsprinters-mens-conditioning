@@ -22,12 +22,10 @@
         }
     </script>
 
-    <!-- グラフ用と、紙吹雪（自己ベスト演出用）のライブラリ -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
-        /* ☀️ ライトモード（通常）のカラー変数 */
         :root { 
             --primary: #2563eb; 
             --primary-dark: #1e3a8a; 
@@ -55,7 +53,6 @@
             --good-text: #059669;
         }
         
-        /* 🌙 ダークモードのカラー変数 */
         body.dark-mode {
             --primary: #60a5fa; 
             --primary-dark: #93c5fd; 
@@ -100,8 +97,8 @@
         .form-group { margin-bottom: 15px; }
         .form-label-flex { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
         .form-label-flex label { font-size: 14px; font-weight: bold; color: var(--text-muted); margin: 0; transition: color 0.3s; }
+        .required-mark { font-size: 12px; color: var(--warning-text); font-weight: bold; margin-left: 5px; }
         
-        /* 🔥 アニメーションする顔文字メーター */
         .emoji-display { font-size: 24px; font-weight: bold; color: var(--primary-dark); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: inline-block; }
         .emoji-display.pop { transform: scale(1.4); }
         
@@ -123,7 +120,6 @@
         .tag-btn { background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
         .tag-btn.selected { background-color: var(--tag-sel-bg); border-color: var(--tag-sel-border); color: var(--tag-sel-text); font-weight: bold; }
 
-        /* 🔥 新しいケア選択用のボタンスタイル */
         .care-tag.selected { background-color: #dbeafe; border-color: #3b82f6; color: #1d4ed8; font-weight: bold; }
         body.dark-mode .care-tag.selected { background-color: #1e3a8a; border-color: #60a5fa; color: #bfdbfe; }
 
@@ -150,7 +146,7 @@
         .profile-section { background: var(--card-bg); padding: 15px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: all 0.3s; }
 
         .tab-nav { display: flex; background: var(--card-bg); border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: all 0.3s; }
-        .tab-btn { flex: 1; padding: 15px 0; text-align: center; font-weight: bold; font-size: 14px; color: var(--text-muted); background: none; border: none; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
+        .tab-btn { flex: 1; padding: 12px 0; text-align: center; font-weight: bold; font-size: 13px; color: var(--text-muted); background: none; border: none; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
         .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background-color: var(--result-bg); }
         
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
@@ -171,7 +167,6 @@
         .history-text-item { margin-bottom: 8px; font-size: 14px; }
         .history-label { font-size: 12px; font-weight: bold; color: var(--text-muted); display: block; margin-bottom: 2px; }
         .history-text-content { background-color: var(--history-text-content-bg); padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); white-space: pre-wrap; color: var(--text-main); transition: all 0.3s; }
-        .no-data { text-align: center; color: var(--text-muted); font-size: 14px; padding: 20px; }
         
         .sprint-dist-input, .sprint-time-input { border-color: var(--primary) !important; }
 
@@ -187,12 +182,10 @@
         .goal-edit-btn:hover { background: #fde68a; }
         .goal-text { font-weight: bold; color: #78350f; font-size: 15px; white-space: pre-wrap; line-height: 1.4; padding: 5px; }
 
-        /* 🔥 カウントダウンバナーのスタイル */
         .countdown-banner { background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; padding: 12px 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(234, 88, 12, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .countdown-banner .days { font-size: 28px; background: white; color: #ea580c; padding: 2px 10px; border-radius: 8px; margin: 0 5px; }
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* 🔥 追加：「学び」タブ用スタイル */
         .edu-cat-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
         .edu-cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
@@ -202,9 +195,6 @@
         .edu-desc { font-size: 13px; color: var(--text-main); white-space: pre-wrap; line-height: 1.5; margin-bottom: 10px; }
         .yt-container { position: relative; width: 100%; padding-bottom: 56.25%; border-radius: 8px; overflow: hidden; background: #000; margin-top: 10px; }
         .yt-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-        
-        /* 🔥 タブの幅を4等分に調整 */
-        .tab-btn { flex: 1; padding: 12px 0; text-align: center; font-weight: bold; font-size: 13px; color: var(--text-muted); background: none; border: none; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
     </style>
 </head>
 <body>
@@ -228,13 +218,10 @@
             <button onclick="fetchWeather()" style="background:none; border:none; color:var(--primary); font-size:12px; text-align:right; cursor:pointer; padding:0; font-weight:bold;">🔄 天気を更新</button>
         </div>
 
-        <!-- 🔥 追加：カウントダウンバナー -->
-        <div id="countdown-banner" class="countdown-banner">
-            <!-- JSで動的に中身が入ります -->
-        </div>
+        <div id="countdown-banner" class="countdown-banner"></div>
 
         <div class="profile-section">
-            <div class="form-label-flex"><label>👤 選手名と日付を選択 <span style="color:var(--warning-text);">*</span></label></div>
+            <div class="form-label-flex"><label>👤 選手名と日付を選択 <span class="required-mark">*必須</span></label></div>
             <div class="flex-row-gap">
                 <select id="player-name" required style="flex: 2;">
                     <option value="" disabled selected>読み込み中...</option>
@@ -261,7 +248,6 @@
             </div>
         </div>
 
-        <!-- 🔥 改修：タブに「📖 学び」を追加（全4つ） -->
         <div class="tab-nav">
             <button class="tab-btn active" onclick="switchTab('pre')">🌅 朝</button>
             <button class="tab-btn" onclick="switchTab('post')">🌙 夜</button>
@@ -270,7 +256,7 @@
         </div>
 
         <!-- ==========================================
-             タブ1: 練習前 (Pre-Training)
+             タブ1: 朝 (Pre-Training)
         =========================================== -->
         <div id="tab-pre" class="tab-content active">
             <form id="form-pre">
@@ -280,14 +266,14 @@
                      
                      <div class="form-group">
                          <div class="form-label-flex">
-                             <label>睡眠時間 (時間) <span style="font-size:12px; font-weight:normal;">任意</span></label>
+                             <label>睡眠時間 (時間) <span class="required-mark">*必須</span></label>
                              <button type="button" class="sync-btn" onclick="syncDeviceData('睡眠時間')">⌚️ 同期</button>
                          </div>
                          <input type="number" id="sleep" step="0.5" placeholder="例: 7.5">
                      </div>
                      
                      <div class="form-group">
-                         <div class="form-label-flex"><label>主観的な睡眠の質 <span style="font-size:12px; font-weight:normal;">任意</span></label></div>
+                         <div class="form-label-flex"><label>主観的な睡眠の質 <span class="required-mark">*必須</span></label></div>
                          <div class="star-rating">
                              <input type="radio" id="star5-pre" name="sleep-quality" value="5"><label for="star5-pre">★</label>
                              <input type="radio" id="star4-pre" name="sleep-quality" value="4"><label for="star4-pre">★</label>
@@ -313,7 +299,7 @@
 
                      <div class="form-group">
                          <div class="form-label-flex">
-                             <label>起床時の疲労度 (1:絶好調 〜 10:限界)</label>
+                             <label>起床時の疲労度 (1:絶好調 〜 10:限界) <span class="required-mark">*必須</span></label>
                              <div class="emoji-display" id="fatigue-display">😃 1</div>
                          </div>
                          <input type="range" id="fatigue" min="1" max="10" value="1" step="1">
@@ -321,7 +307,7 @@
 
                      <div class="form-group">
                          <div class="form-label-flex">
-                             <label>ストレス状態 (1:リラックス 〜 10:重圧)</label>
+                             <label>ストレス状態 (1:リラックス 〜 10:重圧) <span class="required-mark">*必須</span></label>
                              <div class="emoji-display" id="stress-display">😌 1</div>
                          </div>
                          <input type="range" id="stress" min="1" max="10" value="1" step="1">
@@ -334,6 +320,7 @@
                              <button type="button" class="tag-btn tag-btn-pre" data-part="肩">肩</button>
                              <button type="button" class="tag-btn tag-btn-pre" data-part="腕">腕</button>
                              <button type="button" class="tag-btn tag-btn-pre" data-part="背中">背中</button>
+                             <button type="button" class="tag-btn tag-btn-pre" data-part="腰">腰</button>
                              <button type="button" class="tag-btn tag-btn-pre" data-part="腹筋">腹筋</button>
                              <button type="button" class="tag-btn tag-btn-pre" data-part="胸部">胸部</button>
                              <button type="button" class="tag-btn tag-btn-pre" data-part="腸腰筋">腸腰筋</button>
@@ -369,16 +356,16 @@
         </div>
 
         <!-- ==========================================
-             タブ2: 練習後 (Post-Training)
+             タブ2: 夜 (Post-Training)
         =========================================== -->
         <div id="tab-post" class="tab-content">
             <form id="form-post">
                 <div class="card">
                      <h2 class="section-title">📊 トレーニング負荷 (sRPE)</h2>
-                     <div class="form-group"><div class="form-label-flex"><label>運動時間 (分)</label></div><input type="number" id="duration" placeholder="例: 120"></div>
+                     <div class="form-group"><div class="form-label-flex"><label>運動時間 (分) <span class="required-mark">*必須</span></label></div><input type="number" id="duration" placeholder="例: 120"></div>
                      <div class="form-group">
                          <div class="form-label-flex">
-                             <label>RPE: 主観的きつさ (0:楽 〜 10:限界)</label>
+                             <label>RPE: 主観的きつさ (0:楽 〜 10:限界) <span class="required-mark">*必須</span></label>
                              <div class="emoji-display" id="rpe-display">🏃‍♂️ 5.0</div>
                          </div>
                          <input type="range" id="rpe" min="0" max="10" step="0.5" value="5">
@@ -392,6 +379,29 @@
                         <button type="button" onclick="addSprintRow()" style="background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: bold; cursor: pointer;">➕ 追加</button>
                     </div>
                     <div id="sprint-rows-container"></div>
+                    
+                    <!-- 🔥 復活・改修：RSIとF-v診断（タイム入力自動計算） -->
+                    <div style="border-top: 1px solid var(--border-color); margin-top: 15px; padding-top: 15px;">
+                        <h3 class="section-title" style="border: none; margin-bottom: 10px; font-size: 15px;">🔬 特殊計測 (RSI / F-vプロファイル)</h3>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <div class="form-label-flex"><label>RSI (反応筋力指数)</label></div>
+                            <input type="number" id="rsi" step="0.01" placeholder="例: 2.50">
+                        </div>
+                        
+                        <div style="background-color: var(--input-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                            <div class="form-label-flex"><label>F-vプロファイル診断用タイム</label></div>
+                            <div class="flex-row-gap" style="margin-bottom: 10px;">
+                                <input type="number" id="time-30m" step="0.01" placeholder="30m (秒)" oninput="calcFv()">
+                                <input type="number" id="time-fly20m" step="0.01" placeholder="Fly 20m (秒)" oninput="calcFv()">
+                            </div>
+                            <div class="result-box" style="margin-top: 0; padding: 10px;">
+                                <span class="result-label" style="font-size: 13px;">診断結果</span>
+                                <span class="result-value" id="fv-display" style="font-size: 15px;">-</span>
+                            </div>
+                            <!-- 非表示で結果を保持 -->
+                            <input type="hidden" id="fv-result" value="">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="card">
@@ -405,6 +415,7 @@
                              <button type="button" class="tag-btn tag-btn-post" data-part="肩">肩</button>
                              <button type="button" class="tag-btn tag-btn-post" data-part="腕">腕</button>
                              <button type="button" class="tag-btn tag-btn-post" data-part="背中">背中</button>
+                             <button type="button" class="tag-btn tag-btn-post" data-part="腰">腰</button>
                              <button type="button" class="tag-btn tag-btn-post" data-part="腹筋">腹筋</button>
                              <button type="button" class="tag-btn tag-btn-post" data-part="胸部">胸部</button>
                              <button type="button" class="tag-btn tag-btn-post" data-part="腸腰筋">腸腰筋</button>
@@ -442,7 +453,6 @@
                      <div class="form-group"><div class="form-label-flex"><label style="color: var(--good-text);">👍 できたこと</label></div><textarea id="good" rows="2"></textarea></div>
                      <div class="form-group"><div class="form-label-flex"><label style="color: var(--warning-text);">👎 できなかったこと・課題</label></div><textarea id="bad" rows="2"></textarea></div>
                      
-                     <!-- 🔥 改修：ケア内容のチェックボタン化 -->
                      <div class="form-group">
                          <div class="form-label-flex"><label style="color: var(--primary-dark);">🛁 今夜実施するケア (複数選択可)</label></div>
                          <div class="tags-container" id="care-tags" style="margin-bottom: 10px;">
@@ -471,7 +481,7 @@
         </div>
 
         <!-- ==========================================
-             🔥 タブ3: 学び・動画 (Education) - NEW!!
+             タブ3: 学び・動画 (Education)
         =========================================== -->
         <div id="tab-education" class="tab-content">
             <div class="card" style="background: linear-gradient(135deg, #e0f2fe, #bfdbfe); border: none;">
@@ -488,7 +498,6 @@
             </div>
 
             <div id="education-list-container">
-                <!-- JSでコンテンツカードが挿入される -->
                 <div style="text-align: center; padding: 20px; color: var(--text-muted);">読み込み中...</div>
             </div>
         </div>
@@ -596,10 +605,9 @@
         let teamGoals = {}; 
         let teamSettings = {}; 
         
-        let globalEducation = []; // 🔥 学びコンテンツ保存用
+        let globalEducation = [];
         let currentEduCategory = 'すべて';
 
-        // 🔥 グラフに大会日の縦線を引くプラグイン
         const targetDateLinePlugin = {
             id: 'targetDateLinePlugin',
             afterDraw: (chart) => {
@@ -769,7 +777,7 @@
         }
 
         function calculateIRS(type) {
-            let score = 10; 
+            let score = 5; 
             
             if(type === 'pre') {
                 const fatigue = parseInt(document.getElementById('fatigue').value);
@@ -778,21 +786,21 @@
                 const sleepQualityNode = document.querySelector('input[name="sleep-quality"]:checked');
                 const sleepQuality = sleepQualityNode ? parseInt(sleepQualityNode.value) : 5; 
                 
-                if (fatigue >= 8) score += 20;
-                else if (fatigue >= 6) score += 10;
-                if (stress >= 8) score += 10;
+                if (fatigue >= 8) score += 15;
+                else if (fatigue >= 6) score += 5;
+                if (stress >= 8) score += 5;
 
-                if (sleep > 0 && sleep < 6) score += 15;
+                if (sleep > 0 && sleep < 6) score += 10;
                 else if (sleep > 0 && sleep < 7) score += 5;
-                if (sleepQuality <= 2) score += 10;
+                if (sleepQuality <= 2) score += 5;
 
-                if (selectedSorenessPre.includes('ハムストリングス')) score += 25; 
-                if (selectedSorenessPre.includes('カーフ') || selectedSorenessPre.includes('アキレス腱')) score += 15;
-                if (selectedSorenessPre.includes('腸腰筋') || selectedSorenessPre.includes('大腿四頭筋')) score += 10;
+                if (selectedSorenessPre.includes('ハムストリングス')) score += 20; 
+                if (selectedSorenessPre.includes('カーフ') || selectedSorenessPre.includes('アキレス腱')) score += 10;
+                if (selectedSorenessPre.includes('腸腰筋') || selectedSorenessPre.includes('大腿四頭筋') || selectedSorenessPre.includes('腰')) score += 10;
                 
-                const criticalParts = ['ハムストリングス', 'カーフ', 'アキレス腱', '腸腰筋', '大腿四頭筋'];
+                const criticalParts = ['ハムストリングス', 'カーフ', 'アキレス腱', '腸腰筋', '大腿四頭筋', '腰'];
                 selectedSorenessPre.forEach(part => {
-                    if(!criticalParts.includes(part)) score += 5;
+                    if(!criticalParts.includes(part)) score += 3;
                 });
 
                 updateIRSUIDisplay('pre', score);
@@ -802,16 +810,16 @@
                 const loadText = document.getElementById('load-result').textContent;
                 const load = loadText !== '-' ? parseFloat(loadText) : 0;
                 
-                if (rpe >= 8) score += 15;
-                if (load > 600) score += 15;
+                if (rpe >= 8) score += 10;
+                if (load > 600) score += 10;
 
-                if (selectedSorenessPost.includes('ハムストリングス')) score += 30; 
-                if (selectedSorenessPost.includes('カーフ') || selectedSorenessPost.includes('アキレス腱')) score += 20;
-                if (selectedSorenessPost.includes('腸腰筋') || selectedSorenessPost.includes('大腿四頭筋')) score += 15;
+                if (selectedSorenessPost.includes('ハムストリングス')) score += 20; 
+                if (selectedSorenessPost.includes('カーフ') || selectedSorenessPost.includes('アキレス腱')) score += 15;
+                if (selectedSorenessPost.includes('腸腰筋') || selectedSorenessPost.includes('大腿四頭筋') || selectedSorenessPost.includes('腰')) score += 10;
                 
-                const criticalParts = ['ハムストリングス', 'カーフ', 'アキレス腱', '腸腰筋', '大腿四頭筋'];
+                const criticalParts = ['ハムストリングス', 'カーフ', 'アキレス腱', '腸腰筋', '大腿四頭筋', '腰'];
                 selectedSorenessPost.forEach(part => {
-                    if(!criticalParts.includes(part)) score += 5;
+                    if(!criticalParts.includes(part)) score += 3;
                 });
 
                 updateIRSUIDisplay('post', score);
@@ -863,6 +871,7 @@
             if (selectedSorenessPre.includes('腸腰筋') || selectedSorenessPre.includes('大腿四頭筋')) advices.push("💡 <b>【前ももの張り】</b><br>ブレーキ動作が多くなっているか、骨盤が後傾気味です。アップで大臀筋（お尻）にスイッチを入れるドリルを多めに行いましょう。");
             if (selectedSorenessPre.includes('カーフ') || selectedSorenessPre.includes('アキレス腱') || selectedSorenessPre.includes('足裏')) advices.push("💡 <b>【足部・下腿の疲労】</b><br>接地時のバネ組織が疲労しています。今日は過度な跳躍や反発ドリルは控えめにするのが無難です。");
             if (selectedSorenessPre.includes('腕')) advices.push("💡 <b>【腕の張り】</b><br>スプリント時の腕振りによる疲労や、ウエイトトレーニングの影響が考えられます。肩甲骨周りと合わせてストレッチを行い、上半身の連動性を保ちましょう。");
+            if (selectedSorenessPre.includes('腰')) advices.push("💡 <b>【腰の張り】</b><br>体幹の疲労や着地衝撃の吸収がうまくいっていない可能性があります。アップでは股関節の可動域を広げ、腰に過度な負担をかけない動きを意識してください。");
 
             if (fatigue >= 8) advices.push("⚠️ <b>【過労警告】</b><br>起床時から強い疲労があります。高強度のスプリントは避け、回復走や技術確認に留める勇気を持つことも重要です。");
 
@@ -894,6 +903,7 @@
             if (selectedSorenessPost.includes('カーフ') || selectedSorenessPost.includes('アキレス腱') || selectedSorenessPost.includes('足裏')) advices.push("💡 <b>【足部・下腿のケア】</b><br>接地の衝撃でふくらはぎや足底が硬くなっています。テニスボールや青竹踏みで足裏をほぐし、ふくらはぎは下から上へ血流を戻すように優しくマッサージしてください。");
             if (selectedSorenessPost.includes('臀部')) advices.push("💡 <b>【お尻のケア】</b><br>推進力を生む大きな筋肉が疲労しています。テニスボールをお尻の下に置いて自重でリリースしたり、仰向けで膝を胸に抱えるストレッチで張りをとりましょう。");
             if (selectedSorenessPost.includes('背中') || selectedSorenessPost.includes('肩') || selectedSorenessPost.includes('腕')) advices.push("💡 <b>【上半身のケア】</b><br>腕振りや体幹の固定による疲労です。フォームローラーでの胸椎の伸展や、肩甲骨周りのストレッチを行い、上半身の力みをリセットしましょう。");
+            if (selectedSorenessPost.includes('腰')) advices.push("💡 <b>【腰のケア】</b><br>スプリントの着地衝撃やウエイトトレーニングで腰背部に負担がかかっています。仰向けになって両膝を抱えるストレッチや、湯船でしっかり温めて血流を良くしましょう。");
 
             const injuryText = document.getElementById('injury').value;
             const badText = document.getElementById('bad').value;
@@ -925,7 +935,6 @@
             return arr;
         }
 
-        // 🔥 自己ベスト更新の判定関数
         function checkPersonalBest(newSprints, playerName) {
             let isBest = false;
             const bestTimes = {};
@@ -951,7 +960,6 @@
             return isBest;
         }
 
-        // 🔥 紙吹雪（お祝い）演出をトリガーする関数
         function triggerConfetti() {
             if (typeof confetti === 'function') {
                 var duration = 3 * 1000;
@@ -977,6 +985,40 @@
             }
         }
 
+        // 🔥 追加：F-vプロファイルの自動計算関数
+        function calcFv() {
+            const t30 = parseFloat(document.getElementById('time-30m').value);
+            const t20 = parseFloat(document.getElementById('time-fly20m').value);
+            const display = document.getElementById('fv-display');
+            const hiddenInput = document.getElementById('fv-result');
+
+            if (t30 > 0 && t20 > 0) {
+                const ratio = t30 / t20;
+                let result = '';
+                let color = '';
+                
+                // スポーツ科学の基準に基づく比率によるグループ分け
+                if (ratio >= 2.15) {
+                    result = '力不足(Force Deficit)';
+                    color = '#ea580c'; // オレンジ（警告色）
+                } else if (ratio <= 1.95) {
+                    result = '速度不足(Velocity Deficit)';
+                    color = '#2563eb'; // ブルー
+                } else {
+                    result = 'バランス型(Optimal)';
+                    color = '#10b981'; // グリーン（安全色）
+                }
+                
+                display.textContent = `${result} (比率: ${ratio.toFixed(2)})`;
+                display.style.color = color;
+                hiddenInput.value = result;
+            } else {
+                display.textContent = '-';
+                display.style.color = 'var(--text-main)';
+                hiddenInput.value = '';
+            }
+        }
+
         async function initFirebase() {
             try {
                 firebase.initializeApp(myFirebaseConfig);
@@ -986,7 +1028,7 @@
                 playersColRef = db.collection('team_players');
                 let goalsColRefLocal = db.collection('team_goals'); 
                 let settingsColRef = db.collection('team_settings'); 
-                let eduColRefLocal = db.collection('team_education'); // 🔥 学びコレクション
+                let eduColRefLocal = db.collection('team_education');
 
                 playersColRef.onSnapshot(snapshot => {
                     const players = [];
@@ -1010,7 +1052,6 @@
                     }
                 });
 
-                // 🔥 学びコンテンツの取得と描画
                 eduColRefLocal.onSnapshot(snapshot => {
                     globalEducation = [];
                     snapshot.forEach(doc => {
@@ -1041,7 +1082,6 @@
             teamGoals = JSON.parse(localStorage.getItem('team_goals') || '{}');
             teamSettings = JSON.parse(localStorage.getItem('team_settings') || '{}'); 
             
-            // ローカルから学びコンテンツ復元
             globalEducation = JSON.parse(localStorage.getItem('team_education') || '[]');
             renderEducationList();
 
@@ -1049,9 +1089,6 @@
             updateCountdownUI();
         }
 
-        // ==========================================
-        // 🔥 学び・動画コンテンツの処理
-        // ==========================================
         function getYouTubeEmbedUrl(url) {
             if(!url) return null;
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -1104,7 +1141,6 @@
             renderEducationList();
         }
 
-        // 🔥 カウントダウンバナーの描画
         function updateCountdownUI() {
             const banner = document.getElementById('countdown-banner');
             if (!teamSettings || !teamSettings.targetEventDate) {
@@ -1128,7 +1164,7 @@
                 banner.style.background = 'linear-gradient(135deg, #10b981, #059669)';
                 banner.innerHTML = `🔥 本日は ${teamSettings.targetEventName || '大会'} 当日です！健闘を祈ります！`;
             } else {
-                banner.style.display = 'none'; // 過ぎたら消す
+                banner.style.display = 'none'; 
             }
         }
 
@@ -1200,6 +1236,7 @@
             alert(`【デバイス連携機能について】\n\n現在、Webブラウザのセキュリティ制限により、Apple HealthやGoogle Fit、スマートウォッチから「${itemName}」を直接取得する機能は開発準備中です。\n\nお手数ですが、現在はお手持ちのデバイスやアプリの数値を確認して、直接入力してください！`);
         }
 
+        // 🔥 データ保存処理（必須チェック追加）
         async function saveData(type) {
             const playerName = document.getElementById('player-name').value;
             const date = document.getElementById('date').value;
@@ -1208,6 +1245,25 @@
                 alert("一番上の「選手名」と「日付」を選択してください！");
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 return;
+            }
+            
+            // 🔥 必須入力チェック
+            if (type === 'pre') {
+                if (!document.getElementById('sleep').value) {
+                    alert("「睡眠時間」を入力してください！\nケガ予防のために非常に重要なデータです。");
+                    document.getElementById('sleep').focus();
+                    return;
+                }
+                if (!document.querySelector('input[name="sleep-quality"]:checked')) {
+                    alert("「睡眠の質」の星を選択してください！\n疲労の回復度合いを測る重要な指標です。");
+                    return;
+                }
+            } else if (type === 'post') {
+                if (!document.getElementById('duration').value) {
+                    alert("Loadを計算するため、「運動時間(分)」を入力してください！");
+                    document.getElementById('duration').focus();
+                    return;
+                }
             }
 
             const docId = `${playerName}_${date}`;
@@ -1235,6 +1291,13 @@
                 partialData.rpe = document.getElementById('rpe').value;
                 partialData.trainingLoad = document.getElementById('load-result').textContent;
                 partialData.sprintLogs = getSprintData();
+                
+                // 🔥 追加・修正：RSIとF-vの保存（入力されたタイムも保存）
+                partialData.rsi = document.getElementById('rsi').value;
+                partialData.time30m = document.getElementById('time-30m').value;
+                partialData.timeFly20m = document.getElementById('time-fly20m').value;
+                partialData.fvResult = document.getElementById('fv-result').value;
+                
                 partialData.menu = document.getElementById('menu').value;
                 partialData.steps = document.getElementById('steps').value;
                 partialData.good = document.getElementById('good').value;
@@ -1242,7 +1305,6 @@
                 partialData.injury = document.getElementById('injury').value;
                 partialData.sorenessPost = selectedSorenessPost.join(', ');
                 
-                // 🔥 ケア内容：選択されたタグと自由記述を結合して保存
                 let selectedCares = [];
                 document.querySelectorAll('.care-tag.selected').forEach(btn => {
                     selectedCares.push(btn.getAttribute('data-care'));
@@ -1253,7 +1315,6 @@
                 partialData.aiAdvicePost = document.getElementById('ai-advice-post').innerHTML;
                 partialData.irsPost = document.getElementById('irs-value-post').textContent;
 
-                // 🔥 自己ベスト更新判定
                 const myLogs = allTeamLogs.filter(l => l.playerName === playerName);
                 if (myLogs.length > 0) {
                     isPB = checkPersonalBest(partialData.sprintLogs, playerName);
@@ -1275,7 +1336,6 @@
                     loadLocalData();
                 }
                 
-                // 🔥 アラートと自己ベストお祝い演出
                 if(type === 'pre') {
                     alert('🌅 朝のデータを保存しました！今日も一日頑張りましょう！');
                 } else {
@@ -1291,7 +1351,6 @@
             }
         }
 
-        // 🔥 新しい顔文字メーターの更新関数
         function updateFaceMeter(id, value, type) {
             const el = document.getElementById(id);
             let emoji = "";
@@ -1384,14 +1443,12 @@
                 });
             });
 
-            // 🔥 追加：ケア選択タグのクリックイベント
             document.querySelectorAll('.care-tag').forEach(btn => {
                 btn.addEventListener('click', function() {
                     this.classList.toggle('selected');
                 });
             });
             
-            // 初期状態の顔文字メーターをセット
             updateFaceMeter('fatigue-display', document.getElementById('fatigue').value, 'fatigue');
             updateFaceMeter('stress-display', document.getElementById('stress').value, 'stress');
             updateFaceMeter('rpe-display', document.getElementById('rpe').value, 'rpe');
@@ -1437,8 +1494,12 @@
                 let sprintHtml = '';
                 if(log.sprintLogs) log.sprintLogs.forEach(s => sprintHtml += `<span class="stat-badge" style="background:var(--primary); color:white;">🏃‍♂️ ${s.distance}m: ${s.time}s</span> `);
                 
+                // 🔥 追加：履歴にRSIとF-vも表示
+                if(log.rsi) sprintHtml += `<span class="stat-badge" style="background:#10b981; color:white;">RSI: ${log.rsi}</span> `;
+                if(log.fvResult) sprintHtml += `<span class="stat-badge" style="background:#8b5cf6; color:white;">F-v: ${log.fvResult}</span> `;
+                
                 const sorenessHtml = log.soreness ? `<div class="history-text-item"><span class="history-label">🌅 朝の張り:</span> <span style="color:var(--tag-sel-text); font-weight:bold; font-size:13px;">${log.soreness}</span></div>` : '';
-                const sorenessPostHtml = log.sorenessPost ? `<div class="history-text-item"><span class="history-label">🏃‍♂️ 練習後の張り:</span> <span style="color:#ea580c; font-weight:bold; font-size:13px;">${log.sorenessPost}</span></div>` : '';
+                const sorenessPostHtml = log.sorenessPost ? `<div class="history-text-item"><span class="history-label">🏃‍♂️ 夜の張り:</span> <span style="color:#ea580c; font-weight:bold; font-size:13px;">${log.sorenessPost}</span></div>` : '';
 
                 list.innerHTML += `
                 <div class="history-card">
@@ -1482,14 +1543,12 @@
                         data: {
                             labels: labels,
                             datasets: [
-                                { label: 'Training Load', data: loadData, backgroundColor: '#3b82f6', yAxisID: 'y', type: 'bar', order: 2 },
-                                { label: '疲労度', data: fatigueData, borderColor: '#ef4444', backgroundColor: '#ef4444', borderDash: [5, 5], yAxisID: 'y1', tension: 0.2, order: 1 }
+                                { label: 'Training Load', data: loadData, borderColor: '#3b82f6', backgroundColor: '#3b82f6', yAxisID: 'y', tension: 0.2 },
+                                { label: '疲労度', data: fatigueData, borderColor: '#ef4444', backgroundColor: '#ef4444', borderDash: [5, 5], yAxisID: 'y1', tension: 0.2 }
                             ]
                         },
-                        plugins: [targetDateLinePlugin], // 🔥 プラグイン登録
                         options: {
                             responsive: true,
-                            layout: { padding: { top: 20 } }, // 文字が切れないように余白
                             plugins: { 
                                 title: { display: true, text: '最近のコンディション推移 (最大7日間)', color: tickColor },
                                 legend: { labels: { color: tickColor } }
