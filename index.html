@@ -6,7 +6,7 @@
     <title>AthleSense KIUH</title>
     
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1e3a8a">
+    <meta name="theme-color" content="#ec4899">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AthleSense">
@@ -25,234 +25,382 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
+    <!-- ==========================================
+         CSSセクション
+    =========================================== -->
     <style>
         :root { 
-            --primary: #2563eb; 
-            --primary-dark: #1e3a8a; 
+            --primary: #ec4899; 
+            --primary-dark: #be185d; 
+            --primary-light: #fce7f3;
+            --primary-alpha: rgba(236, 72, 153, 0.2);
+            --secondary: #f97316; 
+            --secondary-light: #ffedd5;
+            --secondary-alpha: rgba(249, 115, 22, 0.2);
+            
             --bg-color: #f8fafc; 
             --card-bg: #ffffff; 
-            --text-main: #334155; 
+            --text-main: #1f2937; 
             --text-muted: #64748b;
-            --border-color: #cbd5e1;
-            --input-bg: #f8fafc;
-            --result-bg: #eff6ff;
-            --ai-card-bg: linear-gradient(145deg, #ffffff, #f0fdf4);
-            --ai-card-border: #bbf7d0;
-            --ai-box-bg: white;
-            --ai-box-text: #1e293b;
-            --weather-bg: linear-gradient(135deg, #e0f2fe, #bae6fd);
-            --weather-text: #1e3a8a;
-            --weather-advice-bg: rgba(255,255,255,0.6);
-            --weather-advice-text: #0f172a;
-            --tag-sel-bg: #fef08a;
-            --tag-sel-border: #f59e0b;
-            --tag-sel-text: #b45309;
-            --history-card-bg: #f8fafc;
-            --history-text-content-bg: white;
-            --warning-text: #dc2626;
-            --good-text: #059669;
+            --border-color: rgba(0, 0, 0, 0.05);
+            --input-bg: #f9fafb;
+            --result-bg: #fff1f2;
+            
+            --ai-card-bg: linear-gradient(135deg, #ffffff 0%, #fff1f2 100%);
+            --ai-card-border: rgba(236, 72, 153, 0.2);
+            --ai-box-bg: rgba(255, 255, 255, 0.8);
+            --ai-box-text: #1f2937;
+            
+            --weather-bg: linear-gradient(135deg, #ffedd5, #fce7f3);
+            --weather-text: #9f1239;
+            --weather-advice-bg: rgba(255,255,255,0.7);
+            --weather-advice-text: #1f2937;
+            
+            --tag-sel-bg: #ffedd5;
+            --tag-sel-border: #f97316;
+            --tag-sel-text: #c2410c;
+            
+            --care-tag-sel-bg: #fce7f3;
+            --care-tag-sel-border: #ec4899;
+            --care-tag-sel-text: #be185d;
+
+            --history-card-bg: #ffffff;
+            --history-text-content-bg: #f9fafb;
+            
+            --warning-text: #ef4444; 
+            --good-text: #10b981; 
+            
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px -15px rgba(236, 72, 153, 0.2);
+            
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
         }
         
         body.dark-mode {
-            --primary: #60a5fa; 
-            --primary-dark: #93c5fd; 
+            --primary: #f472b6; 
+            --primary-dark: #f9a8d4; 
+            --primary-light: rgba(236, 72, 153, 0.15);
+            --primary-alpha: rgba(236, 72, 153, 0.25);
+            --secondary: #fb923c;
+            --secondary-light: rgba(249, 115, 22, 0.15);
+            --secondary-alpha: rgba(249, 115, 22, 0.25);
+            
             --bg-color: #0f172a; 
             --card-bg: #1e293b; 
-            --text-main: #f8fafc; 
+            --text-main: #f1f5f9; 
             --text-muted: #94a3b8;
-            --border-color: #334155;
+            --border-color: rgba(255, 255, 255, 0.05);
             --input-bg: #0f172a;
-            --result-bg: #334155;
-            --ai-card-bg: linear-gradient(145deg, #1e293b, #064e3b);
-            --ai-card-border: #059669;
-            --ai-box-bg: #0f172a;
-            --ai-box-text: #f8fafc;
-            --weather-bg: linear-gradient(135deg, #1e3a8a, #0f172a);
-            --weather-text: #93c5fd;
-            --weather-advice-bg: rgba(0,0,0,0.4);
-            --weather-advice-text: #f8fafc;
-            --tag-sel-bg: #78350f;
-            --tag-sel-border: #b45309;
-            --tag-sel-text: #fde68a;
-            --history-card-bg: #0f172a;
-            --history-text-content-bg: #1e293b;
+            --result-bg: #331824;
+            
+            --ai-card-bg: linear-gradient(135deg, #1e293b 0%, #3a1523 100%);
+            --ai-card-border: rgba(244, 114, 182, 0.3);
+            --ai-box-bg: rgba(15, 23, 42, 0.6);
+            --ai-box-text: #f1f5f9;
+            
+            --weather-bg: linear-gradient(135deg, #3a1523, #1e293b);
+            --weather-text: #fbcfe8;
+            --weather-advice-bg: rgba(0,0,0,0.5);
+            --weather-advice-text: #f3f4f6;
+            
+            --tag-sel-bg: #7c2d12;
+            --tag-sel-border: #ea580c;
+            --tag-sel-text: #ffedd5;
+            
+            --care-tag-sel-bg: #831843;
+            --care-tag-sel-border: #db2777;
+            --care-tag-sel-text: #fce7f3;
+
+            --history-card-bg: #1e293b;
+            --history-text-content-bg: #0f172a;
+            
             --warning-text: #fca5a5;
             --good-text: #6ee7b7;
+            
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+            --shadow-lg: 0 20px 40px -15px rgba(0, 0, 0, 0.8);
         }
 
-        body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; line-height: 1.6; transition: background-color 0.3s, color 0.3s; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; line-height: 1.6; transition: background-color 0.4s var(--ease-out-expo), color 0.4s var(--ease-out-expo); -webkit-font-smoothing: antialiased; }
         .container { max-width: 600px; margin: 0 auto; padding: 15px; padding-bottom: 80px; }
         
-        header { background-color: #1e3a8a; color: white; padding: 15px 20px; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .theme-toggle-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); font-size: 13px; cursor: pointer; padding: 6px 12px; color: white; border-radius: 20px; font-weight: bold; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
-        .theme-toggle-btn:hover { background: rgba(255,255,255,0.3); }
+        /* 🔥 ヘッダー */
+        header { 
+            background: linear-gradient(135deg, rgba(236,72,153,0.85), rgba(249,115,22,0.85)); 
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            color: white; padding: 15px 20px; font-size: 20px; font-weight: 800; position: sticky; top: 0; z-index: 100; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; 
+            letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        body.dark-mode header { background: linear-gradient(135deg, rgba(190,24,93,0.85), rgba(194,65,12,0.85)); }
         
-        .weather-widget { background: var(--weather-bg); border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px; border-left: 5px solid var(--primary); transition: all 0.3s; }
-        .weather-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: var(--weather-text); }
-        .weather-advice { font-size: 13px; color: var(--weather-advice-text); background: var(--weather-advice-bg); padding: 10px; border-radius: 8px; transition: all 0.3s; }
+        .theme-toggle-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); font-size: 13px; cursor: pointer; padding: 6px 10px; color: white; border-radius: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: all 0.3s var(--ease-out-expo); backdrop-filter: blur(4px); }
+        .theme-toggle-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
+        .theme-toggle-btn:active { transform: scale(0.95); }
         
-        .card { background-color: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: all 0.3s; }
-        .section-title { font-size: 17px; font-weight: bold; color: var(--primary-dark); border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px; margin-top: 0; display: flex; align-items: center; gap: 5px; transition: color 0.3s, border-color 0.3s; }
+        /* ウィジェット・バナー */
+        .weather-widget { background: var(--weather-bg); border-radius: 16px; padding: 15px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; transition: transform 0.3s var(--ease-out-expo), box-shadow 0.3s var(--ease-out-expo); box-shadow: var(--shadow-md); border: 1px solid rgba(255,255,255,0.3); }
+        .weather-widget:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .countdown-banner { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 12px 15px; border-radius: 16px; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 18px; display: none; align-items: center; justify-content: center; gap: 10px; animation: popIn 0.6s var(--ease-out-expo); box-shadow: var(--shadow-lg); border: 1px solid rgba(255,255,255,0.2); }
+        .countdown-banner .days { font-size: 28px; background: rgba(255,255,255,0.95); color: var(--primary); padding: 2px 12px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
         
-        .form-group { margin-bottom: 15px; }
-        .form-label-flex { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
-        .form-label-flex label { font-size: 14px; font-weight: bold; color: var(--text-muted); margin: 0; transition: color 0.3s; }
-        .required-mark { font-size: 12px; color: var(--warning-text); font-weight: bold; margin-left: 5px; }
+        /* 🔥 カレンダー UI */
+        .calendar-container { background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); transition: all 0.3s var(--ease-out-expo); }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .calendar-header button { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main); font-weight: bold; padding: 8px 14px; border-radius: 10px; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm); }
+        .calendar-header button:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); transform: translateY(-1px); }
+        .calendar-header h3 { margin: 0; color: var(--primary); font-size: 18px; letter-spacing: 0.5px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+        .calendar-day-name { font-size: 12px; color: var(--text-muted); font-weight: bold; padding-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;}
+        .calendar-day { position: relative; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main); transition: all 0.3s var(--ease-out-expo); }
+        .calendar-day.empty { background: transparent; border: none; cursor: default; }
+        .calendar-day:not(.empty):hover { transform: translateY(-2px); box-shadow: var(--shadow-md); z-index: 5; }
+        .calendar-day:not(.empty):active { transform: scale(0.92); }
+        .calendar-day.selected { border: 2px solid var(--primary); box-shadow: 0 0 0 4px var(--primary-alpha); transform: scale(1.05); z-index: 10; }
+        .calendar-day.today { text-decoration: underline; text-underline-offset: 4px; decoration-thickness: 2px; }
         
-        .emoji-display { font-size: 24px; font-weight: bold; color: var(--primary-dark); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: inline-block; }
-        .emoji-display.pop { transform: scale(1.4); }
+        /* カレンダーの疲労色 */
+        .calendar-day.bg-green { background-color: rgba(16, 185, 129, 0.1); color: #047857; border-color: rgba(16, 185, 129, 0.3); }
+        .calendar-day.bg-yellow { background-color: rgba(245, 158, 11, 0.1); color: #b45309; border-color: rgba(245, 158, 11, 0.3); }
+        .calendar-day.bg-red { background-color: rgba(239, 68, 68, 0.1); color: #b91c1c; border-color: rgba(239, 68, 68, 0.3); }
+        body.dark-mode .calendar-day.bg-green { color: #34d399; }
+        body.dark-mode .calendar-day.bg-yellow { color: #fbbf24; }
+        body.dark-mode .calendar-day.bg-red { color: #f87171; }
         
-        select, input[type="text"], input[type="date"], input[type="number"], textarea { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; font-size: 16px; background-color: var(--input-bg); color: var(--text-main); appearance: none; transition: all 0.3s; }
-        select:focus, input:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        textarea { resize: vertical; }
+        /* ケガの強調表示 */
+        .calendar-day.has-injury {
+            border: 2px solid var(--warning-text) !important;
+            background-color: rgba(239,68,68,0.15) !important;
+            color: var(--warning-text) !important;
+            animation: pulseInjury 2s infinite;
+        }
+        .injury-icon { 
+            position: absolute; top: -6px; right: -6px; font-size: 14px; 
+            background: #fef2f2; border: 1px solid var(--warning-text); border-radius: 50%; 
+            width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; 
+            line-height: 1; z-index: 5;
+        }
+        @keyframes pulseInjury {
+            0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+            100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+        }
 
-        input[type="range"] { width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; outline: none; -webkit-appearance: none; margin-bottom: 10px; transition: background-color 0.3s; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-
-        .result-box { background-color: var(--result-bg); border-radius: 8px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border: 1px solid var(--border-color); transition: all 0.3s; }
-        .result-label { font-size: 14px; font-weight: bold; color: var(--primary-dark); transition: color 0.3s; }
-        .result-value { font-size: 20px; font-weight: bold; color: var(--primary); text-align: right; transition: color 0.3s; }
+        /* 🔥 カード・フォーム共通 */
+        .card { background-color: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border-color); transition: all 0.3s var(--ease-out-expo); box-shadow: var(--shadow-md); }
+        .profile-section { background: var(--card-bg); padding: 15px; border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--border-color); box-shadow: var(--shadow-md); }
+        .section-title { font-size: 17px; font-weight: 800; color: var(--primary); border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; margin-bottom: 18px; margin-top: 0; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px;}
         
-        .submit-btn { background-color: var(--primary); color: white; border: none; border-radius: 8px; padding: 15px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: background-color 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .submit-btn:hover { filter: brightness(1.1); }
-
-        .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
-        .tag-btn { background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
-        .tag-btn.selected { background-color: var(--tag-sel-bg); border-color: var(--tag-sel-border); color: var(--tag-sel-text); font-weight: bold; }
-
-        .care-tag.selected { background-color: #dbeafe; border-color: #3b82f6; color: #1d4ed8; font-weight: bold; }
-        body.dark-mode .care-tag.selected { background-color: #1e3a8a; border-color: #60a5fa; color: #bfdbfe; }
-
-        .ai-card { background: var(--ai-card-bg); border: 2px solid var(--ai-card-border); transition: all 0.3s; }
-        .ai-box { background-color: var(--ai-box-bg); border-radius: 8px; padding: 15px; border-left: 4px solid #10b981; font-size: 13.5px; color: var(--ai-box-text); line-height: 1.5; transition: all 0.3s; }
-
-        .irs-container { background-color: var(--card-bg); border-radius: 8px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: all 0.3s; }
-        .irs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .irs-title { font-size: 15px; font-weight: bold; margin: 0; display: flex; align-items: center; gap: 5px; color: var(--text-main); transition: color 0.3s; }
-        .irs-value-text { font-size: 20px; font-weight: bold; color: var(--text-main); transition: color 0.3s; }
-        .irs-bar-bg { width: 100%; height: 12px; background-color: var(--border-color); border-radius: 6px; overflow: hidden; margin-bottom: 8px; transition: background-color 0.3s; }
-        .irs-bar-fill { height: 100%; width: 0%; transition: width 0.5s ease, background-color 0.5s ease; border-radius: 6px; }
-        .irs-status { font-size: 14px; font-weight: bold; text-align: right; }
-        .irs-note { font-size: 11px; color: var(--text-muted); margin: 0; line-height: 1.4; border-top: 1px dashed var(--border-color); padding-top: 8px; margin-top: 8px; transition: color 0.3s, border-color 0.3s; }
-
-        .star-rating { display: inline-flex; flex-direction: row-reverse; gap: 4px; justify-content: flex-end; }
+        .form-group { margin-bottom: 18px; }
+        .form-label-flex { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
+        .form-label-flex label { font-size: 14px; font-weight: bold; color: var(--text-main); margin: 0; }
+        .required-mark { font-size: 11px; color: white; background: var(--warning-text); padding: 2px 6px; border-radius: 10px; font-weight: bold; margin-left: 5px; letter-spacing: 0.5px;}
+        
+        select, input[type="text"], input[type="date"], input[type="number"], textarea { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 10px; box-sizing: border-box; font-size: 16px; background-color: var(--input-bg); color: var(--text-main); appearance: none; transition: all 0.3s var(--ease-out-expo); font-family: inherit; }
+        select:focus, input:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-alpha); background-color: var(--card-bg); }
+        
+        input[type="range"] { width: 100%; height: 10px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 5px; outline: none; -webkit-appearance: none; margin-bottom: 10px; overflow: hidden; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: transform 0.1s; }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+        
+        /* 🔥 流れるグラデーションボタン */
+        .submit-btn { 
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--primary)); 
+            background-size: 200% auto; color: white; border: none; border-radius: 12px; padding: 16px; width: 100%; font-size: 16px; font-weight: 800; cursor: pointer; margin-bottom: 20px; 
+            transition: all 0.4s var(--ease-out-expo); box-shadow: var(--shadow-md); letter-spacing: 1px;
+        }
+        .submit-btn:hover { background-position: right center; transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+        .submit-btn:active { transform: translateY(1px) scale(0.98); box-shadow: var(--shadow-sm); }
+        
+        .sync-btn { background-color: var(--primary-light); border: 1px solid var(--primary-alpha); color: var(--primary); padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; margin-left: 10px; transition: all 0.2s var(--ease-out-expo); }
+        .sync-btn:hover { background-color: var(--primary); color: white; transform: translateY(-1px); box-shadow: 0 4px 10px var(--primary-alpha); }
+        
+        /* インジケーター・特殊UI */
+        .emoji-display { font-size: 28px; font-weight: 800; color: var(--primary); display: inline-block; transition: transform 0.4s var(--ease-out-expo); }
+        .emoji-display.pop { transform: scale(1.5) rotate(-5deg); }
+        .result-box { background-color: var(--result-bg); border-radius: 10px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border: 1px solid var(--primary-alpha); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        .result-value { font-size: 22px; font-weight: 900; color: var(--primary); }
+        
+        .star-rating { display: inline-flex; flex-direction: row-reverse; gap: 6px; justify-content: flex-end; }
         .star-rating input { display: none; }
-        .star-rating label { font-size: 26px; color: var(--border-color); cursor: pointer; transition: color 0.2s; margin: 0; }
-        .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label { color: #fbbf24; }
+        .star-rating label { font-size: 30px; color: var(--border-color); cursor: pointer; transition: all 0.3s var(--ease-out-expo); margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .star-rating label:hover { transform: scale(1.2); }
+        .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label { color: var(--secondary); text-shadow: 0 0 10px var(--secondary-alpha); } 
 
-        .flex-row-gap { display: flex; gap: 10px; align-items: center; }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        /* タグシステム */
+        .tags-container { display: flex; flex-wrap: wrap; gap: 10px; }
+        .tag-btn { background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.3s var(--ease-out-expo); font-weight: 600; box-shadow: var(--shadow-sm); }
+        .tag-btn:hover { transform: translateY(-2px); border-color: var(--primary-alpha); }
+        .tag-btn:active { transform: scale(0.95); }
+        .tag-btn.selected { background-color: var(--tag-sel-bg); border-color: var(--tag-sel-border); color: var(--tag-sel-text); box-shadow: 0 4px 12px var(--secondary-alpha); transform: translateY(-2px); }
+        .care-tag.selected { background-color: var(--care-tag-sel-bg); border-color: var(--care-tag-sel-border); color: var(--care-tag-sel-text); box-shadow: 0 4px 12px var(--primary-alpha); transform: translateY(-2px); }
+
+        /* AIアドバイス＆IRSバー */
+        .ai-card { background: var(--ai-card-bg); border: 2px solid var(--ai-card-border); position: relative; overflow: hidden; }
+        .ai-card::before { content: ''; position: absolute; top:0; left:0; width:100%; height:4px; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+        .ai-box { background-color: var(--ai-box-bg); border-radius: 10px; padding: 18px; border-left: 5px solid var(--primary); font-size: 14px; color: var(--ai-box-text); line-height: 1.6; box-shadow: var(--shadow-sm); backdrop-filter: blur(4px); }
         
-        .profile-section { background: var(--card-bg); padding: 15px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: all 0.3s; }
+        .irs-container { background-color: var(--card-bg); border-radius: 12px; padding: 18px; margin-bottom: 18px; border: 1px solid var(--border-color); box-shadow: var(--shadow-md); }
+        .irs-bar-bg { width: 100%; height: 14px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 7px; overflow: hidden; margin-bottom: 10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        .irs-bar-fill { height: 100%; width: 0%; transition: width 0.8s var(--ease-out-expo), background-color 0.5s ease; border-radius: 7px; }
 
-        .tab-nav { display: flex; background: var(--card-bg); border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border-color); transition: all 0.3s; }
-        .tab-btn { flex: 1; padding: 12px 0; text-align: center; font-weight: bold; font-size: 13px; color: var(--text-muted); background: none; border: none; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
-        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background-color: var(--result-bg); }
+        /* 🔥 タブシステム (リッチアニメーション) */
+        .tab-nav { display: flex; background: var(--card-bg); border-radius: 14px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--border-color); box-shadow: var(--shadow-md); padding: 4px; gap: 4px; }
+        .tab-btn { flex: 1; padding: 14px 0; text-align: center; font-weight: 800; font-size: 14px; color: var(--text-muted); background: transparent; border: none; border-radius: 10px; cursor: pointer; transition: all 0.3s var(--ease-out-expo); position: relative; z-index: 1;}
+        .tab-btn:hover { color: var(--primary); background: var(--primary-alpha); }
+        .tab-btn.active { color: white; background: var(--primary); box-shadow: 0 4px 12px var(--primary-alpha); }
         
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: slideFadeUp 0.5s var(--ease-out-expo) forwards; }
+        @keyframes slideFadeUp { 
+            from { opacity: 0; transform: translateY(20px) scale(0.98); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
+        @keyframes popIn { 
+            0% { transform: scale(0.8); opacity: 0; } 
+            70% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; } 
+        }
 
-        .reminder-box { background: var(--result-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; margin-top: 15px; transition: all 0.3s; }
-        .toggle-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        /* その他 */
+        .goal-card { background-color: var(--secondary-light); border: 2px solid var(--secondary); border-radius: 16px; padding: 20px; margin-bottom: 25px; box-shadow: var(--shadow-md); }
+        .goal-edit-btn { background: var(--card-bg); border: 1px solid var(--secondary); color: var(--secondary); font-size: 12px; font-weight: bold; cursor: pointer; padding: 4px 10px; border-radius: 12px; transition: all 0.2s var(--ease-out-expo); box-shadow: var(--shadow-sm);}
+        .goal-edit-btn:hover { transform: translateY(-2px); background: var(--secondary); color: white; }
+        .stat-badge { font-size: 11px; padding: 6px 8px; border-radius: 6px; font-weight: 800; display: inline-block; margin-bottom: 4px; letter-spacing: 0.5px;}
+        
+        /* 学びタブ */
+        .edu-cat-container { display: flex; gap: 10px; overflow-x: auto; padding: 6px 4px 16px 4px; margin-bottom: 15px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .edu-cat-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.3s var(--ease-out-expo); box-shadow: var(--shadow-sm);}
+        .edu-cat-btn:hover { transform: translateY(-2px); border-color: var(--primary-alpha); }
+        .edu-cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px var(--primary-alpha); transform: translateY(-2px);}
+        
+        .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-md); transition: transform 0.3s var(--ease-out-expo); }
+        .edu-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+        .yt-container { position: relative; width: 100%; padding-bottom: 56.25%; background: #000; border-radius: 10px; overflow: hidden; margin-top: 12px; box-shadow: var(--shadow-sm);}
+        .yt-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        
+        .toggle-switch { position: relative; display: inline-block; width: 54px; height: 30px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #10b981; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .4s var(--ease-out-expo); border-radius: 34px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);}
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .4s var(--ease-out-expo); border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);}
+        input:checked + .slider { background-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(24px); }
 
-        .history-card { background-color: var(--history-card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px; transition: all 0.3s; }
-        .history-date { font-weight: bold; color: var(--text-main); border-bottom: 2px solid var(--border-color); padding-bottom: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; transition: all 0.3s; }
-        .stat-badge { font-size: 11px; padding: 4px 6px; border-radius: 4px; font-weight: bold; display: inline-block; margin-bottom: 4px;}
-        .history-text-item { margin-bottom: 8px; font-size: 14px; }
-        .history-label { font-size: 12px; font-weight: bold; color: var(--text-muted); display: block; margin-bottom: 2px; }
-        .history-text-content { background-color: var(--history-text-content-bg); padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); white-space: pre-wrap; color: var(--text-main); transition: all 0.3s; }
-        
-        .sprint-dist-input, .sprint-time-input { border-color: var(--primary) !important; }
+        .flex-row-gap { display: flex; gap: 12px; align-items: center; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
 
-        .sync-btn { background-color: #f1f5f9; border: 1px solid #cbd5e1; color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold; margin-left: 10px; transition: all 0.2s; }
-        .sync-btn:hover { background-color: #e0f2fe; border-color: #93c5fd; }
-        
-        .goal-card { background-color: #fffbeb; border: 2px solid #fcd34d; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .goal-section-inner { margin-bottom: 15px; }
-        .goal-section-inner:last-child { margin-bottom: 0; }
-        .goal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #fde68a; padding-bottom: 8px; margin-bottom: 10px; }
-        .goal-title { margin: 0; color: #b45309; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
-        .goal-edit-btn { background: #fef3c7; border: 1px solid #fde68a; color: #d97706; font-size: 11px; font-weight: bold; cursor: pointer; padding: 3px 8px; border-radius: 12px; transition: all 0.2s; }
-        .goal-edit-btn:hover { background: #fde68a; }
-        .goal-text { font-weight: bold; color: #78350f; font-size: 15px; white-space: pre-wrap; line-height: 1.4; padding: 5px; }
-
-        .countdown-banner { background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; padding: 12px 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(234, 88, 12, 0.3); display: none; align-items: center; justify-content: center; gap: 10px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .countdown-banner .days { font-size: 28px; background: white; color: #ea580c; padding: 2px 10px; border-radius: 8px; margin: 0 5px; }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        .edu-cat-btn { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
-        .edu-cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-        .edu-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .edu-category-badge { background: #e0f2fe; color: #1e40af; font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: bold; display: inline-block; margin-bottom: 8px; }
-        body.dark-mode .edu-category-badge { background: #1e3a8a; color: #bfdbfe; }
-        .edu-title { font-size: 16px; font-weight: bold; color: var(--primary-dark); margin: 0 0 10px 0; }
-        .edu-desc { font-size: 13px; color: var(--text-main); white-space: pre-wrap; line-height: 1.5; margin-bottom: 10px; }
-        .yt-container { position: relative; width: 100%; padding-bottom: 56.25%; border-radius: 8px; overflow: hidden; background: #000; margin-top: 10px; }
-        .yt-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        /* 🔥 モーダル用CSS (グラスモーフィズム) */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 15px; box-sizing: border-box; animation: fadeIn 0.3s var(--ease-out-expo);}
+        .modal-content-box { width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; margin: 0; animation: popIn 0.5s var(--ease-out-expo); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); background: var(--card-bg); color: var(--text-main); }
+        .modal-close-btn { position: absolute; top: 15px; right: 15px; background: var(--input-bg); border: 1px solid var(--border-color); font-size: 14px; cursor: pointer; color: var(--text-main); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: all 0.2s var(--ease-out-expo); box-shadow: var(--shadow-sm); z-index:10;}
+        .modal-close-btn:hover { background: var(--primary-light); color: var(--primary); transform: scale(1.1); }
     </style>
 </head>
 <body>
 
     <header>
-        <span style="visibility: hidden; width: 80px;"></span>
+        <div style="width: 70px;"></div>
         <span>AthleSense KIUH</span>
-        <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" title="画面の明るさ切替">🌙 ダーク</button>
+        <div style="display: flex; gap: 8px;">
+            <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()">🌙</button>
+            <button id="logout-btn" class="theme-toggle-btn" onclick="logout()" style="display: none; background: rgba(220,38,38,0.8); border-color: #fca5a5;" title="ログアウトして選び直す">🚪</button>
+        </div>
     </header>
 
-    <div class="container">
+    <!-- ==========================================
+         🔒 ログイン画面
+    =========================================== -->
+    <div id="login-screen" class="container" style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80vh; animation: slideFadeUp 0.6s var(--ease-out-expo);">
+        <div class="card" style="width: 100%; max-width: 400px; text-align: center; border: 2px solid var(--primary); box-shadow: var(--shadow-lg);">
+            <h2 class="section-title" style="justify-content: center; border: none; font-size: 24px;">👤 ログイン</h2>
+            <p style="font-size: 14px; color: var(--text-main); margin-bottom: 25px;">自分の名前を選択して、この端末を「自分専用」に設定してください。</p>
+            <select id="login-player-select" style="margin-bottom: 25px; font-weight: bold; border-color: var(--primary); padding: 16px; text-align: center; background-color: var(--input-bg); color: var(--text-main); border-radius: 12px; font-size: 18px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                <option value="" disabled selected>名前を読み込み中...</option>
+            </select>
+            <button class="submit-btn" onclick="login()">ログインして開始 🚀</button>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         📱 メインアプリ画面
+    =========================================== -->
+    <div id="main-app" class="container" style="display: none;">
         
+        <!-- 天気ウィジェット -->
         <div class="weather-widget" id="weather-widget">
-            <div class="weather-header">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--weather-text); font-size: 16px;">
                 <span>📍 <span id="location-text">現在地を取得中...</span></span>
-                <span id="temp-text">-- ℃</span>
+                <span id="temp-text" style="font-size: 22px;">-- ℃</span>
             </div>
-            <div class="weather-advice" id="weather-advice">
+            <div style="font-size: 14px; color: var(--weather-advice-text); background: var(--weather-advice-bg); padding: 12px; border-radius: 10px; font-weight: 500; backdrop-filter: blur(4px);" id="weather-advice">
                 気象データに基づくコンディショニング提案を読み込んでいます...
             </div>
-            <button onclick="fetchWeather()" style="background:none; border:none; color:var(--primary); font-size:12px; text-align:right; cursor:pointer; padding:0; font-weight:bold;">🔄 天気を更新</button>
+            <button onclick="fetchWeather()" style="background:rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.8); color:var(--weather-text); font-size:12px; text-align:center; cursor:pointer; padding:6px 12px; border-radius: 20px; font-weight:bold; margin-left: auto; transition: all 0.2s; backdrop-filter: blur(4px);">🔄 更新</button>
         </div>
 
         <div id="countdown-banner" class="countdown-banner"></div>
 
-        <div class="profile-section">
-            <div class="form-label-flex"><label>👤 選手名と日付を選択 <span class="required-mark">*必須</span></label></div>
-            <div class="flex-row-gap">
-                <select id="player-name" required style="flex: 2;">
-                    <option value="" disabled selected>読み込み中...</option>
-                </select>
-                <input type="date" id="date" required style="flex: 1.5; padding: 10px;">
+        <!-- 🔥 コンディション・カレンダー -->
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <button onclick="changeMonth(-1)">◀ 先月</button>
+                <div style="text-align: center;">
+                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 2px;">👤 <span class="display-player-name" style="font-weight:800; color:var(--primary);"></span> の記録</div>
+                    <h3 id="calendar-month-year">2026年 7月</h3>
+                </div>
+                <button onclick="changeMonth(1)">来月 ▶</button>
             </div>
-            <div id="player-warning" style="font-size: 11px; color: var(--warning-text); display: none; margin-top: 5px;">※監督が名簿に選手を登録すると選択できるようになります。</div>
+            
+            <div class="calendar-grid">
+                <div class="calendar-day-name">日</div><div class="calendar-day-name">月</div><div class="calendar-day-name">火</div><div class="calendar-day-name">水</div>
+                <div class="calendar-day-name">木</div><div class="calendar-day-name">金</div><div class="calendar-day-name">土</div>
+            </div>
+            <div class="calendar-grid" id="calendar-grid">
+                <!-- JSで動的にカレンダーを生成 -->
+            </div>
+            <div style="text-align:center; margin-top:18px; font-size:12px; color:var(--text-muted); font-weight:bold;">
+                ※日付をタップしてデータを振り返り・修正<br>
+                <div style="margin-top:8px; display:flex; justify-content:center; gap:12px; align-items: center;">
+                    <span><span style="display:inline-block;width:12px;height:12px;background:rgba(16,185,129,0.2);border:1px solid #10b981;border-radius:4px;vertical-align:-2px;"></span> 良好</span>
+                    <span><span style="display:inline-block;width:12px;height:12px;background:rgba(245,158,11,0.2);border:1px solid #f59e0b;border-radius:4px;vertical-align:-2px;"></span> 注意</span>
+                    <span><span style="display:inline-block;width:12px;height:12px;background:rgba(239,68,68,0.2);border:1px solid #ef4444;border-radius:4px;vertical-align:-2px;"></span> 疲労</span>
+                    <span style="display:flex; align-items:center; gap:4px;"><div style="font-size:11px; background:#fef2f2; border:1px solid var(--warning-text); border-radius:50%; width:18px; height:18px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 5px rgba(239,68,68,0.5);">⚠️</div> ケガ報告</span>
+                </div>
+            </div>
         </div>
 
+        <!-- プロフィールと日付選択 -->
+        <div class="profile-section" style="display: none;">
+            <!-- カレンダーで日付を管理するため非表示にし、内部の input を隠しとして持つか、連動させる -->
+            <input type="date" id="date" onchange="selectDate(this.value)">
+        </div>
+
+        <!-- 目標カード -->
         <div class="goal-card" id="goal-container" style="display: none;">
-            <div class="goal-section-inner">
-                <div class="goal-header">
-                    <h3 class="goal-title">🎯 今シーズンの目標</h3>
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--secondary); padding-bottom: 10px; margin-bottom: 12px;">
+                    <h3 style="margin: 0; color: var(--secondary); font-size: 16px; font-weight:800;">🎯 今シーズンの目標</h3>
                     <button class="goal-edit-btn" onclick="editGoal('season')">✎ 編集</button>
                 </div>
-                <div id="season-goal-text" class="goal-text">目標を設定してください</div>
+                <div id="season-goal-text" style="font-weight: 700; color: var(--text-main); font-size: 16px; white-space: pre-wrap; line-height: 1.5; padding: 0 5px;">目標を設定してください</div>
             </div>
-            <div class="goal-section-inner" style="border-top: 1px dashed #fde68a; padding-top: 15px;">
-                <div class="goal-header">
-                    <h3 class="goal-title">🗓️ 今月の目標・テーマ</h3>
+            <div style="border-top: 2px dashed rgba(249, 115, 22, 0.3); padding-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--secondary); padding-bottom: 10px; margin-bottom: 12px;">
+                    <h3 style="margin: 0; color: var(--secondary); font-size: 16px; font-weight:800;">🗓️ 今月の目標・テーマ</h3>
                     <button class="goal-edit-btn" onclick="editGoal('month')">✎ 編集</button>
                 </div>
-                <div id="month-goal-text" class="goal-text">目標を設定してください</div>
+                <div id="month-goal-text" style="font-weight: 700; color: var(--text-main); font-size: 16px; white-space: pre-wrap; line-height: 1.5; padding: 0 5px;">目標を設定してください</div>
             </div>
         </div>
 
+        <!-- タブナビゲーション -->
         <div class="tab-nav">
-            <button class="tab-btn active" onclick="switchTab('pre')">🌅 朝</button>
-            <button class="tab-btn" onclick="switchTab('post')">🌙 夜</button>
-            <button class="tab-btn" onclick="switchTab('education')">📖 学び</button>
-            <button class="tab-btn" onclick="switchTab('history')">🏆 履歴</button>
+            <button class="tab-btn active" onclick="switchTab('pre', this)">🌅 朝</button>
+            <button class="tab-btn" onclick="switchTab('post', this)">🌙 夜</button>
+            <button class="tab-btn" onclick="switchTab('education', this)">📖 学び</button>
+            <button class="tab-btn" onclick="switchTab('history', this)">🏆 履歴</button>
         </div>
 
         <!-- ==========================================
@@ -261,19 +409,19 @@
         <div id="tab-pre" class="tab-content active">
             <form id="form-pre">
                 <div class="card">
-                     <h2 class="section-title">🌅 起床時のコンディション</h2>
-                     <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">※練習前に体の状態をチェックし、怪我のリスクを減らしましょう。</p>
+                     <h2 class="section-title">🌅 起床時のコンディション <span id="display-date-pre" style="font-size:13px; font-weight:bold; color:var(--text-muted); margin-left:auto; background:var(--input-bg); padding:4px 10px; border-radius:8px; border:1px solid var(--border-color);"></span></h2>
+                     <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">※カレンダーから日付を選んで入力・修正します。</p>
                      
                      <div class="form-group">
                          <div class="form-label-flex">
-                             <label>睡眠時間 (時間) <span class="required-mark">*必須</span></label>
+                             <label>睡眠時間 (時間) <span class="required-mark">必須</span></label>
                              <button type="button" class="sync-btn" onclick="syncDeviceData('睡眠時間')">⌚️ 同期</button>
                          </div>
                          <input type="number" id="sleep" step="0.5" placeholder="例: 7.5">
                      </div>
                      
                      <div class="form-group">
-                         <div class="form-label-flex"><label>主観的な睡眠の質 <span class="required-mark">*必須</span></label></div>
+                         <div class="form-label-flex"><label>主観的な睡眠の質 <span class="required-mark">必須</span></label></div>
                          <div class="star-rating">
                              <input type="radio" id="star5-pre" name="sleep-quality" value="5"><label for="star5-pre">★</label>
                              <input type="radio" id="star4-pre" name="sleep-quality" value="4"><label for="star4-pre">★</label>
@@ -284,30 +432,30 @@
                      </div>
 
                      <div class="flex-row-gap">
-                         <div class="form-group">
-                             <div class="form-label-flex"><label>起床時体重 (kg)</label></div>
+                         <div class="form-group" style="flex:1;">
+                             <div class="form-label-flex"><label>体重 (kg)</label></div>
                              <input type="number" id="weight" step="0.1" placeholder="例: 65.5">
                          </div>
-                         <div class="form-group">
+                         <div class="form-group" style="flex:1;">
                              <div class="form-label-flex">
-                                 <label>起床時心拍数</label>
-                                 <button type="button" class="sync-btn" onclick="syncDeviceData('心拍数')">⌚️ 同期</button>
+                                 <label>心拍数</label>
+                                 <button type="button" class="sync-btn" onclick="syncDeviceData('心拍数')" style="margin-left:auto;">⌚️</button>
                              </div>
                              <input type="number" id="heart-rate" placeholder="例: 60">
                          </div>
                      </div>
 
-                     <div class="form-group">
+                     <div class="form-group" style="background: var(--input-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color);">
                          <div class="form-label-flex">
-                             <label>起床時の疲労度 (1:絶好調 〜 10:限界) <span class="required-mark">*必須</span></label>
+                             <label>疲労度 <span style="font-size:11px; font-weight:normal;">(1:絶好調 〜 10:限界)</span> <span class="required-mark">必須</span></label>
                              <div class="emoji-display" id="fatigue-display">😃 1</div>
                          </div>
                          <input type="range" id="fatigue" min="1" max="10" value="1" step="1">
                      </div>
 
-                     <div class="form-group">
+                     <div class="form-group" style="background: var(--input-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color);">
                          <div class="form-label-flex">
-                             <label>ストレス状態 (1:リラックス 〜 10:重圧) <span class="required-mark">*必須</span></label>
+                             <label>ストレス <span style="font-size:11px; font-weight:normal;">(1:リラックス 〜 10:重圧)</span> <span class="required-mark">必須</span></label>
                              <div class="emoji-display" id="stress-display">😌 1</div>
                          </div>
                          <input type="range" id="stress" min="1" max="10" value="1" step="1">
@@ -332,26 +480,31 @@
                              <button type="button" class="tag-btn tag-btn-pre" data-part="足裏">足裏</button>
                          </div>
                      </div>
-                </div>
-
-                <div class="irs-container">
-                    <div class="irs-header">
-                        <h4 class="irs-title">⚠️ Injury Risk Score (怪我リスク)</h4>
-                        <div class="irs-value-text" id="irs-value-pre">10%</div>
-                    </div>
-                    <div class="irs-bar-bg"><div class="irs-bar-fill" id="irs-bar-pre" style="width: 10%; background-color: #10b981;"></div></div>
-                    <div class="irs-status" id="irs-status-pre" style="color: #10b981;">🟢 安全圏 (Normal)</div>
-                    <p class="irs-note">※スコアが高くても必ず怪我をするわけではありません。あくまで科学的データに基づく統計的な傾向です。50%を超えたら高強度スプリントを控えるなど、勇気ある決断の目安にしてください。</p>
-                </div>
-
-                <div class="card ai-card">
-                     <h2 class="section-title" style="color: var(--good-text); border-bottom:none;">✨ AI 事前アドバイス</h2>
-                     <div class="ai-box" id="ai-advice-pre">
-                          数値を入力すると、練習前に意識すべきポイントや怪我予防の提案を表示します。
+                     
+                     <div class="form-group" style="background: rgba(239,68,68,0.05); padding: 15px; border-radius: 12px; border: 1px dashed var(--warning-text);">
+                         <div class="form-label-flex"><label style="color: var(--warning-text); font-size:15px;">🔥 ケガ・痛みの詳細 (朝)</label></div>
+                         <textarea id="injury-pre" rows="2" placeholder="睡眠中の違和感や、朝起きた時の痛みの状況があれば詳しく..." style="border-color: rgba(239,68,68,0.3); background: var(--input-bg); color: var(--text-main); margin-bottom: 0;"></textarea>
                      </div>
                 </div>
 
-                <button type="button" class="submit-btn" onclick="saveData('pre')">朝のデータを保存</button>
+                <!-- IRSバー -->
+                <div class="irs-container">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h4 style="font-size: 16px; font-weight:800; margin: 0; color: var(--text-main);">⚠️ Injury Risk Score</h4>
+                        <div style="font-size: 24px; font-weight: 900; color: var(--text-main);" id="irs-value-pre">10%</div>
+                    </div>
+                    <div class="irs-bar-bg"><div class="irs-bar-fill" id="irs-bar-pre" style="width: 10%; background-color: var(--good-text); box-shadow: 0 0 10px rgba(16,185,129,0.5);"></div></div>
+                    <div style="font-size: 15px; font-weight: bold; text-align: right; color: var(--good-text);" id="irs-status-pre">🟢 安全圏 (Normal)</div>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-top: 12px; border-top: 1px dashed var(--border-color); padding-top: 12px;">※スコアが高くても必ず怪我をするわけではありません。あくまで科学的データに基づく統計的な傾向です。50%を超えたら高強度スプリントを控えるなど、勇気ある決断の目安にしてください。</p>
+                </div>
+
+                <!-- AIアドバイス -->
+                <div class="card ai-card">
+                     <h2 class="section-title" style="color: var(--primary); border-bottom:none; margin-bottom:10px;">✨ AI 事前アドバイス</h2>
+                     <div class="ai-box" id="ai-advice-pre">数値を入力すると、練習前に意識すべきポイントや怪我予防の提案を表示します。</div>
+                </div>
+
+                <button type="button" class="submit-btn" onclick="saveData('pre')">選択した日の「朝」を保存</button>
             </form>
         </div>
 
@@ -361,44 +514,43 @@
         <div id="tab-post" class="tab-content">
             <form id="form-post">
                 <div class="card">
-                     <h2 class="section-title">📊 トレーニング負荷 (sRPE)</h2>
-                     <div class="form-group"><div class="form-label-flex"><label>運動時間 (分) <span class="required-mark">*必須</span></label></div><input type="number" id="duration" placeholder="例: 120"></div>
-                     <div class="form-group">
+                     <h2 class="section-title">📊 トレーニング負荷 (sRPE) <span id="display-date-post" style="font-size:13px; font-weight:bold; color:var(--text-muted); margin-left:auto; background:var(--input-bg); padding:4px 10px; border-radius:8px; border:1px solid var(--border-color);"></span></h2>
+                     <div class="form-group"><div class="form-label-flex"><label>運動時間 (分) <span class="required-mark">必須</span></label></div><input type="number" id="duration" placeholder="例: 120"></div>
+                     <div class="form-group" style="background: var(--input-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color);">
                          <div class="form-label-flex">
-                             <label>RPE: 主観的きつさ (0:楽 〜 10:限界) <span class="required-mark">*必須</span></label>
+                             <label>RPE: 主観的きつさ <span style="font-size:11px; font-weight:normal;">(0:楽 〜 10:限界)</span> <span class="required-mark">必須</span></label>
                              <div class="emoji-display" id="rpe-display">🏃‍♂️ 5.0</div>
                          </div>
                          <input type="range" id="rpe" min="0" max="10" step="0.5" value="5">
                      </div>
-                     <div class="result-box"><span class="result-label">Training Load</span><span class="result-value" id="load-result">-</span></div>
+                     <div class="result-box"><span style="font-size:15px; font-weight:800; color:var(--text-main);">💪 Training Load</span><span class="result-value" id="load-result">-</span></div>
                 </div>
 
-                <div class="card" style="border: 2px solid var(--primary);">
-                    <div class="flex-between" style="border-bottom: none; margin-bottom: 5px;">
-                        <h2 class="section-title" style="border-bottom: none; margin-bottom: 0;">⏱️ 本日のスプリント記録</h2>
-                        <button type="button" onclick="addSprintRow()" style="background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: bold; cursor: pointer;">➕ 追加</button>
+                <div class="card" style="border: 2px solid var(--secondary);">
+                    <div class="flex-between" style="border-bottom: 2px solid var(--secondary-light); padding-bottom: 10px; margin-bottom: 15px;">
+                        <h2 class="section-title" style="border: none; margin-bottom: 0; color: var(--secondary);">⏱️ 本日のスプリント記録</h2>
+                        <button type="button" onclick="addSprintRow()" style="background-color: var(--secondary); color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: bold; cursor: pointer; transition: transform 0.2s; box-shadow: var(--shadow-sm);">➕ 追加</button>
                     </div>
                     <div id="sprint-rows-container"></div>
                     
-                    <!-- 🔥 復活・改修：RSIとF-v診断（タイム入力自動計算） -->
-                    <div style="border-top: 1px solid var(--border-color); margin-top: 15px; padding-top: 15px;">
-                        <h3 class="section-title" style="border: none; margin-bottom: 10px; font-size: 15px;">🔬 特殊計測 (RSI / F-vプロファイル)</h3>
+                    <!-- 特殊計測 -->
+                    <div style="border-top: 2px dashed rgba(249, 115, 22, 0.3); margin-top: 15px; padding-top: 15px;">
+                        <h3 class="section-title" style="border: none; margin-bottom: 12px; font-size: 16px; color: var(--secondary);">🔬 特殊計測 (RSI / F-vプロファイル)</h3>
                         <div class="form-group" style="margin-bottom: 15px;">
                             <div class="form-label-flex"><label>RSI (反応筋力指数)</label></div>
-                            <input type="number" id="rsi" step="0.01" placeholder="例: 2.50">
+                            <input type="number" id="rsi" step="0.01" placeholder="例: 2.50" style="border-color: rgba(249, 115, 22, 0.4);">
                         </div>
                         
-                        <div style="background-color: var(--input-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div style="background-color: var(--input-bg); padding: 15px; border-radius: 12px; border: 1px solid rgba(249, 115, 22, 0.3); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
                             <div class="form-label-flex"><label>F-vプロファイル診断用タイム</label></div>
                             <div class="flex-row-gap" style="margin-bottom: 10px;">
                                 <input type="number" id="time-30m" step="0.01" placeholder="30m (秒)" oninput="calcFv()">
                                 <input type="number" id="time-fly20m" step="0.01" placeholder="Fly 20m (秒)" oninput="calcFv()">
                             </div>
-                            <div class="result-box" style="margin-top: 0; padding: 10px;">
-                                <span class="result-label" style="font-size: 13px;">診断結果</span>
-                                <span class="result-value" id="fv-display" style="font-size: 15px;">-</span>
+                            <div class="result-box" style="margin-top: 0; padding: 12px; border-color:var(--secondary-alpha); background: var(--secondary-light);">
+                                <span style="font-size: 14px; font-weight:bold; color:var(--text-main);">診断結果</span>
+                                <span class="result-value" id="fv-display" style="font-size: 16px; color: var(--secondary);">-</span>
                             </div>
-                            <!-- 非表示で結果を保持 -->
                             <input type="hidden" id="fv-result" value="">
                         </div>
                     </div>
@@ -406,8 +558,6 @@
 
                 <div class="card">
                      <h2 class="section-title">📝 練習後のダメージ確認</h2>
-                     <p style="font-size: 12px; color: var(--text-muted); margin-top: 0;">※練習によって新たに発生した張りや痛みのある部位を選択してください。</p>
-                     
                      <div class="form-group">
                          <div class="form-label-flex"><label>練習後の筋肉痛・張り</label></div>
                          <div class="tags-container" id="soreness-tags-post">
@@ -427,22 +577,26 @@
                              <button type="button" class="tag-btn tag-btn-post" data-part="足裏">足裏</button>
                          </div>
                      </div>
-                     <div class="form-group"><div class="form-label-flex"><label style="color: var(--warning-text);">🔥 ケガ・痛みの詳細</label></div><textarea id="injury" rows="2" placeholder="痛みや怪我の状況があれば詳しく..."></textarea></div>
+                     <div class="form-group" style="background: rgba(239,68,68,0.05); padding: 15px; border-radius: 12px; border: 1px dashed var(--warning-text);">
+                         <div class="form-label-flex"><label style="color: var(--warning-text); font-size:15px;">🔥 ケガ・痛みの詳細 (夜)</label></div>
+                         <textarea id="injury" rows="2" placeholder="痛みや怪我の状況があれば詳しく..." style="border-color: rgba(239,68,68,0.3); background: var(--input-bg); color: var(--text-main); margin-bottom: 0;"></textarea>
+                     </div>
                 </div>
 
+                <!-- IRSバー(夜) -->
                 <div class="irs-container">
-                    <div class="irs-header">
-                        <h4 class="irs-title">⚠️ 明日の Injury Risk Score (怪我リスク)</h4>
-                        <div class="irs-value-text" id="irs-value-post">10%</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h4 style="font-size: 16px; font-weight:800; margin: 0; color: var(--text-main);">⚠️ 明日の Injury Risk Score</h4>
+                        <div style="font-size: 24px; font-weight: 900; color: var(--text-main);" id="irs-value-post">10%</div>
                     </div>
-                    <div class="irs-bar-bg"><div class="irs-bar-fill" id="irs-bar-post" style="width: 10%; background-color: #10b981;"></div></div>
-                    <div class="irs-status" id="irs-status-post" style="color: #10b981;">🟢 安全圏 (Normal)</div>
-                    <p class="irs-note">※練習後のダメージに基づく「明日の怪我リスク」の予測です。スコアが高い場合は、今夜の念入りなリカバリー（入浴・睡眠）が必須です。</p>
+                    <div class="irs-bar-bg"><div class="irs-bar-fill" id="irs-bar-post" style="width: 10%; background-color: var(--good-text); box-shadow: 0 0 10px rgba(16,185,129,0.5);"></div></div>
+                    <div style="font-size: 15px; font-weight: bold; text-align: right; color: var(--good-text);" id="irs-status-post">🟢 安全圏 (Normal)</div>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-top: 12px; border-top: 1px dashed var(--border-color); padding-top: 12px;">※練習後のダメージに基づく「明日の怪我リスク」の予測です。スコアが高い場合は、今夜の念入りなリカバリーが必須です。</p>
                 </div>
 
                 <div class="card">
                      <h2 class="section-title">📝 練習の振り返り・ケア</h2>
-                     <div class="form-group"><div class="form-label-flex"><label>練習メニュー</label></div><textarea id="menu" rows="2"></textarea></div>
+                     <div class="form-group"><div class="form-label-flex"><label>練習メニュー</label></div><textarea id="menu" rows="2" placeholder="今日のドリルや走った本数など..."></textarea></div>
                      <div class="form-group">
                          <div class="form-label-flex">
                              <label>歩数 (歩)</label>
@@ -450,33 +604,22 @@
                          </div>
                          <input type="number" id="steps" placeholder="例: 8000">
                      </div>
-                     <div class="form-group"><div class="form-label-flex"><label style="color: var(--good-text);">👍 できたこと</label></div><textarea id="good" rows="2"></textarea></div>
-                     <div class="form-group"><div class="form-label-flex"><label style="color: var(--warning-text);">👎 できなかったこと・課題</label></div><textarea id="bad" rows="2"></textarea></div>
+                     <div class="form-group"><div class="form-label-flex"><label style="color: var(--good-text);">👍 できたこと</label></div><textarea id="good" rows="2" placeholder="フォームの気づきや良かった点..."></textarea></div>
+                     <div class="form-group"><div class="form-label-flex"><label style="color: var(--warning-text);">👎 できなかったこと・課題</label></div><textarea id="bad" rows="2" placeholder="次回の練習で意識したいこと..."></textarea></div>
                      
-                     <div class="form-group">
-                         <div class="form-label-flex"><label style="color: var(--primary-dark);">🛁 今夜実施するケア (複数選択可)</label></div>
-                         <div class="tags-container" id="care-tags" style="margin-bottom: 10px;">
-                             <button type="button" class="tag-btn care-tag" data-care="🍚 栄養補給(30分以内)">🍚 栄養補給(30分以内)</button>
-                             <button type="button" class="tag-btn care-tag" data-care="🧊 アイシング(急性炎症抑制)">🧊 アイシング</button>
-                             <button type="button" class="tag-btn care-tag" data-care="🛁 交代浴(血流促進)">🛁 交代浴</button>
-                             <button type="button" class="tag-btn care-tag" data-care="🧘‍♂️ 静的ストレッチ(副交感神経優位)">🧘‍♂️ 静的ストレッチ</button>
-                             <button type="button" class="tag-btn care-tag" data-care="💆‍♂️ フォームローラー(筋膜リリース)">💆‍♂️ フォームローラー</button>
-                             <button type="button" class="tag-btn care-tag" data-care="✋ マッサージ・マッサージガン">✋ マッサージ/ガン</button>
-                             <button type="button" class="tag-btn care-tag" data-care="🧦 圧縮ウエア・足の挙上">🧦 圧縮ウエア/挙上</button>
-                             <button type="button" class="tag-btn care-tag" data-care="💤 8時間以上の睡眠">💤 8時間以上の睡眠</button>
-                         </div>
-                         <textarea id="care" rows="2" placeholder="その他、独自のケアがあれば自由記述..."></textarea>
+                     <div class="form-group" style="background: var(--input-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color);">
+                         <div class="form-label-flex"><label style="color: var(--primary); font-size:15px;">🛁 今夜実施するケア (複数選択可)</label></div>
+                         <div class="tags-container" id="care-tags" style="margin-bottom: 12px;"></div>
+                         <textarea id="care" rows="2" placeholder="その他、独自のケアがあれば自由記述..." style="margin-bottom:0;"></textarea>
                      </div>
                 </div>
 
                 <div class="card ai-card">
-                     <h2 class="section-title" style="color: var(--good-text); border-bottom:none;">✨ AI リカバリーアドバイス</h2>
-                     <div class="ai-box" id="ai-advice-post">
-                          練習の負荷やダメージ状況から、今日の夜に最適なリカバリー方法を提案します。
-                     </div>
+                     <h2 class="section-title" style="color: var(--primary); border-bottom:none; margin-bottom:10px;">✨ AI リカバリーアドバイス</h2>
+                     <div class="ai-box" id="ai-advice-post">練習の負荷やダメージ状況から、今日の夜に最適なリカバリー方法を提案します。</div>
                 </div>
 
-                <button type="button" class="submit-btn" onclick="saveData('post')">夜のデータを保存</button>
+                <button type="button" class="submit-btn" onclick="saveData('post')">選択した日の「夜」を保存</button>
             </form>
         </div>
 
@@ -484,12 +627,12 @@
              タブ3: 学び・動画 (Education)
         =========================================== -->
         <div id="tab-education" class="tab-content">
-            <div class="card" style="background: linear-gradient(135deg, #e0f2fe, #bfdbfe); border: none;">
-                <h2 class="section-title" style="border: none; margin-bottom: 5px;">📖 チームの学び・資料</h2>
-                <p style="font-size: 13px; color: #1e3a8a; margin: 0;">監督からのアドバイスや、正しいケア・トレーニングの動画ライブラリです。</p>
+            <div class="card" style="background: linear-gradient(135deg, var(--primary-light), var(--secondary-light)); border: none; box-shadow: var(--shadow-md);">
+                <h2 class="section-title" style="border: none; margin-bottom: 5px; color: var(--primary-dark);">📖 チームの学び・資料</h2>
+                <p style="font-size: 13px; color: var(--primary-dark); margin: 0; font-weight:600;">監督からのアドバイスや、正しいケア・トレーニングの動画ライブラリです。</p>
             </div>
             
-            <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: none;">
+            <div class="edu-cat-container">
                 <button class="edu-cat-btn active" onclick="filterEducation('すべて', this)">すべて</button>
                 <button class="edu-cat-btn" onclick="filterEducation('ケア・リカバリー', this)">ケア</button>
                 <button class="edu-cat-btn" onclick="filterEducation('トレーニング理論', this)">理論</button>
@@ -498,7 +641,7 @@
             </div>
 
             <div id="education-list-container">
-                <div style="text-align: center; padding: 20px; color: var(--text-muted);">読み込み中...</div>
+                <div style="text-align: center; padding: 30px; color: var(--text-muted); font-weight:bold;">読み込み中...</div>
             </div>
         </div>
 
@@ -508,27 +651,26 @@
         <div id="tab-history" class="tab-content">
             <div class="card">
                 <h2 class="section-title">⏰ リマインダー設定</h2>
-                <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">朝・夜の入力を忘れないように、ブラウザの通知でお知らせします。</p>
-                <div class="reminder-box">
+                <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">朝・夜の入力を忘れないように通知でお知らせします。</p>
+                <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
                     <div class="flex-between">
-                        <span style="font-weight: bold; color: var(--text-main);">🔔 通知機能をオンにする</span>
+                        <span style="font-weight: 800; color: var(--text-main); font-size:15px;">🔔 通知機能をオンにする</span>
                         <label class="toggle-switch">
                             <input type="checkbox" id="notification-toggle" onchange="toggleNotifications(this)">
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <div id="notification-status" style="font-size: 12px; color: var(--warning-text); margin-top: 8px; display: none;">
-                        ※初回オン時に「通知の許可」を求められますので「許可」を選択してください。
-                    </div>
+                    <div id="notification-status" style="font-size: 12px; color: var(--warning-text); margin-top: 10px; font-weight:bold; display: none;"></div>
                 </div>
             </div>
 
+            <!-- 🔥 個別ログは削除し、ベストとグラフだけ残す -->
             <div class="card" id="history-section" style="display: none;">
-                <div style="background-color: var(--result-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-                    <h3 style="margin-top:0; color:var(--primary-dark); font-size:15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; margin-bottom: 10px;">🏆 自己ベスト & チーム内順位</h3>
-                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
-                        <label style="font-size: 13px; font-weight: bold; color: var(--primary-dark);">表示距離:</label>
-                        <select id="my-sprint-distance" style="flex: 1; padding: 8px;">
+                <div style="background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 25px; box-shadow: var(--shadow-sm);">
+                    <h3 style="margin-top:0; color:var(--primary); font-size:16px; border-bottom: 2px solid var(--primary-light); padding-bottom: 8px; margin-bottom: 15px; font-weight:800;">🏆 自己ベスト & チーム内順位</h3>
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+                        <label style="font-size: 14px; font-weight: bold; color: var(--text-main);">表示距離:</label>
+                        <select id="my-sprint-distance" style="flex: 1; padding: 10px; background-color: var(--card-bg); color: var(--text-main); border-color:var(--border-color); font-weight:bold;" onchange="renderPlayerHistory()">
                             <option value="50" selected>50m</option>
                             <option value="60">60m</option>
                             <option value="100">100m</option>
@@ -537,43 +679,49 @@
                             <option value="300">300m</option>
                         </select>
                     </div>
-                    <div style="display: flex; justify-content: space-between; background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; background: var(--card-bg); padding: 18px; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
                         <div style="flex: 1;">
-                            <div style="font-size: 12px; color: var(--text-muted); font-weight: bold;">自己ベスト</div>
-                            <div style="font-size: 24px; font-weight: bold; color: var(--primary); line-height: 1.2;" id="my-best-time">- 秒</div>
+                            <div style="font-size: 13px; color: var(--text-muted); font-weight: bold; margin-bottom:4px;">自己ベスト</div>
+                            <div style="font-size: 26px; font-weight: 900; color: var(--primary);" id="my-best-time">- 秒</div>
                         </div>
                         <div style="flex: 1; text-align: right; border-left: 1px solid var(--border-color); padding-left: 10px;">
-                            <div style="font-size: 12px; color: var(--text-muted); font-weight: bold;">チーム内順位</div>
-                            <div style="font-size: 24px; font-weight: bold; color: #ea580c; line-height: 1.2;" id="my-team-rank">- 位</div>
+                            <div style="font-size: 13px; color: var(--text-muted); font-weight: bold; margin-bottom:4px;">チーム内順位</div>
+                            <div style="font-size: 26px; font-weight: 900; color: var(--secondary);" id="my-team-rank">- 位</div>
                         </div>
                     </div>
                 </div>
 
-                <div style="margin-bottom: 20px;"><canvas id="player-chart"></canvas></div>
-                <div id="history-list"></div>
+                <div style="margin-bottom: 10px; padding: 10px; background: var(--input-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);"><canvas id="player-chart"></canvas></div>
             </div>
         </div>
+    </div>
 
+    <!-- ==========================================
+         🔍 日別サマリー表示用モーダル (修正版)
+    =========================================== -->
+    <div id="daily-summary-modal" class="modal-overlay">
+        <div class="card modal-content-box" style="position: relative; max-width: 500px;">
+            <button class="modal-close-btn" onclick="closeDailySummary()">✖</button>
+            <h2 class="section-title" id="summary-modal-date" style="margin-top:0; border-bottom:2px solid var(--primary-light); justify-content:center; padding-bottom:12px; margin-bottom:20px; font-size:20px;">YYYY/MM/DD の記録</h2>
+            <div id="summary-modal-content">
+                <!-- JSで中身を生成 -->
+            </div>
+            <button id="edit-daily-btn" class="submit-btn" style="margin-bottom: 0; margin-top: 20px;" onclick="editDailyData()">この日のデータを編集する</button>
+        </div>
     </div>
 
     <!-- スプリント入力行テンプレート -->
     <template id="sprint-row-template">
         <div class="sprint-row flex-row-gap" style="margin-bottom: 10px; align-items: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 10px;">
-            <select class="sprint-dist-input" style="flex: 2; padding: 10px; border-color: var(--primary);">
+            <select class="sprint-dist-input" onchange="updateAIAdvicePost()" style="flex: 2; padding: 12px; border-color: var(--secondary); background-color: var(--input-bg); color: var(--text-main); font-weight:bold;">
                 <option value="">距離</option>
-                <option value="30">30m</option>
-                <option value="50">50m</option>
-                <option value="60">60m</option>
-                <option value="80">80m</option>
-                <option value="100">100m</option>
-                <option value="120">120m</option>
-                <option value="150">150m</option>
-                <option value="200">200m</option>
-                <option value="300">300m</option>
+                <option value="30">30m</option><option value="50">50m</option><option value="60">60m</option>
+                <option value="80">80m</option><option value="100">100m</option><option value="120">120m</option>
+                <option value="150">150m</option><option value="200">200m</option><option value="300">300m</option>
                 <option value="400">400m</option>
             </select>
-            <input type="number" class="sprint-time-input" step="0.01" placeholder="タイム(秒)" style="flex: 2; padding: 10px; border-color: var(--primary);">
-            <button type="button" onclick="this.parentElement.remove()" style="flex: 0; background: none; border: none; color: #ef4444; font-size: 24px; cursor: pointer; padding: 0 5px;">×</button>
+            <input type="number" class="sprint-time-input" step="0.01" placeholder="タイム(秒)" oninput="updateAIAdvicePost()" style="flex: 2; padding: 12px; border-color: var(--secondary); background-color: var(--input-bg); color: var(--text-main); font-weight:bold;">
+            <button type="button" onclick="this.parentElement.remove(); updateAIAdvicePost();" style="flex: 0; background: none; border: none; color: var(--warning-text); font-size: 28px; cursor: pointer; padding: 0 5px; transition:transform 0.2s;">×</button>
         </div>
     </template>
 
@@ -583,778 +731,643 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
-        const myFirebaseConfig = {
-          apiKey: "AIzaSyAQoESOlZIGJfOgfIwpkL0r0YcYu4tl8ZQ",
-          authDomain: "team-conditioning-controling.firebaseapp.com",
-          projectId: "team-conditioning-controling",
-          storageBucket: "team-conditioning-controling.firebasestorage.app",
-          messagingSenderId: "330203393971",
-          appId: "1:330203393971:web:f47b8e66137d0fce8b65c6",
-          measurementId: "G-SCMMTXKZ37"
+        /* ==========================================
+           📌 1. 定数化 (CONSTANTS)
+        ========================================== */
+        const CONSTANTS = {
+            FIREBASE_CONFIG: {
+                apiKey: "AIzaSyAQoESOlZIGJfOgfIwpkL0r0YcYu4tl8ZQ",
+                authDomain: "team-conditioning-controling.firebaseapp.com",
+                projectId: "team-conditioning-controling",
+                storageBucket: "team-conditioning-controling.firebasestorage.app",
+                messagingSenderId: "330203393971",
+                appId: "1:330203393971:web:f47b8e66137d0fce8b65c6"
+            },
+            IRS_WEIGHTS: {
+                FATIGUE_SEVERE: { threshold: 8, score: 15 },
+                FATIGUE_HIGH: { threshold: 6, score: 5 },
+                STRESS_HIGH: { threshold: 8, score: 5 },
+                SLEEP_SHORT: { threshold: 6, score: 10 },
+                SLEEP_MED: { threshold: 7, score: 5 },
+                QUALITY_LOW: { threshold: 2, score: 5 },
+                LOAD_HIGH: { threshold: 600, score: 10 },
+                RPE_HIGH: { threshold: 8, score: 10 },
+                CRITICAL_PARTS: ['ハムストリングス', 'カーフ', 'アキレス腱', '腸腰筋', '大腿四頭筋', '腰'],
+                SORENESS_HAMSTRING: 20,
+                SORENESS_CALF_ACHILLES: 10,
+                SORENESS_QUAD_HIP_LOWER: 10,
+                SORENESS_OTHER: 3
+            },
+            FV_THRESHOLDS: {
+                FORCE_DEFICIT: 2.15,
+                VELOCITY_DEFICIT: 1.95
+            },
+            WEATHER: {
+                HOT: 30, WARM: 25, MODERATE: 15, COOL: 10
+            },
+            DEFAULT_CARES: [
+                "🍚 栄養補給(30分以内)", "🧊 アイシング", "🛁 交代浴", 
+                "🧘‍♂️ 静的ストレッチ", "💆‍♂️ フォームローラー", "✋ マッサージ/ガン", 
+                "🧦 圧縮ウエア/挙上", "💤 8時間以上の睡眠"
+            ]
+        };
+
+        /* ==========================================
+           📌 2. グローバル変数・状態管理 (STATE)
+        ========================================== */
+        const STATE = {
+            logs: [],
+            players: [],
+            goals: {},
+            settings: {},
+            education: [],
+            sorenessPre: [],
+            sorenessPost: [],
+            chartInstance: null,
+            currentEduCat: 'すべて',
+            currentUser: null,
+            calYear: new Date().getFullYear(),
+            calMonth: new Date().getMonth()
         };
 
         let db = null;
-        let colRef = null;
-        let playersColRef = null;
-        let allTeamLogs = []; 
-        let playerChartInstance = null; 
-        
-        let selectedSorenessPre = [];
-        let selectedSorenessPost = [];
-        
-        let teamGoals = {}; 
-        let teamSettings = {}; 
-        
-        let globalEducation = [];
-        let currentEduCategory = 'すべて';
+        let colRefs = {};
 
         const targetDateLinePlugin = {
             id: 'targetDateLinePlugin',
             afterDraw: (chart) => {
-                if (!teamSettings || !teamSettings.targetEventDate) return;
-                
-                const targetObj = new Date(teamSettings.targetEventDate);
+                if (!STATE.settings || !STATE.settings.targetEventDate) return;
+                const targetObj = new Date(STATE.settings.targetEventDate);
                 const targetLabel = String(targetObj.getMonth()+1).padStart(2,'0') + '/' + String(targetObj.getDate()).padStart(2,'0');
-                
                 const index = chart.data.labels.findIndex(l => l === targetLabel);
+                
                 if (index !== -1) {
-                    const ctx = chart.ctx;
-                    const meta = chart.getDatasetMeta(0);
+                    const ctx = chart.ctx, meta = chart.getDatasetMeta(0);
                     if (!meta.data[index]) return;
-                    
-                    const x = meta.data[index].x;
-                    const topY = chart.chartArea.top;
-                    const bottomY = chart.chartArea.bottom;
-
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.moveTo(x, topY);
-                    ctx.lineTo(x, bottomY);
-                    ctx.lineWidth = 2;
-                    ctx.strokeStyle = '#ea580c';
-                    ctx.setLineDash([5, 5]);
-                    ctx.stroke();
-
-                    ctx.fillStyle = '#ea580c';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'bottom';
-                    const isDark = document.body.classList.contains('dark-mode');
-                    ctx.font = 'bold 12px sans-serif';
-                    ctx.fillText('🏆 ' + (teamSettings.targetEventName || '大会日'), x, topY - 5);
+                    const x = meta.data[index].x, topY = chart.chartArea.top, bottomY = chart.chartArea.bottom;
+                    ctx.save(); ctx.beginPath(); ctx.moveTo(x, topY); ctx.lineTo(x, bottomY);
+                    ctx.lineWidth = 2; ctx.strokeStyle = '#f97316'; ctx.setLineDash([5, 5]); ctx.stroke();
+                    ctx.fillStyle = '#f97316'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+                    ctx.font = 'bold 12px -apple-system, sans-serif';
+                    ctx.fillText('🏆 ' + (STATE.settings.targetEventName || '大会日'), x, topY - 5);
                     ctx.restore();
                 }
             }
         };
 
-        function toggleTheme() {
-            const body = document.body;
-            body.classList.toggle('dark-mode');
-            const isDark = body.classList.contains('dark-mode');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            document.getElementById('theme-toggle').innerHTML = isDark ? '☀️ ライト' : '🌙 ダーク';
-            
-            if(playerChartInstance) {
-                const tickColor = isDark ? '#94a3b8' : '#64748b';
-                const gridColor = isDark ? '#334155' : '#e2e8f0';
-                playerChartInstance.options.scales.x.ticks.color = tickColor;
-                playerChartInstance.options.scales.x.grid.color = gridColor;
-                playerChartInstance.options.scales.y.ticks.color = tickColor;
-                playerChartInstance.options.scales.y.grid.color = gridColor;
-                playerChartInstance.options.scales.y1.ticks.color = tickColor;
-                playerChartInstance.options.plugins.title.color = tickColor;
-                playerChartInstance.options.plugins.legend.labels.color = tickColor;
-                playerChartInstance.update();
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
+        /* ==========================================
+           📌 3. 初期化・イベントリスナー
+        ========================================== */
+        async function initApp() {
             if (localStorage.getItem('theme') === 'dark') {
                 document.body.classList.add('dark-mode');
-                document.getElementById('theme-toggle').innerHTML = '☀️ ライト';
-            }
-        });
-
-        function fetchWeather() {
-            const locText = document.getElementById('location-text');
-            const tempText = document.getElementById('temp-text');
-            const adviceBox = document.getElementById('weather-advice');
-            
-            if (!navigator.geolocation) {
-                locText.textContent = "GPS未対応の端末です";
-                adviceBox.innerHTML = "※お使いの端末では天候ベースのアドバイスを利用できません。";
-                return;
-            }
-
-            locText.textContent = "取得中...";
-            
-            navigator.geolocation.getCurrentPosition(position => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-                
-                fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ja`)
-                    .then(res => res.json())
-                    .then(geoData => {
-                        const cityName = geoData.locality || geoData.city || geoData.principalSubdivision || "現在地";
-                        locText.textContent = `${cityName} 付近の天候`;
-                    })
-                    .catch(() => { locText.textContent = "現在地の天候"; });
-
-                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
-                    .then(res => res.json())
-                    .then(data => {
-                        const temp = data.current_weather.temperature;
-                        tempText.textContent = `${temp} ℃`;
-                        
-                        let advice = "";
-                        if(temp >= 30) advice = "🥵 <b>【熱中症・脱水警戒】</b><br>非常に暑いです。練習30分前に250〜500mlの水分補給を行い、練習中も塩分を含むドリンクを摂りましょう。";
-                        else if(temp >= 25) advice = "💦 <b>【暑熱環境】</b><br>発汗量が増え、体重の2%の水分を失うと出力が露骨に落ちます。喉が渇く前に水分補給を。";
-                        else if(temp >= 15) advice = "😊 <b>【適温環境】</b><br>スプリントに適した良い気候です。質の高い出力にフォーカスしましょう。";
-                        else if(temp >= 10) advice = "🧥 <b>【肌寒い環境】</b><br>体が温まるまで時間がかかります。動的ストレッチの時間を長めに取りましょう。";
-                        else advice = "🥶 <b>【寒冷・肉離れ警戒】</b><br>筋肉が硬直しやすいです。急激な出力は肉離れのリスク大！アップを念入りに行ってください。";
-                        
-                        adviceBox.innerHTML = advice;
-                    })
-                    .catch(err => {
-                        adviceBox.innerHTML = "※通信エラーのため天気情報が取得できませんでした。";
-                    });
-            }, err => {
-                locText.textContent = "GPSが許可されていません";
-                adviceBox.innerHTML = "※設定から位置情報を「許可」すると、気温に応じた対策アドバイスが表示されます。";
-            });
-        }
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(`tab-${tabId}`).classList.add('active');
-            event.currentTarget.classList.add('active');
-            if(tabId === 'history') {
-                const playerName = document.getElementById('player-name').value;
-                if(playerName) renderPlayerHistory(playerName);
-            }
-        }
-
-        function toggleNotifications(checkbox) {
-            const statusText = document.getElementById('notification-status');
-            if(checkbox.checked) {
-                statusText.style.display = 'block';
-                if (!("Notification" in window)) {
-                    alert("このブラウザは通知に対応していません。");
-                    checkbox.checked = false;
-                    return;
-                }
-                Notification.requestPermission().then(function (permission) {
-                    if (permission === "granted") {
-                        statusText.textContent = "✅ 通知が許可されました！朝と夜に通知でお知らせします。";
-                        localStorage.setItem('reminder_enabled', 'true');
-                        new Notification("AthleSense", { body: "通知設定が完了しました！", icon: "icon.png" });
-                    } else {
-                        statusText.textContent = "❌ 通知がブロックされました。ブラウザの設定から許可してください。";
-                        checkbox.checked = false;
-                    }
-                });
+                document.getElementById('theme-toggle').innerHTML = '☀️';
             } else {
-                statusText.style.display = 'none';
-                localStorage.setItem('reminder_enabled', 'false');
+                document.getElementById('theme-toggle').innerHTML = '🌙';
             }
-        }
-
-        function checkReminders() {
-            const isEnabled = localStorage.getItem('reminder_enabled') === 'true';
-            const toggle = document.getElementById('notification-toggle');
-            if(toggle) toggle.checked = isEnabled;
             
-            if(isEnabled && Notification.permission === "granted") {
-                const hour = new Date().getHours();
-                const lastReminded = localStorage.getItem('last_reminder_day');
-                const today = new Date().getDate().toString();
-                
-                if(hour >= 20 && lastReminded !== today + "_post") {
-                    new Notification("AthleSense", { body: "夜になりました。今日の「夜」の記録とケアを入力しましょう！" });
-                    localStorage.setItem('last_reminder_day', today + "_post");
-                }
-            }
-        }
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+            document.getElementById('date').value = todayStr;
+            STATE.calYear = today.getFullYear();
+            STATE.calMonth = today.getMonth();
 
-        function calculateIRS(type) {
-            let score = 5; 
-            
-            if(type === 'pre') {
-                const fatigue = parseInt(document.getElementById('fatigue').value);
-                const stress = parseInt(document.getElementById('stress').value);
-                const sleep = parseFloat(document.getElementById('sleep').value) || 0;
-                const sleepQualityNode = document.querySelector('input[name="sleep-quality"]:checked');
-                const sleepQuality = sleepQualityNode ? parseInt(sleepQualityNode.value) : 5; 
-                
-                if (fatigue >= 8) score += 15;
-                else if (fatigue >= 6) score += 5;
-                if (stress >= 8) score += 5;
+            setupEventListeners();
+            fetchWeather();
+            checkReminders();
 
-                if (sleep > 0 && sleep < 6) score += 10;
-                else if (sleep > 0 && sleep < 7) score += 5;
-                if (sleepQuality <= 2) score += 5;
-
-                if (selectedSorenessPre.includes('ハムストリングス')) score += 20; 
-                if (selectedSorenessPre.includes('カーフ') || selectedSorenessPre.includes('アキレス腱')) score += 10;
-                if (selectedSorenessPre.includes('腸腰筋') || selectedSorenessPre.includes('大腿四頭筋') || selectedSorenessPre.includes('腰')) score += 10;
-                
-                const criticalParts = ['ハムストリングス', 'カーフ', 'アキレス腱', '腸腰筋', '大腿四頭筋', '腰'];
-                selectedSorenessPre.forEach(part => {
-                    if(!criticalParts.includes(part)) score += 3;
-                });
-
-                updateIRSUIDisplay('pre', score);
-                
-            } else if (type === 'post') {
-                const rpe = parseFloat(document.getElementById('rpe').value) || 0;
-                const loadText = document.getElementById('load-result').textContent;
-                const load = loadText !== '-' ? parseFloat(loadText) : 0;
-                
-                if (rpe >= 8) score += 10;
-                if (load > 600) score += 10;
-
-                if (selectedSorenessPost.includes('ハムストリングス')) score += 20; 
-                if (selectedSorenessPost.includes('カーフ') || selectedSorenessPost.includes('アキレス腱')) score += 15;
-                if (selectedSorenessPost.includes('腸腰筋') || selectedSorenessPost.includes('大腿四頭筋') || selectedSorenessPost.includes('腰')) score += 10;
-                
-                const criticalParts = ['ハムストリングス', 'カーフ', 'アキレス腱', '腸腰筋', '大腿四頭筋', '腰'];
-                selectedSorenessPost.forEach(part => {
-                    if(!criticalParts.includes(part)) score += 3;
-                });
-
-                updateIRSUIDisplay('post', score);
-            }
-        }
-
-        function updateIRSUIDisplay(type, rawScore) {
-            let score = Math.min(rawScore, 95);
-            const fillEl = document.getElementById(`irs-bar-${type}`);
-            const valEl = document.getElementById(`irs-value-${type}`);
-            const statusEl = document.getElementById(`irs-status-${type}`);
-            
-            valEl.textContent = `${score}%`;
-            fillEl.style.width = `${score}%`;
-
-            if (score <= 30) {
-                fillEl.style.backgroundColor = "#10b981"; 
-                statusEl.style.color = "#10b981";
-                statusEl.textContent = "🟢 安全圏 (Normal)";
-            } else if (score <= 50) {
-                fillEl.style.backgroundColor = "#f59e0b"; 
-                statusEl.style.color = "#f59e0b";
-                statusEl.textContent = "🟡 注意 (Caution)";
-            } else if (score <= 75) {
-                fillEl.style.backgroundColor = "#ea580c"; 
-                statusEl.style.color = "#ea580c";
-                statusEl.textContent = "🟠 警戒 (Warning)";
-            } else {
-                fillEl.style.backgroundColor = "#dc2626"; 
-                statusEl.style.color = "#dc2626";
-                statusEl.textContent = "🔴 危険 (Danger)";
-            }
-        }
-
-        function updateAIAdvicePre() {
-            calculateIRS('pre');
-
-            const fatigue = parseInt(document.getElementById('fatigue').value);
-            const sleep = parseFloat(document.getElementById('sleep').value) || 0;
-            const sleepQualityNode = document.querySelector('input[name="sleep-quality"]:checked');
-            const sleepQuality = sleepQualityNode ? parseInt(sleepQualityNode.value) : 5; 
-            
-            let advices = [];
-            
-            if (sleep > 0 && sleep < 7) advices.push("💤 <b>【睡眠不足アラート】</b><br>睡眠が7時間未満の場合、<b>ケガのリスクが約1.7倍</b>に跳ね上がり、反応速度も低下します。今日の練習は集中力を高め、終了後は早めに寝るよう計画してください。");
-            else if (sleepQuality <= 2) advices.push("💤 <b>【睡眠の質低下】</b><br>長く寝ても質が悪いと神経系の疲労が抜けません。アップでは「リラックス」を意識してください。");
-
-            if (selectedSorenessPre.includes('ハムストリングス')) advices.push("💡 <b>【ハムの張り】</b><br>練習前に仰向けで足を上げ、無理のない範囲で静的な収縮を入れて痛みの度合いをチェックしてください。");
-            if (selectedSorenessPre.includes('腸腰筋') || selectedSorenessPre.includes('大腿四頭筋')) advices.push("💡 <b>【前ももの張り】</b><br>ブレーキ動作が多くなっているか、骨盤が後傾気味です。アップで大臀筋（お尻）にスイッチを入れるドリルを多めに行いましょう。");
-            if (selectedSorenessPre.includes('カーフ') || selectedSorenessPre.includes('アキレス腱') || selectedSorenessPre.includes('足裏')) advices.push("💡 <b>【足部・下腿の疲労】</b><br>接地時のバネ組織が疲労しています。今日は過度な跳躍や反発ドリルは控えめにするのが無難です。");
-            if (selectedSorenessPre.includes('腕')) advices.push("💡 <b>【腕の張り】</b><br>スプリント時の腕振りによる疲労や、ウエイトトレーニングの影響が考えられます。肩甲骨周りと合わせてストレッチを行い、上半身の連動性を保ちましょう。");
-            if (selectedSorenessPre.includes('腰')) advices.push("💡 <b>【腰の張り】</b><br>体幹の疲労や着地衝撃の吸収がうまくいっていない可能性があります。アップでは股関節の可動域を広げ、腰に過度な負担をかけない動きを意識してください。");
-
-            if (fatigue >= 8) advices.push("⚠️ <b>【過労警告】</b><br>起床時から強い疲労があります。高強度のスプリントは避け、回復走や技術確認に留める勇気を持つことも重要です。");
-
-            const box = document.getElementById('ai-advice-pre');
-            if (advices.length === 0) {
-                box.innerHTML = "✨ <b>【Good!】</b> 起床時の状態は良好です。天候に合わせたウォームアップを行い、今日の目標にフォーカスしましょう！";
-                box.style.borderLeftColor = "#10b981";
-            } else {
-                box.innerHTML = advices.join("<hr style='border-top:1px dashed var(--border-color); margin:10px 0;'>");
-                box.style.borderLeftColor = "#f59e0b";
-            }
-        }
-
-        function updateAIAdvicePost() {
-            calculateIRS('post');
-
-            const loadText = document.getElementById('load-result').textContent;
-            const rpe = parseFloat(document.getElementById('rpe').value);
-            let advices = [];
-
-            if (loadText !== '-' && parseFloat(loadText) > 600) advices.push("🔥 <b>【ハイロード警告】</b><br>今日の負荷は非常に高いです。筋肉のグリコーゲンが枯渇しているため、練習後30分以内に炭水化物とタンパク質を必ず摂取してください。");
-            if (rpe >= 8) advices.push("🥵 <b>【高RPEへの対応】</b><br>かなりキツイ練習でした。神経系が興奮しているため、今夜はぬるめのお湯に浸かり、副交感神経を優位にしてリラックスしましょう。");
-
-            const sprintDataArray = getSprintData();
-            if (sprintDataArray.length >= 3) advices.push("🏃‍♂️ <b>【スプリント過多注意】</b><br>複数回のスプリント計測を行いました。脳へのダメージが大きいため、明日は爆発的なメニューを避けるのが理想的です。");
-
-            if (selectedSorenessPost.includes('ハムストリングス')) advices.push("💡 <b>【ハムのケア】</b><br>スプリントで最も酷使される部位です。強い張りがある場合は無理にストレッチせず、まずはアイシング等で熱を抜き、その後交代浴やお風呂で血流を促して疲労物質を流しましょう。");
-            if (selectedSorenessPost.includes('腸腰筋') || selectedSorenessPost.includes('大腿四頭筋')) advices.push("💡 <b>【前もも・股関節のケア】</b><br>ブレーキ動作や脚の引き上げで疲労しています。お風呂上がりに股関節の前側をゆっくり伸ばす静的ストレッチや、フォームローラーで太もも前をほぐすのが有効です。");
-            if (selectedSorenessPost.includes('カーフ') || selectedSorenessPost.includes('アキレス腱') || selectedSorenessPost.includes('足裏')) advices.push("💡 <b>【足部・下腿のケア】</b><br>接地の衝撃でふくらはぎや足底が硬くなっています。テニスボールや青竹踏みで足裏をほぐし、ふくらはぎは下から上へ血流を戻すように優しくマッサージしてください。");
-            if (selectedSorenessPost.includes('臀部')) advices.push("💡 <b>【お尻のケア】</b><br>推進力を生む大きな筋肉が疲労しています。テニスボールをお尻の下に置いて自重でリリースしたり、仰向けで膝を胸に抱えるストレッチで張りをとりましょう。");
-            if (selectedSorenessPost.includes('背中') || selectedSorenessPost.includes('肩') || selectedSorenessPost.includes('腕')) advices.push("💡 <b>【上半身のケア】</b><br>腕振りや体幹の固定による疲労です。フォームローラーでの胸椎の伸展や、肩甲骨周りのストレッチを行い、上半身の力みをリセットしましょう。");
-            if (selectedSorenessPost.includes('腰')) advices.push("💡 <b>【腰のケア】</b><br>スプリントの着地衝撃やウエイトトレーニングで腰背部に負担がかかっています。仰向けになって両膝を抱えるストレッチや、湯船でしっかり温めて血流を良くしましょう。");
-
-            const injuryText = document.getElementById('injury').value;
-            const badText = document.getElementById('bad').value;
-            if(injuryText.length > 0 || badText.includes('痛') || badText.includes('違和感')) advices.push("🚑 <b>【痛みへの対処】</b><br>痛みを伴う違和感がある場合、無理なストレッチはかえって炎症を悪化させます。様子を見て安静にしてください。");
-
-            const box = document.getElementById('ai-advice-post');
-            if (advices.length === 0) {
-                box.innerHTML = "✨ <b>【お疲れ様でした】</b><br>適度な負荷の練習でした。入力した「実施するケア」を必ず実行し、明日に備えてしっかり睡眠を取りましょう！";
-                box.style.borderLeftColor = "#10b981";
-            } else {
-                box.innerHTML = advices.join("<hr style='border-top:1px dashed var(--border-color); margin:10px 0;'>");
-                box.style.borderLeftColor = "#3b82f6";
-            }
-        }
-
-        function addSprintRow() {
-            const container = document.getElementById('sprint-rows-container');
-            const template = document.getElementById('sprint-row-template');
-            container.appendChild(template.content.cloneNode(true));
-        }
-
-        function getSprintData() {
-            const arr = [];
-            document.querySelectorAll('.sprint-row').forEach(row => {
-                const dist = row.querySelector('.sprint-dist-input').value;
-                const time = row.querySelector('.sprint-time-input').value;
-                if (dist && time) arr.push({ distance: dist, time: time });
-            });
-            return arr;
-        }
-
-        function checkPersonalBest(newSprints, playerName) {
-            let isBest = false;
-            const bestTimes = {};
-            allTeamLogs.forEach(log => {
-                if (log.playerName !== playerName) return;
-                let sLogs = log.sprintLogs || [];
-                sLogs.forEach(s => {
-                    const t = parseFloat(s.time);
-                    if (t > 0 && (!bestTimes[s.distance] || t < bestTimes[s.distance])) {
-                        bestTimes[s.distance] = t;
-                    }
-                });
-            });
-
-            newSprints.forEach(ns => {
-                const t = parseFloat(ns.time);
-                if (t > 0) {
-                    if (bestTimes[ns.distance] && t < bestTimes[ns.distance]) {
-                        isBest = true;
-                    }
-                }
-            });
-            return isBest;
-        }
-
-        function triggerConfetti() {
-            if (typeof confetti === 'function') {
-                var duration = 3 * 1000;
-                var animationEnd = Date.now() + duration;
-                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
-
-                function randomInRange(min, max) {
-                    return Math.random() * (max - min) + min;
-                }
-
-                var interval = setInterval(function() {
-                    var timeLeft = animationEnd - Date.now();
-                    if (timeLeft <= 0) return clearInterval(interval);
-
-                    var particleCount = 50 * (timeLeft / duration);
-                    confetti(Object.assign({}, defaults, { particleCount,
-                        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
-                    }));
-                    confetti(Object.assign({}, defaults, { particleCount,
-                        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
-                    }));
-                }, 250);
-            }
-        }
-
-        // 🔥 追加：F-vプロファイルの自動計算関数
-        function calcFv() {
-            const t30 = parseFloat(document.getElementById('time-30m').value);
-            const t20 = parseFloat(document.getElementById('time-fly20m').value);
-            const display = document.getElementById('fv-display');
-            const hiddenInput = document.getElementById('fv-result');
-
-            if (t30 > 0 && t20 > 0) {
-                const ratio = t30 / t20;
-                let result = '';
-                let color = '';
-                
-                // スポーツ科学の基準に基づく比率によるグループ分け
-                if (ratio >= 2.15) {
-                    result = '力不足(Force Deficit)';
-                    color = '#ea580c'; // オレンジ（警告色）
-                } else if (ratio <= 1.95) {
-                    result = '速度不足(Velocity Deficit)';
-                    color = '#2563eb'; // ブルー
-                } else {
-                    result = 'バランス型(Optimal)';
-                    color = '#10b981'; // グリーン（安全色）
-                }
-                
-                display.textContent = `${result} (比率: ${ratio.toFixed(2)})`;
-                display.style.color = color;
-                hiddenInput.value = result;
-            } else {
-                display.textContent = '-';
-                display.style.color = 'var(--text-main)';
-                hiddenInput.value = '';
-            }
-        }
-
-        async function initFirebase() {
             try {
-                firebase.initializeApp(myFirebaseConfig);
+                firebase.initializeApp(CONSTANTS.FIREBASE_CONFIG);
                 db = firebase.firestore();
+                db.settings({ experimentalForceLongPolling: true });
                 await firebase.auth().signInAnonymously();
-                colRef = db.collection('team_condition_logs');
-                playersColRef = db.collection('team_players');
-                let goalsColRefLocal = db.collection('team_goals'); 
-                let settingsColRef = db.collection('team_settings'); 
-                let eduColRefLocal = db.collection('team_education');
-
-                playersColRef.onSnapshot(snapshot => {
-                    const players = [];
-                    snapshot.forEach(doc => players.push({name: doc.data().name}));
-                    updatePlayerSelect(players);
-                });
-
-                goalsColRefLocal.onSnapshot(snapshot => {
-                    teamGoals = {};
-                    snapshot.forEach(doc => {
-                        teamGoals[doc.id] = doc.data();
-                    });
-                    renderPlayerGoal(); 
-                });
-
-                settingsColRef.doc('general').onSnapshot(doc => {
-                    if(doc.exists) {
-                        teamSettings = doc.data();
-                        updateCountdownUI();
-                        if (playerChartInstance) playerChartInstance.update();
-                    }
-                });
-
-                eduColRefLocal.onSnapshot(snapshot => {
-                    globalEducation = [];
-                    snapshot.forEach(doc => {
-                        globalEducation.push({ id: doc.id, ...doc.data() });
-                    });
-                    globalEducation.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                    renderEducationList();
-                });
-
-                colRef.onSnapshot(snapshot => {
-                    allTeamLogs = [];
-                    snapshot.forEach(doc => allTeamLogs.push(doc.data()));
-                    allTeamLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
-                });
-                fetchWeather();
-                checkReminders();
+                
+                colRefs = {
+                    logs: db.collection('team_condition_logs'),
+                    players: db.collection('team_players'),
+                    goals: db.collection('team_goals'),
+                    settings: db.collection('team_settings'),
+                    edu: db.collection('team_education')
+                };
+                setupFirebaseListeners();
+                checkLoginStatus(); 
             } catch (error) {
                 console.log("Firebase Error, falling back to local storage.", error);
                 loadLocalData();
+                checkLoginStatus(); 
             }
+        }
+
+        function checkLoginStatus() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                STATE.currentUser = savedUser;
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                document.getElementById('logout-btn').style.display = 'block';
+                document.querySelectorAll('.display-player-name').forEach(el => el.textContent = STATE.currentUser);
+                
+                renderPlayerGoal();
+                renderCalendar(); 
+                
+                setTimeout(() => {
+                    loadFormData(document.getElementById('date').value); 
+                }, 100);
+                
+                if(document.getElementById('tab-history').classList.contains('active')) renderPlayerHistory();
+            } else {
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('main-app').style.display = 'none';
+                document.getElementById('logout-btn').style.display = 'none';
+            }
+        }
+
+        function login() {
+            const selectedPlayer = document.getElementById('login-player-select').value;
+            if (!selectedPlayer) { alert("名前を選択してください。"); return; }
+            localStorage.setItem('currentUser', selectedPlayer);
+            checkLoginStatus();
+        }
+
+        function logout() {
+            if(confirm("ログアウトしますか？\n（別の人としてログインし直すことができます）")) {
+                localStorage.removeItem('currentUser');
+                location.reload();
+            }
+        }
+
+        function setupEventListeners() {
+            const elFatigue = document.getElementById('fatigue');
+            const elStress = document.getElementById('stress');
+            const elRpe = document.getElementById('rpe');
+            const elDuration = document.getElementById('duration');
+
+            elFatigue.addEventListener('input', () => { updateFaceMeter('fatigue-display', elFatigue.value, 'fatigue'); updateAIAdvicePre(); });
+            elStress.addEventListener('input', () => { updateFaceMeter('stress-display', elStress.value, 'stress'); updateAIAdvicePre(); });
+            elRpe.addEventListener('input', calcLoad);
+            elDuration.addEventListener('input', calcLoad);
+
+            document.querySelectorAll('input[name="sleep-quality"], #sleep, #weight').forEach(el => {
+                el.addEventListener('change', updateAIAdvicePre);
+            });
+            document.getElementById('injury-pre').addEventListener('input', updateAIAdvicePre);
+
+            document.getElementById('injury').addEventListener('input', updateAIAdvicePost);
+            document.getElementById('bad').addEventListener('input', updateAIAdvicePost);
+
+            document.querySelectorAll('.tag-btn-pre').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const part = this.getAttribute('data-part');
+                    if (STATE.sorenessPre.includes(part)) {
+                        STATE.sorenessPre = STATE.sorenessPre.filter(p => p !== part);
+                        this.classList.remove('selected');
+                    } else {
+                        STATE.sorenessPre.push(part);
+                        this.classList.add('selected');
+                    }
+                    updateAIAdvicePre();
+                });
+            });
+
+            document.querySelectorAll('.tag-btn-post').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const part = this.getAttribute('data-part');
+                    if (STATE.sorenessPost.includes(part)) {
+                        STATE.sorenessPost = STATE.sorenessPost.filter(p => p !== part);
+                        this.classList.remove('selected');
+                    } else {
+                        STATE.sorenessPost.push(part);
+                        this.classList.add('selected');
+                    }
+                    updateAIAdvicePost();
+                });
+            });
+        }
+
+        /* ==========================================
+           📌 4. Firebase連携・ローカルデータ
+        ========================================== */
+        function setupFirebaseListeners() {
+            colRefs.players.onSnapshot(snapshot => {
+                let statePlayers = [];
+                snapshot.forEach(doc => statePlayers.push({name: doc.data().name}));
+                STATE.players = statePlayers;
+                updateLoginSelect();
+            });
+
+            colRefs.goals.onSnapshot(snapshot => {
+                STATE.goals = {};
+                snapshot.forEach(doc => { STATE.goals[doc.id] = doc.data(); });
+                if(STATE.currentUser) renderPlayerGoal(); 
+            });
+
+            colRefs.settings.doc('general').onSnapshot(doc => {
+                if(doc.exists) {
+                    STATE.settings = doc.data();
+                    renderCareTags(); 
+                    updateCountdownUI();
+                } else {
+                    renderCareTags(); 
+                }
+            });
+
+            colRefs.edu.onSnapshot(snapshot => {
+                STATE.education = [];
+                snapshot.forEach(doc => { STATE.education.push({ id: doc.id, ...doc.data() }); });
+                STATE.education.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                if(document.getElementById('tab-education').classList.contains('active')) renderEducationList();
+            });
+
+            colRefs.logs.onSnapshot(snapshot => {
+                STATE.logs = [];
+                snapshot.forEach(doc => STATE.logs.push(doc.data()));
+                STATE.logs.sort((a, b) => new Date(b.date) - new Date(a.date));
+                if(STATE.currentUser) {
+                    renderCalendar();
+                    loadFormData(document.getElementById('date').value);
+                    if(document.getElementById('tab-history').classList.contains('active')) renderPlayerHistory();
+                }
+            });
         }
 
         function loadLocalData() {
-            const players = JSON.parse(localStorage.getItem('team_players') || '[]');
-            updatePlayerSelect(players);
-            allTeamLogs = JSON.parse(localStorage.getItem('team_condition_logs') || '[]');
-            allTeamLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
-            teamGoals = JSON.parse(localStorage.getItem('team_goals') || '{}');
-            teamSettings = JSON.parse(localStorage.getItem('team_settings') || '{}'); 
+            STATE.players = JSON.parse(localStorage.getItem('team_players') || '[]');
+            updateLoginSelect();
+            STATE.logs = JSON.parse(localStorage.getItem('team_condition_logs') || '[]');
+            STATE.logs.sort((a, b) => new Date(b.date) - new Date(a.date));
+            STATE.goals = JSON.parse(localStorage.getItem('team_goals') || '{}');
+            STATE.settings = JSON.parse(localStorage.getItem('team_settings') || '{}'); 
+            STATE.education = JSON.parse(localStorage.getItem('team_education') || '[]');
             
-            globalEducation = JSON.parse(localStorage.getItem('team_education') || '[]');
-            renderEducationList();
-
-            renderPlayerGoal();
+            if(document.getElementById('tab-education').classList.contains('active')) renderEducationList();
+            renderCareTags(); 
             updateCountdownUI();
-        }
-
-        function getYouTubeEmbedUrl(url) {
-            if(!url) return null;
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
-        }
-
-        function renderEducationList() {
-            const container = document.getElementById('education-list-container');
-            container.innerHTML = '';
-            
-            const filtered = currentEduCategory === 'すべて' 
-                ? globalEducation 
-                : globalEducation.filter(item => item.category === currentEduCategory || 
-                  (currentEduCategory === 'ケア' && item.category === 'ケア・リカバリー') || 
-                  (currentEduCategory === '理論' && item.category === 'トレーニング理論') || 
-                  (currentEduCategory === '栄養' && item.category === '栄養・食事'));
-
-            if (filtered.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 30px; color: var(--text-muted); font-size: 14px;">このカテゴリのコンテンツはまだありません。<br>監督からの追加をお待ちください！</div>';
-                return;
+            if(STATE.currentUser) {
+                renderPlayerGoal();
+                renderCalendar();
             }
-
-            filtered.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'edu-card';
-                
-                let ytHtml = '';
-                const embedUrl = getYouTubeEmbedUrl(item.url);
-                if (embedUrl) {
-                    ytHtml = `<div class="yt-container"><iframe src="${embedUrl}" allowfullscreen></iframe></div>`;
-                } else if (item.url) {
-                    ytHtml = `<a href="${item.url}" target="_blank" style="display:inline-block; margin-top:10px; color:var(--primary); font-weight:bold; font-size:13px; text-decoration:none;">🔗 リンクを開く</a>`;
-                }
-
-                card.innerHTML = `
-                    <span class="edu-category-badge">${item.category}</span>
-                    <h3 class="edu-title">${item.title}</h3>
-                    <div class="edu-desc">${item.description}</div>
-                    ${ytHtml}
-                `;
-                container.appendChild(card);
-            });
-        }
-        
-        function filterEducation(cat, btn) {
-            document.querySelectorAll('.edu-cat-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentEduCategory = cat;
-            renderEducationList();
         }
 
         function updateCountdownUI() {
             const banner = document.getElementById('countdown-banner');
-            if (!teamSettings || !teamSettings.targetEventDate) {
+            if (!STATE.settings || !STATE.settings.targetEventDate) {
                 banner.style.display = 'none';
                 return;
             }
 
-            const today = new Date();
-            today.setHours(0,0,0,0);
-            const target = new Date(teamSettings.targetEventDate);
-            target.setHours(0,0,0,0);
-            
-            const diffTime = target - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const today = new Date(); today.setHours(0,0,0,0);
+            const target = new Date(STATE.settings.targetEventDate); target.setHours(0,0,0,0);
+            const diffTimeActual = target - today;
+            const diffDays = Math.ceil(diffTimeActual / (1000 * 60 * 60 * 24));
 
             if (diffDays > 0) {
                 banner.style.display = 'flex';
-                banner.innerHTML = `🏆 ${teamSettings.targetEventName || '大会'}まで あと <span class="days">${diffDays}</span> 日！`;
+                banner.innerHTML = `🏆 ${STATE.settings.targetEventName || '大会'}まで あと <span class="days">${diffDays}</span> 日！`;
             } else if (diffDays === 0) {
                 banner.style.display = 'flex';
                 banner.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-                banner.innerHTML = `🔥 本日は ${teamSettings.targetEventName || '大会'} 当日です！健闘を祈ります！`;
+                banner.innerHTML = `🔥 本日は ${STATE.settings.targetEventName || '大会'} 当日です！健闘を祈ります！`;
             } else {
                 banner.style.display = 'none'; 
             }
         }
 
-        function updatePlayerSelect(players) {
-            const select = document.getElementById('player-name');
-            const current = select.value;
-            select.innerHTML = '<option value="" disabled selected>名前を選択してください ▼</option>';
-            players.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.name; opt.textContent = p.name;
-                if(p.name === current) opt.selected = true;
-                select.appendChild(opt);
+        /* ==========================================
+           📌 🔥 管理者画面と連動したケアボタンの動的生成
+        ========================================== */
+        function renderCareTags() {
+            const container = document.getElementById('care-tags');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            const options = STATE.settings.careOptions || CONSTANTS.DEFAULT_CARES;
+            
+            options.forEach(careText => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'tag-btn care-tag';
+                btn.setAttribute('data-care', careText);
+                btn.textContent = careText;
+                
+                btn.addEventListener('click', function() { 
+                    this.classList.toggle('selected'); 
+                });
+                
+                container.appendChild(btn);
             });
-            document.getElementById('player-warning').style.display = players.length === 0 ? 'block' : 'none';
+            
+            if(STATE.currentUser && document.getElementById('date').value) {
+                loadFormData(document.getElementById('date').value);
+            }
         }
 
-        document.getElementById('player-name').addEventListener('change', function() {
-            renderPlayerGoal();
-        });
+        /* ==========================================
+           📌 🔥 カレンダーとサマリーモーダル機能
+        ========================================== */
+        function changeMonth(step) {
+            STATE.calMonth += step;
+            if (STATE.calMonth < 0) { STATE.calMonth = 11; STATE.calYear--; }
+            else if (STATE.calMonth > 11) { STATE.calMonth = 0; STATE.calYear++; }
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            if(!STATE.currentUser) return;
+            const monthYearEl = document.getElementById('calendar-month-year');
+            const gridEl = document.getElementById('calendar-grid');
+            gridEl.innerHTML = '';
+
+            monthYearEl.textContent = `${STATE.calYear}年 ${STATE.calMonth + 1}月`;
+
+            const firstDay = new Date(STATE.calYear, STATE.calMonth, 1).getDay();
+            const daysInMonth = new Date(STATE.calYear, STATE.calMonth + 1, 0).getDate();
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+            const selectedDateStr = document.getElementById('date').value;
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'calendar-day empty';
+                gridEl.appendChild(emptyDiv);
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayDiv = document.createElement('div');
+                const currentDateStr = `${STATE.calYear}-${String(STATE.calMonth+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                
+                dayDiv.className = 'calendar-day';
+                dayDiv.textContent = i;
+                
+                if (currentDateStr === todayStr) dayDiv.classList.add('today');
+                if (currentDateStr === selectedDateStr) dayDiv.classList.add('selected');
+
+                const log = STATE.logs.find(l => l.playerName === STATE.currentUser && l.date === currentDateStr);
+                if (log) {
+                    const fatigue = parseInt(log.fatigue) || 1;
+                    if (fatigue >= 7) dayDiv.classList.add('bg-red');
+                    else if (fatigue >= 4) dayDiv.classList.add('bg-yellow');
+                    else dayDiv.classList.add('bg-green');
+
+                    if (log.injuryPre || log.injury) {
+                        dayDiv.classList.add('has-injury'); 
+                        const icon = document.createElement('div');
+                        icon.className = 'injury-icon';
+                        icon.textContent = '⚠️';
+                        dayDiv.appendChild(icon);
+                    }
+                }
+
+                dayDiv.onclick = () => selectDate(currentDateStr);
+                gridEl.appendChild(dayDiv);
+            }
+        }
+
+        function selectDate(dateStr) {
+            document.getElementById('date').value = dateStr;
+            renderCalendar();
+            
+            const parts = dateStr.split('-');
+            const displayStr = `${parts[1]}/${parts[2]}`;
+            document.getElementById('display-date-pre').textContent = `[ ${displayStr} ]`;
+            document.getElementById('display-date-post').textContent = `[ ${displayStr} ]`;
+
+            const log = STATE.logs.find(l => l.playerName === STATE.currentUser && l.date === dateStr);
+            showDailySummary(dateStr, log);
+        }
+
+        function showDailySummary(dateStr, log) {
+            const parts = dateStr.split('-');
+            document.getElementById('summary-modal-date').textContent = `${parts[1]}/${parts[2]} の記録`;
+            const content = document.getElementById('summary-modal-content');
+            const editBtn = document.getElementById('edit-daily-btn');
+            
+            if (!log) {
+                content.innerHTML = '<p style="text-align:center; color:var(--text-muted); margin: 30px 0; font-weight:bold;">この日の記録はまだありません。</p>';
+                editBtn.textContent = '新規入力する';
+            } else {
+                editBtn.textContent = 'この日のデータを編集する';
+                
+                let sprintHtml = '';
+                if(log.sprintLogs && log.sprintLogs.length > 0) {
+                    sprintHtml = log.sprintLogs.map(s => `<span class="stat-badge" style="background:var(--primary); color:white;">🏃‍♂️ ${s.distance}m: ${s.time}s</span>`).join(' ');
+                }
+                
+                const sorenessPre = log.soreness ? `<div style="font-size:13px; color:var(--secondary); font-weight:bold; margin-bottom:4px;">[朝の張り] ${log.soreness}</div>` : '';
+                const sorenessPost = log.sorenessPost ? `<div style="font-size:13px; color:var(--primary); font-weight:bold;">[夜の張り] ${log.sorenessPost}</div>` : '';
+                
+                const injuryPre = log.injuryPre ? `<div style="margin-top:10px; background:var(--input-bg); border:1px solid var(--warning-text); padding:12px; border-radius:8px;"><b style="color:var(--warning-text); font-size:12px;">⚠️ 朝のケガ詳細:</b><div style="font-size:14px; color:var(--text-main); white-space:pre-wrap; margin-top:4px; font-weight:500;">${log.injuryPre}</div></div>` : '';
+                const injuryPost = log.injury ? `<div style="margin-top:10px; background:var(--input-bg); border:1px solid var(--warning-text); padding:12px; border-radius:8px;"><b style="color:var(--warning-text); font-size:12px;">⚠️ 夜のケガ詳細:</b><div style="font-size:14px; color:var(--text-main); white-space:pre-wrap; margin-top:4px; font-weight:500;">${log.injury}</div></div>` : '';
+
+                content.innerHTML = `
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:20px;">
+                        <div style="background:var(--input-bg); border:1px solid var(--border-color); padding:12px; border-radius:10px; text-align:center; box-shadow:var(--shadow-sm);">
+                            <div style="font-size:12px; color:var(--text-muted); font-weight:bold;">疲労度 (朝)</div>
+                            <div style="font-size:22px; font-weight:900; color:var(--text-main);">${log.fatigue || '-'} <span style="font-size:12px; font-weight:bold; color:var(--text-muted);">/10</span></div>
+                        </div>
+                        <div style="background:var(--input-bg); border:1px solid var(--border-color); padding:12px; border-radius:10px; text-align:center; box-shadow:var(--shadow-sm);">
+                            <div style="font-size:12px; color:var(--text-muted); font-weight:bold;">Training Load (夜)</div>
+                            <div style="font-size:22px; font-weight:900; color:var(--secondary);">${log.trainingLoad || '-'}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom:20px; background:var(--input-bg); border:1px solid var(--border-color); padding:15px; border-radius:12px;">
+                        <div style="font-size:13px; color:var(--primary); font-weight:800; margin-bottom:8px;">🏃‍♂️ スプリント・特殊計測</div>
+                        <div style="margin-bottom:8px;">${sprintHtml || '<span style="font-size:13px; color:var(--text-muted); font-weight:500;">データなし</span>'}</div>
+                        <div style="font-size:13px; font-weight:600; color:var(--text-main);">RSI: <b>${log.rsi || '-'}</b> / F-v: <b>${log.fvResult || '-'}</b></div>
+                    </div>
+
+                    <div style="margin-bottom:20px; border-top:2px dashed var(--border-color); padding-top:20px;">
+                        <div style="font-size:13px; color:var(--text-main); font-weight:800; margin-bottom:8px;">⚡ 筋肉痛・張り</div>
+                        ${sorenessPre}
+                        ${sorenessPost}
+                        ${!sorenessPre && !sorenessPost ? '<span style="font-size:13px; color:var(--text-muted); font-weight:500;">なし</span>' : ''}
+                        ${injuryPre}
+                        ${injuryPost}
+                    </div>
+
+                    <div style="margin-bottom:20px; border-top:2px dashed var(--border-color); padding-top:20px;">
+                        <div style="font-size:13px; color:var(--text-main); font-weight:800; margin-bottom:8px;">💤 睡眠・体調</div>
+                        <div style="font-size:14px; font-weight:500; margin-bottom:4px; color:var(--text-main);">時間: <b>${log.sleep || '-'}h</b> / 質: <b style="color:var(--secondary);">${log.sleepQuality ? '★'.repeat(log.sleepQuality) : '-'}</b></div>
+                        <div style="font-size:14px; font-weight:500; color:var(--text-main);">体重: <b>${log.weight ? log.weight+'kg' : '-'}</b> / 心拍: <b>${log.heartRate || '-'}</b></div>
+                    </div>
+
+                    <div style="border-top:2px dashed var(--border-color); padding-top:20px; padding-bottom:10px;">
+                        <div style="font-size:13px; color:var(--text-main); font-weight:800; margin-bottom:10px;">📝 練習振り返り・ケア</div>
+                        <div style="font-size:14px; background:var(--input-bg); color:var(--text-main); border:1px solid var(--border-color); padding:12px; border-radius:8px; margin-bottom:10px; white-space:pre-wrap; font-weight:500;"><b style="color:var(--primary); font-size:12px;">メニュー:</b><br>${log.menu || '-'}</div>
+                        <div style="font-size:14px; background:var(--input-bg); color:var(--text-main); border:1px solid var(--border-color); padding:12px; border-radius:8px; margin-bottom:10px; white-space:pre-wrap; font-weight:500;"><b style="color:var(--good-text); font-size:12px;">👍 できたこと:</b><br>${log.good || '-'}</div>
+                        <div style="font-size:14px; background:var(--input-bg); color:var(--text-main); border:1px solid var(--border-color); padding:12px; border-radius:8px; margin-bottom:10px; white-space:pre-wrap; font-weight:500;"><b style="color:var(--warning-text); font-size:12px;">👎 課題・できなかったこと:</b><br>${log.bad || '-'}</div>
+                        <div style="font-size:14px; background:var(--input-bg); color:var(--text-main); border:1px solid var(--border-color); padding:12px; border-radius:8px; white-space:pre-wrap; font-weight:500;"><b style="color:var(--primary); font-size:12px;">🛁 ケア:</b><br>${log.care || '-'}</div>
+                    </div>
+                `;
+            }
+            
+            editBtn.setAttribute('data-date', dateStr);
+            document.getElementById('daily-summary-modal').style.display = 'flex';
+        }
+
+        function closeDailySummary() {
+            document.getElementById('daily-summary-modal').style.display = 'none';
+        }
+
+        function editDailyData() {
+            const dateStr = document.getElementById('edit-daily-btn').getAttribute('data-date');
+            document.getElementById('date').value = dateStr;
+            renderCalendar(); 
+            
+            const parts = dateStr.split('-');
+            const displayStr = `${parts[1]}/${parts[2]}`;
+            document.getElementById('display-date-pre').textContent = `[ ${displayStr} ]`;
+            document.getElementById('display-date-post').textContent = `[ ${displayStr} ]`;
+            
+            loadFormData(dateStr);
+            closeDailySummary();
+            
+            switchTab('pre', document.querySelector('.tab-btn[onclick="switchTab(\'pre\', this)"]'));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function loadFormData(dateStr) {
+            const log = STATE.logs.find(l => l.playerName === STATE.currentUser && l.date === dateStr);
+            
+            document.getElementById('form-pre').reset();
+            document.getElementById('form-post').reset();
+            document.querySelectorAll('.tag-btn, .care-tag').forEach(el => el.classList.remove('selected'));
+            document.getElementById('sprint-rows-container').innerHTML = '';
+            document.getElementById('fv-display').textContent = '-';
+            document.getElementById('load-result').textContent = '-';
+            
+            document.getElementById('fatigue').value = 1;
+            document.getElementById('stress').value = 1;
+            document.getElementById('rpe').value = 5;
+            STATE.sorenessPre = [];
+            STATE.sorenessPost = [];
+
+            if (log) {
+                if (log.sleep) document.getElementById('sleep').value = log.sleep;
+                if (log.sleepQuality) {
+                    const sq = document.getElementById(`star${log.sleepQuality}-pre`);
+                    if (sq) sq.checked = true;
+                }
+                if (log.weight) document.getElementById('weight').value = log.weight;
+                if (log.heartRate) document.getElementById('heart-rate').value = log.heartRate;
+                if (log.fatigue) document.getElementById('fatigue').value = log.fatigue;
+                if (log.stress) document.getElementById('stress').value = log.stress;
+                if (log.injuryPre) document.getElementById('injury-pre').value = log.injuryPre;
+                if (log.soreness) {
+                    STATE.sorenessPre = log.soreness.split(',').map(p => p.trim());
+                    document.querySelectorAll('.tag-btn-pre').forEach(btn => {
+                        if (STATE.sorenessPre.includes(btn.getAttribute('data-part'))) btn.classList.add('selected');
+                    });
+                }
+
+                if (log.duration) document.getElementById('duration').value = log.duration;
+                if (log.rpe) document.getElementById('rpe').value = log.rpe;
+                if (log.rsi) document.getElementById('rsi').value = log.rsi;
+                if (log.time30m) document.getElementById('time-30m').value = log.time30m;
+                if (log.timeFly20m) document.getElementById('time-fly20m').value = log.timeFly20m;
+                if (log.injury) document.getElementById('injury').value = log.injury;
+                if (log.menu) document.getElementById('menu').value = log.menu;
+                if (log.steps) document.getElementById('steps').value = log.steps;
+                if (log.good) document.getElementById('good').value = log.good;
+                if (log.bad) document.getElementById('bad').value = log.bad;
+                
+                if (log.sprintLogs) {
+                    log.sprintLogs.forEach(s => addSprintRow(s.distance, s.time));
+                }
+                if (log.sorenessPost) {
+                    STATE.sorenessPost = log.sorenessPost.split(',').map(p => p.trim());
+                    document.querySelectorAll('.tag-btn-post').forEach(btn => {
+                        if (STATE.sorenessPost.includes(btn.getAttribute('data-part'))) btn.classList.add('selected');
+                    });
+                }
+                if (log.care) {
+                    const cares = log.care.split(' / ').map(c => c.trim());
+                    document.querySelectorAll('.care-tag').forEach(btn => {
+                        if (cares.includes(btn.getAttribute('data-care'))) {
+                            btn.classList.add('selected');
+                            cares.splice(cares.indexOf(btn.getAttribute('data-care')), 1); 
+                        }
+                    });
+                    if (cares.length > 0 && cares[0] !== "") {
+                        document.getElementById('care').value = cares.join(' / ');
+                    }
+                }
+            }
+
+            updateFaceMeter('fatigue-display', document.getElementById('fatigue').value, 'fatigue');
+            updateFaceMeter('stress-display', document.getElementById('stress').value, 'stress');
+            updateFaceMeter('rpe-display', document.getElementById('rpe').value, 'rpe');
+            calcLoad();
+            calcFv();
+            updateAIAdvicePre();
+            updateAIAdvicePost();
+        }
+
+        /* ==========================================
+           📌 5. UI・表示更新
+        ========================================== */
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.getElementById('theme-toggle').innerHTML = isDark ? '☀️' : '🌙';
+            
+            if(STATE.chartInstance) {
+                const tickColor = isDark ? '#94a3b8' : '#6b7280';
+                const gridColor = isDark ? '#333333' : '#e5e7eb';
+                STATE.chartInstance.options.scales.x.ticks.color = tickColor;
+                STATE.chartInstance.options.scales.x.grid.color = gridColor;
+                STATE.chartInstance.options.scales.y.ticks.color = tickColor;
+                STATE.chartInstance.options.scales.y.grid.color = gridColor;
+                STATE.chartInstance.options.scales.y1.ticks.color = tickColor;
+                STATE.chartInstance.options.plugins.title.color = tickColor;
+                STATE.chartInstance.options.plugins.legend.labels.color = tickColor;
+                STATE.chartInstance.update();
+            }
+        }
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            if(btn) btn.classList.add('active');
+            if(tabId === 'history') {
+                renderPlayerHistory();
+            }
+        }
+
+        function updateLoginSelect() {
+            const select = document.getElementById('login-player-select');
+            select.innerHTML = '<option value="" disabled selected>名前を選択してください ▼</option>';
+            STATE.players.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.name; 
+                opt.textContent = p.name;
+                select.appendChild(opt);
+            });
+            if(STATE.players.length === 0) {
+                select.innerHTML = '<option value="" disabled selected>※名簿が未登録です</option>';
+            }
+        }
 
         function renderPlayerGoal() {
-            const playerName = document.getElementById('player-name').value;
+            const playerName = STATE.currentUser;
             const container = document.getElementById('goal-container');
+            if (!playerName) { container.style.display = 'none'; return; }
             
-            if (!playerName) {
-                container.style.display = 'none';
-                return;
-            }
             container.style.display = 'block';
-            
-            const goalData = teamGoals[playerName] || {};
+            const goalData = STATE.goals[playerName] || {};
             document.getElementById('season-goal-text').textContent = goalData.seasonGoal || "目標を設定して、日々のモチベーションを高めよう！";
             document.getElementById('month-goal-text').textContent = goalData.monthGoal || "今月の具体的なテーマや目標を設定しましょう！";
         }
 
-        async function editGoal(type) {
-            const playerName = document.getElementById('player-name').value;
-            if (!playerName) {
-                alert("先に一番上で自分の名前を選択してください！");
-                return;
-            }
-            
-            const goalData = teamGoals[playerName] || {};
-            const currentGoal = type === 'season' ? (goalData.seasonGoal || "") : (goalData.monthGoal || "");
-            const title = type === 'season' ? "今シーズンの目標" : "今月の目標・テーマ";
-            
-            const newGoal = prompt(`${title}を入力してください：\n（例：県大会決勝進出！ / スタートの改善 など）`, currentGoal);
-            
-            if (newGoal !== null) {
-                const updateData = { updatedAt: new Date().toISOString() };
-                if (type === 'season') updateData.seasonGoal = newGoal;
-                else updateData.monthGoal = newGoal;
-
-                try {
-                    if (db) {
-                        await db.collection('team_goals').doc(playerName).set(updateData, { merge: true });
-                    } else {
-                        teamGoals[playerName] = { ...goalData, ...updateData };
-                        localStorage.setItem('team_goals', JSON.stringify(teamGoals));
-                        renderPlayerGoal();
-                    }
-                } catch (e) {
-                    alert("目標の保存に失敗しました。");
-                }
-            }
-        }
-
-        function syncDeviceData(itemName) {
-            alert(`【デバイス連携機能について】\n\n現在、Webブラウザのセキュリティ制限により、Apple HealthやGoogle Fit、スマートウォッチから「${itemName}」を直接取得する機能は開発準備中です。\n\nお手数ですが、現在はお手持ちのデバイスやアプリの数値を確認して、直接入力してください！`);
-        }
-
-        // 🔥 データ保存処理（必須チェック追加）
-        async function saveData(type) {
-            const playerName = document.getElementById('player-name').value;
-            const date = document.getElementById('date').value;
-
-            if(!playerName || !date) {
-                alert("一番上の「選手名」と「日付」を選択してください！");
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                return;
-            }
-            
-            // 🔥 必須入力チェック
-            if (type === 'pre') {
-                if (!document.getElementById('sleep').value) {
-                    alert("「睡眠時間」を入力してください！\nケガ予防のために非常に重要なデータです。");
-                    document.getElementById('sleep').focus();
-                    return;
-                }
-                if (!document.querySelector('input[name="sleep-quality"]:checked')) {
-                    alert("「睡眠の質」の星を選択してください！\n疲労の回復度合いを測る重要な指標です。");
-                    return;
-                }
-            } else if (type === 'post') {
-                if (!document.getElementById('duration').value) {
-                    alert("Loadを計算するため、「運動時間(分)」を入力してください！");
-                    document.getElementById('duration').focus();
-                    return;
-                }
-            }
-
-            const docId = `${playerName}_${date}`;
-            let partialData = {
-                playerName: playerName,
-                date: date,
-                updatedAt: new Date().toISOString()
-            };
-
-            let isPB = false;
-
-            if(type === 'pre') {
-                const sqNode = document.querySelector('input[name="sleep-quality"]:checked');
-                partialData.sleep = document.getElementById('sleep').value;
-                partialData.sleepQuality = sqNode ? sqNode.value : '';
-                partialData.weight = document.getElementById('weight').value;
-                partialData.heartRate = document.getElementById('heart-rate').value;
-                partialData.fatigue = document.getElementById('fatigue').value;
-                partialData.stress = document.getElementById('stress').value;
-                partialData.soreness = selectedSorenessPre.join(', ');
-                partialData.aiAdvicePre = document.getElementById('ai-advice-pre').innerHTML;
-                partialData.irsPre = document.getElementById('irs-value-pre').textContent;
-            } else {
-                partialData.duration = document.getElementById('duration').value;
-                partialData.rpe = document.getElementById('rpe').value;
-                partialData.trainingLoad = document.getElementById('load-result').textContent;
-                partialData.sprintLogs = getSprintData();
-                
-                // 🔥 追加・修正：RSIとF-vの保存（入力されたタイムも保存）
-                partialData.rsi = document.getElementById('rsi').value;
-                partialData.time30m = document.getElementById('time-30m').value;
-                partialData.timeFly20m = document.getElementById('time-fly20m').value;
-                partialData.fvResult = document.getElementById('fv-result').value;
-                
-                partialData.menu = document.getElementById('menu').value;
-                partialData.steps = document.getElementById('steps').value;
-                partialData.good = document.getElementById('good').value;
-                partialData.bad = document.getElementById('bad').value;
-                partialData.injury = document.getElementById('injury').value;
-                partialData.sorenessPost = selectedSorenessPost.join(', ');
-                
-                let selectedCares = [];
-                document.querySelectorAll('.care-tag.selected').forEach(btn => {
-                    selectedCares.push(btn.getAttribute('data-care'));
-                });
-                const freeTextCare = document.getElementById('care').value;
-                partialData.care = selectedCares.length > 0 ? selectedCares.join(' / ') + (freeTextCare ? ' / ' + freeTextCare : '') : freeTextCare;
-                
-                partialData.aiAdvicePost = document.getElementById('ai-advice-post').innerHTML;
-                partialData.irsPost = document.getElementById('irs-value-post').textContent;
-
-                const myLogs = allTeamLogs.filter(l => l.playerName === playerName);
-                if (myLogs.length > 0) {
-                    isPB = checkPersonalBest(partialData.sprintLogs, playerName);
-                }
-            }
-
-            try {
-                if(colRef) {
-                    await colRef.doc(docId).set(partialData, { merge: true });
-                } else {
-                    let savedLogs = JSON.parse(localStorage.getItem('team_condition_logs') || '[]');
-                    let existingIndex = savedLogs.findIndex(log => log.playerName === playerName && log.date === date);
-                    if (existingIndex > -1) {
-                        savedLogs[existingIndex] = { ...savedLogs[existingIndex], ...partialData };
-                    } else {
-                        savedLogs.push(partialData);
-                    }
-                    localStorage.setItem('team_condition_logs', JSON.stringify(savedLogs));
-                    loadLocalData();
-                }
-                
-                if(type === 'pre') {
-                    alert('🌅 朝のデータを保存しました！今日も一日頑張りましょう！');
-                } else {
-                    alert('🌙 夜のデータを保存しました！お疲れ様でした。');
-                    if (isPB) {
-                        triggerConfetti();
-                        setTimeout(() => alert('🎉 自己ベスト更新おめでとうございます！！\n日々の努力の成果ですね！'), 300);
-                    }
-                }
-                
-            } catch (error) {
-                alert("保存に失敗しました: " + error.message);
-            }
-        }
-
+        /* ==========================================
+           📌 6. 計算ロジック (IRS, F-v, Load)
+        ========================================== */
         function updateFaceMeter(id, value, type) {
             const el = document.getElementById(id);
-            let emoji = "";
-            let color = "";
+            let emoji = "", color = "";
             const v = parseFloat(value);
             
             if (type === 'fatigue') {
@@ -1376,94 +1389,274 @@
                 else if (v <= 8) { emoji = "🥵"; color = "var(--warning-text)"; }
                 else { emoji = "🤮"; color = "#991b1b"; }
             }
-            
             el.textContent = `${emoji} ${type === 'rpe' ? v.toFixed(1) : v}`;
             el.style.color = color;
-            
             el.classList.add('pop');
             setTimeout(() => el.classList.remove('pop'), 200);
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('date').valueAsDate = new Date();
+        function updateIRSUIDisplay(type, rawScore) {
+            let score = Math.min(rawScore, 95);
+            const fillEl = document.getElementById(`irs-bar-${type}`);
+            const valEl = document.getElementById(`irs-value-${type}`);
+            const statusEl = document.getElementById(`irs-status-${type}`);
             
-            document.getElementById('fatigue').addEventListener('input', function() {
-                updateFaceMeter('fatigue-display', this.value, 'fatigue');
-                updateAIAdvicePre();
-            });
-            document.getElementById('stress').addEventListener('input', function() {
-                updateFaceMeter('stress-display', this.value, 'stress');
-                updateAIAdvicePre();
-            });
-            
-            document.querySelectorAll('input[name="sleep-quality"], #sleep, #weight').forEach(el => {
-                el.addEventListener('change', updateAIAdvicePre);
-            });
+            valEl.textContent = `${score}%`;
+            fillEl.style.width = `${score}%`;
 
-            const durationInput = document.getElementById('duration');
-            const rpeSlider = document.getElementById('rpe');
-            
-            function calcLoad() {
-                const d = parseFloat(durationInput.value) || 0;
-                const r = parseFloat(rpeSlider.value) || 0;
-                updateFaceMeter('rpe-display', r, 'rpe');
-                document.getElementById('load-result').textContent = (d > 0 && r > 0) ? (d * r).toFixed(1) : '-';
-                updateAIAdvicePost();
+            if (score <= 30) {
+                fillEl.style.backgroundColor = "#10b981"; statusEl.style.color = "#10b981"; statusEl.textContent = "🟢 安全圏 (Normal)";
+            } else if (score <= 50) {
+                fillEl.style.backgroundColor = "#f59e0b"; statusEl.style.color = "#f59e0b"; statusEl.textContent = "🟡 注意 (Caution)";
+            } else if (score <= 75) {
+                fillEl.style.backgroundColor = "#ea580c"; statusEl.style.color = "#ea580c"; statusEl.textContent = "🟠 警戒 (Warning)";
+            } else {
+                fillEl.style.backgroundColor = "#dc2626"; statusEl.style.color = "#dc2626"; statusEl.textContent = "🔴 危険 (Danger)";
             }
-            durationInput.addEventListener('input', calcLoad);
-            rpeSlider.addEventListener('input', calcLoad);
-            document.getElementById('injury').addEventListener('input', updateAIAdvicePost);
-            document.getElementById('bad').addEventListener('input', updateAIAdvicePost);
+        }
+
+        function calculateIRS(type) {
+            let score = 5; 
+            const W = CONSTANTS.IRS_WEIGHTS;
             
-            document.querySelectorAll('.tag-btn-pre').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const part = this.getAttribute('data-part');
-                    if (selectedSorenessPre.includes(part)) {
-                        selectedSorenessPre = selectedSorenessPre.filter(item => item !== part);
-                        this.classList.remove('selected');
-                    } else {
-                        selectedSorenessPre.push(part);
-                        this.classList.add('selected');
-                    }
-                    updateAIAdvicePre();
-                });
-            });
+            if(type === 'pre') {
+                const fatigue = parseInt(document.getElementById('fatigue').value);
+                const stress = parseInt(document.getElementById('stress').value);
+                const sleep = parseFloat(document.getElementById('sleep').value) || 0;
+                const sqNode = document.querySelector('input[name="sleep-quality"]:checked');
+                const sleepQuality = sqNode ? parseInt(sqNode.value) : 5; 
+                
+                if (fatigue >= W.FATIGUE_SEVERE.threshold) score += W.FATIGUE_SEVERE.score;
+                else if (fatigue >= W.FATIGUE_HIGH.threshold) score += W.FATIGUE_HIGH.score;
+                if (stress >= W.STRESS_HIGH.threshold) score += W.STRESS_HIGH.score;
 
-            document.querySelectorAll('.tag-btn-post').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const part = this.getAttribute('data-part');
-                    if (selectedSorenessPost.includes(part)) {
-                        selectedSorenessPost = selectedSorenessPost.filter(item => item !== part);
-                        this.classList.remove('selected');
-                    } else {
-                        selectedSorenessPost.push(part);
-                        this.classList.add('selected');
-                    }
-                    updateAIAdvicePost();
-                });
-            });
+                if (sleep > 0 && sleep < W.SLEEP_SHORT.threshold) score += W.SLEEP_SHORT.score;
+                else if (sleep > 0 && sleep < W.SLEEP_MED.threshold) score += W.SLEEP_MED.score;
+                if (sleepQuality <= W.QUALITY_LOW.threshold) score += W.QUALITY_LOW.score;
 
-            document.querySelectorAll('.care-tag').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    this.classList.toggle('selected');
+                STATE.sorenessPre.forEach(part => {
+                    if (part === 'ハムストリングス') score += W.SORENESS_HAMSTRING;
+                    else if (part === 'カーフ' || part === 'アキレス腱') score += W.SORENESS_CALF_ACHILLES;
+                    else if (part === '腸腰筋' || part === '大腿四頭筋' || part === '腰') score += W.SORENESS_QUAD_HIP_LOWER;
+                    else if (!W.CRITICAL_PARTS.includes(part)) score += W.SORENESS_OTHER;
                 });
-            });
-            
-            updateFaceMeter('fatigue-display', document.getElementById('fatigue').value, 'fatigue');
-            updateFaceMeter('stress-display', document.getElementById('stress').value, 'stress');
-            updateFaceMeter('rpe-display', document.getElementById('rpe').value, 'rpe');
+                updateIRSUIDisplay('pre', score);
+                
+            } else if (type === 'post') {
+                const rpe = parseFloat(document.getElementById('rpe').value) || 0;
+                const loadText = document.getElementById('load-result').textContent;
+                const load = loadText !== '-' ? parseFloat(loadText) : 0;
+                
+                if (rpe >= W.RPE_HIGH.threshold) score += W.RPE_HIGH.score;
+                if (load > W.LOAD_HIGH.threshold) score += W.LOAD_HIGH.score;
 
-            updateAIAdvicePre();
+                STATE.sorenessPost.forEach(part => {
+                    if (part === 'ハムストリングス') score += W.SORENESS_HAMSTRING;
+                    else if (part === 'カーフ' || part === 'アキレス腱') score += W.SORENESS_CALF_ACHILLES + 5; 
+                    else if (part === '腸腰筋' || part === '大腿四頭筋' || part === '腰') score += W.SORENESS_QUAD_HIP_LOWER;
+                    else if (!W.CRITICAL_PARTS.includes(part)) score += W.SORENESS_OTHER;
+                });
+                updateIRSUIDisplay('post', score);
+            }
+        }
+
+        function calcLoad() {
+            const d = parseFloat(document.getElementById('duration').value) || 0;
+            const r = parseFloat(document.getElementById('rpe').value) || 0;
+            updateFaceMeter('rpe-display', r, 'rpe');
+            document.getElementById('load-result').textContent = (d > 0 && r > 0) ? (d * r).toFixed(1) : '-';
             updateAIAdvicePost();
-        });
+        }
 
-        function renderPlayerHistory(playerName) {
-            document.getElementById('history-section').style.display = 'block';
-            const myLogs = allTeamLogs.filter(log => log.playerName === playerName);
+        function calcFv() {
+            const t30 = parseFloat(document.getElementById('time-30m').value);
+            const t20 = parseFloat(document.getElementById('time-fly20m').value);
+            const display = document.getElementById('fv-display');
+            const hiddenInput = document.getElementById('fv-result');
+
+            if (t30 > 0 && t20 > 0) {
+                const ratio = t30 / t20;
+                let result = '', color = '';
+                
+                if (ratio >= CONSTANTS.FV_THRESHOLDS.FORCE_DEFICIT) {
+                    result = '力不足(Force Deficit)'; color = '#ea580c';
+                } else if (ratio <= CONSTANTS.FV_THRESHOLDS.VELOCITY_DEFICIT) {
+                    result = '速度不足(Velocity Deficit)'; color = '#2563eb';
+                } else {
+                    result = 'バランス型(Optimal)'; color = '#10b981';
+                }
+                
+                display.textContent = `${result} (比率: ${ratio.toFixed(2)})`;
+                display.style.color = color;
+                hiddenInput.value = result;
+            } else {
+                display.textContent = '-';
+                display.style.color = 'var(--text-main)';
+                hiddenInput.value = '';
+            }
+        }
+
+        /* ==========================================
+           📌 7. AIアドバイス生成
+        ========================================== */
+        function updateAIAdvicePre() {
+            calculateIRS('pre');
+            const fatigue = parseInt(document.getElementById('fatigue').value);
+            const sleep = parseFloat(document.getElementById('sleep').value) || 0;
+            const sqNode = document.querySelector('input[name="sleep-quality"]:checked');
+            const sleepQuality = sqNode ? parseInt(sqNode.value) : 5; 
+            const injuryPreText = document.getElementById('injury-pre').value;
+            let advices = [];
             
+            if (sleep > 0 && sleep < 7) advices.push("💤 <b>【睡眠不足アラート】</b><br>睡眠が7時間未満の場合、<b>ケガのリスクが約1.7倍</b>に跳ね上がり、反応速度も低下します。今日の練習は集中力を高め、終了後は早めに寝るよう計画してください。");
+            else if (sleepQuality <= 2) advices.push("💤 <b>【睡眠の質低下】</b><br>長く寝ても質が悪いと神経系の疲労が抜けません。アップでは「リラックス」を意識してください。");
+
+            if (STATE.sorenessPre.includes('ハムストリングス')) advices.push("💡 <b>【ハムの張り】</b><br>練習前に仰向けで足を上げ、無理のない範囲で静的な収縮を入れて痛みの度合いをチェックしてください。");
+            if (STATE.sorenessPre.includes('腸腰筋') || STATE.sorenessPre.includes('大腿四頭筋')) advices.push("💡 <b>【前ももの張り】</b><br>ブレーキ動作が多くなっているか、骨盤が後傾気味です。アップで大臀筋（お尻）にスイッチを入れるドリルを多めに行いましょう。");
+            if (STATE.sorenessPre.includes('カーフ') || STATE.sorenessPre.includes('アキレス腱') || STATE.sorenessPre.includes('足裏')) advices.push("💡 <b>【足部・下腿の疲労】</b><br>接地時のバネ組織が疲労しています。今日は過度な跳躍や反発ドリルは控えめにするのが無難です。");
+            if (STATE.sorenessPre.includes('腕')) advices.push("💡 <b>【腕の張り】</b><br>スプリント時の腕振りやウエイトの影響が考えられます。肩甲骨周りのストレッチを行い、上半身の連動性を保ちましょう。");
+            if (STATE.sorenessPre.includes('腰')) advices.push("💡 <b>【腰の張り】</b><br>体幹の疲労や衝撃吸収の低下が考えられます。アップでは股関節の可動域を広げ、腰に過度な負担をかけない動きを意識してください。");
+
+            if (fatigue >= 8) advices.push("⚠️ <b>【過労警告】</b><br>起床時から強い疲労があります。高強度のスプリントは避け、回復走や技術確認に留める勇気を持つことも重要です。");
+            
+            if (injuryPreText.length > 0) advices.push("🚑 <b>【痛み・ケガの報告あり】</b><br>具体的な痛みの報告があります。今日の練習は無理をせず、まずは監督やコーチに状態を相談してください。");
+
+            const box = document.getElementById('ai-advice-pre');
+            if (advices.length === 0) {
+                box.innerHTML = "✨ <b>【Good!】</b> 起床時の状態は良好です。天候に合わせたウォームアップを行い、今日の目標にフォーカスしましょう！";
+                box.style.borderLeftColor = "#10b981";
+            } else {
+                box.innerHTML = advices.join("<hr style='border-top:1px dashed var(--border-color); margin:10px 0;'>");
+                box.style.borderLeftColor = "#f59e0b";
+            }
+        }
+
+        function updateAIAdvicePost() {
+            calculateIRS('post');
+            const loadText = document.getElementById('load-result').textContent;
+            const rpe = parseFloat(document.getElementById('rpe').value);
+            let advices = [];
+
+            if (loadText !== '-' && parseFloat(loadText) > 600) advices.push("🔥 <b>【ハイロード警告】</b><br>今日の負荷は非常に高いです。筋肉のグリコーゲンが枯渇しているため、練習後30分以内に炭水化物とタンパク質を必ず摂取してください。");
+            if (rpe >= 8) advices.push("🥵 <b>【高RPEへの対応】</b><br>かなりキツイ練習でした。神経系が興奮しているため、今夜はぬるめのお湯に浸かり、副交感神経を優位にしてリラックスしましょう。");
+
+            if (getSprintData().length >= 3) advices.push("🏃‍♂️ <b>【スプリント過多注意】</b><br>複数回のスプリント計測を行いました。脳へのダメージが大きいため、明日は爆発的なメニューを避けるのが理想的です。");
+
+            if (STATE.sorenessPost.includes('ハムストリングス')) advices.push("💡 <b>【ハムのケア】</b><br>スプリントで最も酷使される部位です。強い張りがある場合は無理にストレッチせず、アイシング等で熱を抜き、その後交代浴やお風呂で血流を促しましょう。");
+            if (STATE.sorenessPost.includes('腸腰筋') || STATE.sorenessPost.includes('大腿四頭筋')) advices.push("💡 <b>【前もも・股関節のケア】</b><br>ブレーキ動作で疲労しています。お風呂上がりに股関節の前側をゆっくり伸ばす静的ストレッチや、フォームローラーが有効です。");
+            if (STATE.sorenessPost.includes('カーフ') || STATE.sorenessPost.includes('アキレス腱') || STATE.sorenessPost.includes('足裏')) advices.push("💡 <b>【足部・下腿のケア】</b><br>衝撃でふくらはぎや足底が硬くなっています。テニスボール等で足裏をほぐし、ふくらはぎは下から上へ優しくマッサージしてください。");
+            if (STATE.sorenessPost.includes('臀部')) advices.push("💡 <b>【お尻のケア】</b><br>推進力を生む大きな筋肉が疲労しています。ボールをお尻の下に置いて自重でリリースしたり、仰向けで膝を抱えるストレッチで張りをとりましょう。");
+            if (STATE.sorenessPost.includes('背中') || STATE.sorenessPost.includes('肩') || STATE.sorenessPost.includes('腕')) advices.push("💡 <b>【上半身のケア】</b><br>腕振りや体幹の固定による疲労です。胸椎の伸展や、肩甲骨周りのストレッチを行い、上半身の力みをリセットしましょう。");
+            if (STATE.sorenessPost.includes('腰')) advices.push("💡 <b>【腰のケア】</b><br>着地衝撃やウエイトで腰背部に負担がかかっています。両膝を抱えるストレッチや、湯船でしっかり温めて血流を良くしましょう。");
+
+            const injuryText = document.getElementById('injury').value;
+            const badText = document.getElementById('bad').value;
+            if(injuryText.length > 0 || badText.includes('痛') || badText.includes('違和感')) advices.push("🚑 <b>【痛みへの対処】</b><br>痛みを伴う違和感がある場合、無理なストレッチはかえって炎症を悪化させます。様子を見て安静にしてください。");
+
+            const box = document.getElementById('ai-advice-post');
+            if (advices.length === 0) {
+                box.innerHTML = "✨ <b>【お疲れ様でした】</b><br>適度な負荷の練習でした。入力した「実施するケア」を必ず実行し、明日に備えてしっかり睡眠を取りましょう！";
+                box.style.borderLeftColor = "#10b981";
+            } else {
+                box.innerHTML = advices.join("<hr style='border-top:1px dashed var(--border-color); margin:10px 0;'>");
+                box.style.borderLeftColor = "#3b82f6";
+            }
+        }
+
+        /* ==========================================
+           📌 8. データ保存・履歴・グラフ描画
+        ========================================== */
+        async function saveData(type) {
+            const playerName = STATE.currentUser;
+            const date = document.getElementById('date').value;
+
+            if(!playerName || !date) {
+                alert("ログイン状態か、日付を確認してください！");
+                window.scrollTo({ top: 0, behavior: 'smooth' }); return;
+            }
+            
+            if (type === 'pre') {
+                if (!document.getElementById('sleep').value) { alert("「睡眠時間」を入力してください！"); return; }
+                if (!document.querySelector('input[name="sleep-quality"]:checked')) { alert("「睡眠の質」の星を選択してください！"); return; }
+            } else if (type === 'post') {
+                if (!document.getElementById('duration').value) { alert("Loadを計算するため、「運動時間(分)」を入力してください！"); return; }
+            }
+
+            const docId = `${playerName}_${date}`;
+            let partialData = { playerName: playerName, date: date, updatedAt: new Date().toISOString() };
+            let isPB = false;
+
+            if(type === 'pre') {
+                const sqNode = document.querySelector('input[name="sleep-quality"]:checked');
+                partialData.sleep = document.getElementById('sleep').value;
+                partialData.sleepQuality = sqNode ? sqNode.value : '';
+                partialData.weight = document.getElementById('weight').value;
+                partialData.heartRate = document.getElementById('heart-rate').value;
+                partialData.fatigue = document.getElementById('fatigue').value;
+                partialData.stress = document.getElementById('stress').value;
+                partialData.soreness = STATE.sorenessPre.join(', ');
+                partialData.injuryPre = document.getElementById('injury-pre').value; 
+                partialData.aiAdvicePre = document.getElementById('ai-advice-pre').innerHTML;
+                partialData.irsPre = document.getElementById('irs-value-pre').textContent;
+            } else {
+                partialData.duration = document.getElementById('duration').value;
+                partialData.rpe = document.getElementById('rpe').value;
+                partialData.trainingLoad = document.getElementById('load-result').textContent;
+                partialData.sprintLogs = getSprintData();
+                partialData.rsi = document.getElementById('rsi').value;
+                partialData.time30m = document.getElementById('time-30m').value;
+                partialData.timeFly20m = document.getElementById('time-fly20m').value;
+                partialData.fvResult = document.getElementById('fv-result').value;
+                partialData.menu = document.getElementById('menu').value;
+                partialData.steps = document.getElementById('steps').value;
+                partialData.good = document.getElementById('good').value;
+                partialData.bad = document.getElementById('bad').value;
+                partialData.injury = document.getElementById('injury').value;
+                partialData.sorenessPost = STATE.sorenessPost.join(', ');
+                
+                let selectedCares = [];
+                document.querySelectorAll('.care-tag.selected').forEach(btn => selectedCares.push(btn.getAttribute('data-care')));
+                const freeTextCare = document.getElementById('care').value;
+                partialData.care = selectedCares.length > 0 ? selectedCares.join(' / ') + (freeTextCare ? ' / ' + freeTextCare : '') : freeTextCare;
+                partialData.aiAdvicePost = document.getElementById('ai-advice-post').innerHTML;
+                partialData.irsPost = document.getElementById('irs-value-post').textContent;
+
+                const myLogs = STATE.logs.filter(l => l.playerName === playerName);
+                if (myLogs.length > 0) isPB = checkPersonalBest(partialData.sprintLogs, playerName);
+            }
+
+            try {
+                if(colRefs.logs) {
+                    await colRefs.logs.doc(docId).set(partialData, { merge: true });
+                } else {
+                    let savedLogs = JSON.parse(localStorage.getItem('team_condition_logs') || '[]');
+                    let existingIndex = savedLogs.findIndex(log => log.playerName === playerName && log.date === date);
+                    if (existingIndex > -1) savedLogs[existingIndex] = { ...savedLogs[existingIndex], ...partialData };
+                    else savedLogs.push(partialData);
+                    localStorage.setItem('team_condition_logs', JSON.stringify(savedLogs));
+                    loadLocalData();
+                }
+                
+                if(type === 'pre') alert('🌅 朝のデータを保存しました！今日も一日頑張りましょう！');
+                else {
+                    alert('🌙 夜のデータを保存しました！お疲れ様でした。');
+                    if (isPB) { triggerConfetti(); setTimeout(() => alert('🎉 自己ベスト更新おめでとうございます！！'), 300); }
+                }
+                renderCalendar();
+            } catch (error) { alert("保存に失敗しました: " + error.message); }
+        }
+
+        function renderPlayerHistory() {
+            const playerName = STATE.currentUser;
+            if(!playerName) return;
+
+            document.getElementById('history-section').style.display = 'block';
+            const myLogs = STATE.logs.filter(log => log.playerName === playerName);
+            
+            // PB計算
             const dist = document.getElementById('my-sprint-distance').value;
             const bestTimes = {};
-            allTeamLogs.forEach(log => {
+            STATE.logs.forEach(log => {
                 let sLogs = log.sprintLogs || [];
                 sLogs.forEach(s => {
                     if(s.distance === dist && s.time) {
@@ -1488,63 +1681,27 @@
                 document.getElementById('my-team-rank').textContent = '- 位';
             }
 
-            const list = document.getElementById('history-list');
-            list.innerHTML = '';
-            myLogs.forEach(log => {
-                let sprintHtml = '';
-                if(log.sprintLogs) log.sprintLogs.forEach(s => sprintHtml += `<span class="stat-badge" style="background:var(--primary); color:white;">🏃‍♂️ ${s.distance}m: ${s.time}s</span> `);
-                
-                // 🔥 追加：履歴にRSIとF-vも表示
-                if(log.rsi) sprintHtml += `<span class="stat-badge" style="background:#10b981; color:white;">RSI: ${log.rsi}</span> `;
-                if(log.fvResult) sprintHtml += `<span class="stat-badge" style="background:#8b5cf6; color:white;">F-v: ${log.fvResult}</span> `;
-                
-                const sorenessHtml = log.soreness ? `<div class="history-text-item"><span class="history-label">🌅 朝の張り:</span> <span style="color:var(--tag-sel-text); font-weight:bold; font-size:13px;">${log.soreness}</span></div>` : '';
-                const sorenessPostHtml = log.sorenessPost ? `<div class="history-text-item"><span class="history-label">🏃‍♂️ 夜の張り:</span> <span style="color:#ea580c; font-weight:bold; font-size:13px;">${log.sorenessPost}</span></div>` : '';
-
-                list.innerHTML += `
-                <div class="history-card">
-                    <div class="history-date">📅 ${log.date}</div>
-                    <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;">
-                        <span class="stat-badge" style="background:var(--warning-text); color:white;">疲労(朝): ${log.fatigue||'-'}</span>
-                        <span class="stat-badge" style="background:var(--primary); color:white;">Load: ${log.trainingLoad||'-'}</span>
-                        ${sprintHtml}
-                    </div>
-                    <div style="font-size:12px; color:var(--text-muted);">
-                        ${sorenessHtml}
-                        ${sorenessPostHtml}
-                        <div style="margin-top: 5px;">
-                            <b style="color:var(--text-main);">練習後ケア:</b>
-                            <div class="history-text-content">${log.care||'-'}</div>
-                        </div>
-                    </div>
-                </div>`;
-            });
-
+            // グラフ描画
             if (typeof Chart !== 'undefined') {
                 const ctx = document.getElementById('player-chart');
                 if (ctx) {
                     const recentLogs = [...myLogs].slice(0, 7).reverse();
-                    const labels = recentLogs.map(log => {
-                        if (!log.date) return '不明';
-                        const parts = log.date.split('-');
-                        return parts.length === 3 ? `${parts[1]}/${parts[2]}` : log.date;
-                    });
+                    const labels = recentLogs.map(log => log.date ? log.date.split('-').slice(1).join('/') : '不明');
                     const loadData = recentLogs.map(log => parseFloat(log.trainingLoad) || 0);
                     const fatigueData = recentLogs.map(log => parseInt(log.fatigue) || 0);
 
-                    if (playerChartInstance) playerChartInstance.destroy();
-
+                    if (STATE.chartInstance) STATE.chartInstance.destroy();
                     const isDark = document.body.classList.contains('dark-mode');
-                    const tickColor = isDark ? '#94a3b8' : '#64748b';
-                    const gridColor = isDark ? '#334155' : '#e2e8f0';
+                    const tickColor = isDark ? '#94a3b8' : '#6b7280';
+                    const gridColor = isDark ? '#333333' : '#e5e7eb';
 
-                    playerChartInstance = new Chart(ctx, {
+                    STATE.chartInstance = new Chart(ctx, {
                         type: 'line',
                         data: {
                             labels: labels,
                             datasets: [
-                                { label: 'Training Load', data: loadData, borderColor: '#3b82f6', backgroundColor: '#3b82f6', yAxisID: 'y', tension: 0.2 },
-                                { label: '疲労度', data: fatigueData, borderColor: '#ef4444', backgroundColor: '#ef4444', borderDash: [5, 5], yAxisID: 'y1', tension: 0.2 }
+                                { label: 'Training Load', data: loadData, borderColor: '#f97316', backgroundColor: '#f97316', yAxisID: 'y', tension: 0.4 }, 
+                                { label: '疲労度', data: fatigueData, borderColor: '#ec4899', backgroundColor: '#ec4899', borderDash: [5, 5], yAxisID: 'y1', tension: 0.4 } 
                             ]
                         },
                         options: {
@@ -1563,9 +1720,190 @@
                 }
             }
         }
-        document.getElementById('my-sprint-distance').addEventListener('change', () => renderPlayerHistory(document.getElementById('player-name').value));
 
-        initFirebase();
+        /* --- ヘルパー関数 --- */
+        async function editGoal(type) {
+            const playerName = STATE.currentUser;
+            if (!playerName) { alert("ログインし直してください！"); return; }
+            
+            const goalData = STATE.goals[playerName] || {};
+            const currentGoal = type === 'season' ? (goalData.seasonGoal || "") : (goalData.monthGoal || "");
+            const title = type === 'season' ? "今シーズンの目標" : "今月の目標・テーマ";
+            const newGoal = prompt(`${title}を入力してください：\n（例：県大会決勝進出！ など）`, currentGoal);
+            
+            if (newGoal !== null) {
+                const updateData = { updatedAt: new Date().toISOString() };
+                if (type === 'season') updateData.seasonGoal = newGoal; else updateData.monthGoal = newGoal;
+                try {
+                    if (colRefs.goals) await colRefs.goals.doc(playerName).set(updateData, { merge: true });
+                    else {
+                        STATE.goals[playerName] = { ...goalData, ...updateData };
+                        localStorage.setItem('team_goals', JSON.stringify(STATE.goals));
+                        renderPlayerGoal();
+                    }
+                } catch (e) { alert("目標の保存に失敗しました。"); }
+            }
+        }
+
+        function addSprintRow(dist = '', time = '') {
+            const container = document.getElementById('sprint-rows-container');
+            const template = document.getElementById('sprint-row-template');
+            const clone = template.content.cloneNode(true);
+            if(dist) clone.querySelector('.sprint-dist-input').value = dist;
+            if(time) clone.querySelector('.sprint-time-input').value = time;
+            container.appendChild(clone);
+        }
+
+        function getSprintData() {
+            const arr = [];
+            document.querySelectorAll('.sprint-row').forEach(row => {
+                const dist = row.querySelector('.sprint-dist-input').value;
+                const time = row.querySelector('.sprint-time-input').value;
+                if (dist && time) arr.push({ distance: dist, time: time });
+            });
+            return arr;
+        }
+
+        function checkPersonalBest(newSprints, playerName) {
+            let isBest = false;
+            const bestTimes = {};
+            STATE.logs.forEach(log => {
+                if (log.playerName !== playerName) return;
+                let sLogs = log.sprintLogs || [];
+                sLogs.forEach(s => {
+                    const t = parseFloat(s.time);
+                    if (t > 0 && (!bestTimes[s.distance] || t < bestTimes[s.distance])) bestTimes[s.distance] = t;
+                });
+            });
+            newSprints.forEach(ns => {
+                const t = parseFloat(ns.time);
+                if (t > 0 && bestTimes[ns.distance] && t < bestTimes[ns.distance]) isBest = true;
+            });
+            return isBest;
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                const duration = 3 * 1000, animationEnd = Date.now() + duration, defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+                const randomInRange = (min, max) => Math.random() * (max - min) + min;
+                const interval = setInterval(function() {
+                    const timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) return clearInterval(interval);
+                    const particleCount = 50 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+            }
+        }
+
+        function fetchWeather() {
+            const locText = document.getElementById('location-text'), tempText = document.getElementById('temp-text'), adviceBox = document.getElementById('weather-advice');
+            if (!navigator.geolocation) { locText.textContent = "GPS未対応"; adviceBox.innerHTML = "※天候アドバイスを利用できません。"; return; }
+            locText.textContent = "取得中...";
+            
+            navigator.geolocation.getCurrentPosition(position => {
+                const lat = position.coords.latitude, lon = position.coords.longitude;
+                fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ja`)
+                    .then(res => res.json()).then(geo => { locText.textContent = `${geo.locality || geo.city || "現在地"} 付近の天候`; })
+                    .catch(() => { locText.textContent = "現在地の天候"; });
+
+                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const temp = data.current_weather.temperature;
+                        tempText.textContent = `${temp} ℃`;
+                        let advice = "";
+                        if(temp >= CONSTANTS.WEATHER.HOT) advice = "🥵 <b>【熱中症・脱水警戒】</b>非常に暑いです。練習30分前に水分補給し、塩分も摂りましょう。";
+                        else if(temp >= CONSTANTS.WEATHER.WARM) advice = "💦 <b>【暑熱環境】</b>発汗量が増え、水分を失うと出力が落ちます。喉が渇く前に水分補給を。";
+                        else if(temp >= CONSTANTS.WEATHER.MODERATE) advice = "😊 <b>【適温環境】</b>スプリントに適した良い気候です。質の高い出力にフォーカスしましょう。";
+                        else if(temp >= CONSTANTS.WEATHER.COOL) advice = "🧥 <b>【肌寒い環境】</b>体が温まるまで時間がかかります。動的ストレッチを長めに取りましょう。";
+                        else advice = "🥶 <b>【寒冷・肉離れ警戒】</b>筋肉が硬直しやすいです。急激な出力は危険！アップを念入りに。";
+                        adviceBox.innerHTML = advice;
+                    }).catch(() => { adviceBox.innerHTML = "※通信エラーのため天気情報が取得できませんでした。"; });
+            }, () => { locText.textContent = "GPS未許可"; adviceBox.innerHTML = "※位置情報を許可すると対策アドバイスが表示されます。"; });
+        }
+
+        function getYouTubeEmbedUrl(url) {
+            if(!url) return null;
+            const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+            return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
+        }
+
+        function filterEducation(cat, btn) {
+            document.querySelectorAll('.edu-cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            STATE.currentEduCat = cat;
+            renderEducationList();
+        }
+
+        function renderEducationList() {
+            const container = document.getElementById('education-list-container');
+            container.innerHTML = '';
+            const filtered = STATE.currentEduCat === 'すべて' ? STATE.education : STATE.education.filter(item => 
+                item.category === STATE.currentEduCat || 
+                (STATE.currentEduCat === 'ケア' && item.category === 'ケア・リカバリー') || 
+                (STATE.currentEduCat === '理論' && item.category === 'トレーニング理論') || 
+                (STATE.currentEduCat === '栄養' && item.category === '栄養・食事')
+            );
+            if (filtered.length === 0) { container.innerHTML = '<div style="text-align: center; padding: 30px; color: var(--text-muted); font-size: 14px; font-weight:bold;">このカテゴリのコンテンツはまだありません。</div>'; return; }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div'); card.className = 'edu-card';
+                const embedUrl = getYouTubeEmbedUrl(item.url);
+                const ytHtml = embedUrl ? `<div class="yt-container"><iframe src="${embedUrl}" allowfullscreen></iframe></div>` : (item.url ? `<a href="${item.url}" target="_blank" style="display:inline-block; margin-top:10px; color:var(--primary); font-weight:bold; font-size:13px;">🔗 リンクを開く</a>` : '');
+                
+                const isDark = document.body.classList.contains('dark-mode');
+                const bg = isDark ? '#3a1523' : '#ffedd5'; 
+                const col = isDark ? '#fbcfe8' : '#c2410c'; 
+                
+                card.innerHTML = `
+                    <span style="background:${bg}; color:${col}; font-size:11px; padding:3px 8px; border-radius:12px; font-weight:bold; display:inline-block; margin-bottom:8px;">${item.category}</span>
+                    <h3 style="font-size: 16px; font-weight: bold; color: var(--primary); margin: 0 0 10px 0;">${item.title}</h3>
+                    <div style="font-size: 13px; color: var(--text-main); white-space: pre-wrap; line-height: 1.5;">${item.description}</div>
+                    ${ytHtml}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleNotifications(checkbox) {
+            const statusText = document.getElementById('notification-status');
+            if(checkbox.checked) {
+                statusText.style.display = 'block';
+                if (!("Notification" in window)) { alert("ブラウザが通知非対応です。"); checkbox.checked = false; return; }
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        statusText.textContent = "✅ 通知が許可されました！";
+                        localStorage.setItem('reminder_enabled', 'true');
+                        new Notification("AthleSense", { body: "通知設定が完了しました！", icon: "icon.png" });
+                    } else {
+                        statusText.textContent = "❌ 通知がブロックされました。"; checkbox.checked = false;
+                    }
+                });
+            } else {
+                statusText.style.display = 'none'; localStorage.setItem('reminder_enabled', 'false');
+            }
+        }
+
+        function checkReminders() {
+            const isEnabled = localStorage.getItem('reminder_enabled') === 'true';
+            const toggle = document.getElementById('notification-toggle');
+            if(toggle) toggle.checked = isEnabled;
+            if(isEnabled && Notification.permission === "granted") {
+                const hour = new Date().getHours(), lastReminded = localStorage.getItem('last_reminder_day'), today = new Date().getDate().toString();
+                if(hour >= 20 && lastReminded !== today + "_post") {
+                    new Notification("AthleSense", { body: "夜になりました。今日の記録とケアを入力しましょう！" });
+                    localStorage.setItem('last_reminder_day', today + "_post");
+                }
+            }
+        }
+
+        function syncDeviceData(itemName) {
+            alert(`【デバイス連携機能について】\n\n現在、Webブラウザの制限により「${itemName}」の自動取得機能は開発準備中です。\nお手持ちのデバイスの数値を確認して入力してください！`);
+        }
+
+        // アプリ起動
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
