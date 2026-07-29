@@ -1889,12 +1889,31 @@
             const isEnabled = localStorage.getItem('reminder_enabled') === 'true';
             const toggle = document.getElementById('notification-toggle');
             if(toggle) toggle.checked = isEnabled;
-            if(isEnabled && Notification.permission === "granted") {
-                const hour = new Date().getHours(), lastReminded = localStorage.getItem('last_reminder_day'), today = new Date().getDate().toString();
-                if(hour >= 20 && lastReminded !== today + "_post") {
-                    new Notification("AthleSense", { body: "夜になりました。今日の記録とケアを入力しましょう！" });
-                    localStorage.setItem('last_reminder_day', today + "_post");
+            
+            const check = () => {
+                if(localStorage.getItem('reminder_enabled') === 'true' && Notification.permission === "granted") {
+                    const now = new Date();
+                    const hour = now.getHours();
+                    const today = now.getDate().toString();
+                    
+                    const lastRemindedPre = localStorage.getItem('last_reminder_pre');
+                    if(hour >= 7 && hour < 12 && lastRemindedPre !== today) {
+                        new Notification("AthleSense", { body: "🌅 おはようございます！朝のコンディションを入力しましょう！", icon: "icon.png" });
+                        localStorage.setItem('last_reminder_pre', today);
+                    }
+                    
+                    const lastRemindedPost = localStorage.getItem('last_reminder_post');
+                    if(hour >= 20 && lastRemindedPost !== today) {
+                        new Notification("AthleSense", { body: "🌙 夜になりました。今日の記録とケアを入力しましょう！", icon: "icon.png" });
+                        localStorage.setItem('last_reminder_post', today);
+                    }
                 }
+            };
+            
+            check();
+            // アプリを開いたままにしている場合も対応できるよう、1分ごとにチェック
+            if(!window.reminderInterval) {
+                window.reminderInterval = setInterval(check, 60000);
             }
         }
 
