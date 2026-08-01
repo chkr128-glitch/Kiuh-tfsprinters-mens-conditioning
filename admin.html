@@ -769,7 +769,9 @@
                 ACWR_SWEET_SPOT_MIN: 0.8,
                 ACWR_SWEET_SPOT_MAX: 1.3,
                 FV_FORCE_DEFICIT: 2.15,
-                FV_VELOCITY_DEFICIT: 1.95
+                FV_VELOCITY_DEFICIT: 1.95,
+                // 🔥 IRS計算用の重み付けを追加
+                IRS_WEIGHTS: { FATIGUE_SEVERE: { threshold: 8, score: 15 }, FATIGUE_HIGH: { threshold: 6, score: 5 }, STRESS_HIGH: { threshold: 8, score: 5 }, SLEEP_SHORT: { threshold: 6, score: 10 }, SLEEP_MED: { threshold: 7, score: 5 }, QUALITY_LOW: { threshold: 2, score: 5 }, LOAD_HIGH: { threshold: 600, score: 10 }, RPE_HIGH: { threshold: 8, score: 10 }, CRITICAL_PARTS: ['ハムストリングス', 'カーフ', 'アキレス腱', '腸腰筋', '大腿四頭筋', '腰'], SORENESS_HAMSTRING: 20, SORENESS_CALF_ACHILLES: 10, SORENESS_QUAD_HIP_LOWER: 10, SORENESS_OTHER: 3 }
             },
             COLORS: { CHART_LOAD: '#0ea5e9', CHART_FATIGUE: '#8b5cf6', TEXT_MUTED: '#6b7280', GRID_LINE: '#e5e7eb' },
             DEFAULT_CARES: ["🍚 栄養補給", "🧊 アイシング", "🛁 交代浴", "🧘‍♂️ ストレッチ", "💆‍♂️ ローラー", "💤 睡眠"],
@@ -971,7 +973,7 @@
         }
 
         // ==========================================
-        // 📌 4. 計算ロジック (Monotony, Strain, ACWR)
+        // 📌 4. 計算ロジック (Monotony, Strain, ACWR, IRS)
         // ==========================================
         function calculateMonotony(logs) {
             const loads = logs.map(l => parseFloat(l.trainingLoad) || 0);
@@ -1002,6 +1004,56 @@
             const ratio = chronicAvg > 0 ? (acuteAvg / chronicAvg) : 0;
             
             return { ratio, acute: acuteAvg, chronic: chronicAvg };
+        }
+
+        // 🔥 新機能: データからIRSを動的計算する関数
+        function calcLogIrs(log, type) {
+            let score = 5; 
+            const W = CONSTANTS.THRESHOLDS.IRS_WEIGHTS;
+            if (!W) return '-';
+
+            if (type === 'pre') {
+                if (!log.fatigue && !log.sleep) return '-';
+                
+                const fatigue = parseInt(log.fatigue) || 1;
+                const stress = parseInt(log.stress) || 1;
+                const sleep = parseFloat(log.sleep) || 0;
+                const sleepQuality = parseInt(log.sleepQuality) || 5;
+
+                if (fatigue >= W.FATIGUE_SEVERE.threshold) score += W.FATIGUE_SEVERE.score; 
+                else if (fatigue >= W.FATIGUE_HIGH.threshold) score += W.FATIGUE_HIGH.score; 
+                if (stress >= W.STRESS_HIGH.threshold) score += W.STRESS_HIGH.score; 
+                if (sleep > 0 && sleep < W.SLEEP_SHORT.threshold) score += W.SLEEP_SHORT.score; 
+                else if (sleep > 0 && sleep < W.SLEEP_MED.threshold) score += W.SLEEP_MED.score; 
+                if (sleepQuality <= W.QUALITY_LOW.threshold) score += W.QUALITY_LOW.score;
+
+                const sorenessArr = log.soreness ? log.soreness.split(',').map(s => s.trim()).filter(s => s) : [];
+                sorenessArr.forEach(part => { 
+                    if (part === 'ハムストリングス') score += W.SORENESS_HAMSTRING; 
+                    else if (part === 'カーフ' || part === 'アキレス腱') score += W.SORENESS_CALF_ACHILLES; 
+                    else if (part === '腸腰筋' || part === '大腿四頭筋' || part === '腰') score += W.SORENESS_QUAD_HIP_LOWER; 
+                    else if (!W.CRITICAL_PARTS.includes(part)) score += W.SORENESS_OTHER; 
+                });
+                return `${Math.min(score, 95)}%`;
+            } else if (type === 'post') {
+                if (!log.rpe && !log.trainingLoad) return '-';
+
+                const rpe = parseFloat(log.rpe) || 0;
+                const load = parseFloat(log.trainingLoad) || 0;
+
+                if (rpe >= W.RPE_HIGH.threshold) score += W.RPE_HIGH.score; 
+                if (load > W.LOAD_HIGH.threshold) score += W.LOAD_HIGH.score;
+
+                const sorenessPostArr = log.sorenessPost ? log.sorenessPost.split(',').map(s => s.trim()).filter(s => s) : [];
+                sorenessPostArr.forEach(part => { 
+                    if (part === 'ハムストリングス') score += W.SORENESS_HAMSTRING; 
+                    else if (part === 'カーフ' || part === 'アキレス腱') score += W.SORENESS_CALF_ACHILLES + 5; 
+                    else if (part === '腸腰筋' || part === '大腿四頭筋' || part === '腰') score += W.SORENESS_QUAD_HIP_LOWER; 
+                    else if (!W.CRITICAL_PARTS.includes(part)) score += W.SORENESS_OTHER; 
+                });
+                return `${Math.min(score, 95)}%`;
+            }
+            return '-';
         }
 
         // ==========================================
@@ -1171,9 +1223,17 @@
                     sLogs.forEach(s => { sprintHtml += `<span style="color:var(--accent); font-weight:900; display:block; margin-bottom: 2px;">${s.distance}m : ${s.time}s</span>`; });
                 } else { sprintHtml = '-'; }
 
-                const irsPre = getIrsBadgeHtml(log.irsPre);
-                const irsPost = getIrsBadgeHtml(log.irsPost);
+                // 🔥 ここで過去データに対してもIRSを動的計算して表示
+                const irsPreVal = log.irsPre || calcLogIrs(log, 'pre');
+                const irsPostVal = log.irsPost || calcLogIrs(log, 'post');
+                const irsPre = getIrsBadgeHtml(irsPreVal);
+                const irsPost = getIrsBadgeHtml(irsPostVal);
+
                 const catBadge = getCategoryBadge(getPlayerCategory(log.playerName));
+
+                const safeMenu = (log.menu || '-').replace(/'/g, "\\'").replace(/\n/g, '\\n');
+                const safeGood = (log.good || '-').replace(/'/g, "\\'").replace(/\n/g, '\\n');
+                const safeBad = (log.bad || '-').replace(/'/g, "\\'").replace(/\n/g, '\\n');
 
                 const commentBtnClass = log.coachComment ? 'btn-success' : 'btn-info';
                 const commentBtnText = log.coachComment ? '💬 編集' : '💬 コメント';
@@ -1866,8 +1926,12 @@
                 const s1 = sLogs[0] || { distance: '', time: '' }; const s2 = sLogs[1] || { distance: '', time: '' }; const s3 = sLogs[2] || { distance: '', time: '' };
                 const coachCommentText = log.coachComment ? `${log.coachComment.stamp} ${log.coachComment.text}` : '';
 
+                // 🔥 CSVダウンロード時も動的計算したIRSを出力
+                const irsPreVal = log.irsPre || calcLogIrs(log, 'pre');
+                const irsPostVal = log.irsPost || calcLogIrs(log, 'post');
+
                 const row = [
-                    log.date, log.playerName, log.irsPre, log.irsPost, log.fatigue, log.stress, log.trainingLoad, 
+                    log.date, log.playerName, irsPreVal, irsPostVal, log.fatigue, log.stress, log.trainingLoad, 
                     s1.distance, s1.time, s2.distance, s2.time, s3.distance, s3.time,
                     log.rsi, log.fvResult, log.soreness, log.sorenessPost, log.weight, log.heartRate, log.steps, log.sleep, log.sleepQuality, 
                     log.injuryPre || '', log.injury || '', log.menu, log.good, log.bad, log.care, coachCommentText
