@@ -1231,6 +1231,8 @@
 
                 const catBadge = getCategoryBadge(getPlayerCategory(log.playerName));
 
+                let safeCare = String(log.care || '').replace(/null/g, '').split('/').map(s => s.trim()).filter(s => s !== '').join(' / ');
+
                 const safeMenu = (log.menu || '-').replace(/'/g, "\\'").replace(/\n/g, '\\n');
                 const safeGood = (log.good || '-').replace(/'/g, "\\'").replace(/\n/g, '\\n');
                 const safeBad = (log.bad || '-').replace(/'/g, "\\'").replace(/\n/g, '\\n');
@@ -1255,7 +1257,7 @@
                     <td style="font-weight:800;">${log.heartRate || '-'}</td>
                     <td style="font-weight:800;">${log.steps || '-'}</td>
                     <td>${sleepText}</td>
-                    <td style="color:var(--accent); max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700;" title="${log.care || ''}">${log.care || ''}</td>
+                    <td style="color:var(--accent); max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700;" title="${safeCare}">${safeCare || '-'}</td>
                     <td style="text-align:center; min-width:90px;">
                         <button class="btn btn-info w-full mb-2" style="padding:6px; font-size:12px; background:var(--text-muted); box-shadow:none;" onclick="openDetailModal('${log.playerName}', '${log.date}')">📋 詳細</button>
                         <button class="btn ${commentBtnClass} w-full mb-2" style="padding:6px; font-size:12px; box-shadow:none;" onclick="openCommentModal('${log.playerName}', '${log.date}')">${commentBtnText}</button>
@@ -1930,11 +1932,13 @@
                 const irsPreVal = log.irsPre || calcLogIrs(log, 'pre');
                 const irsPostVal = log.irsPost || calcLogIrs(log, 'post');
 
+                let safeCare = String(log.care || '').replace(/null/g, '').split('/').map(s => s.trim()).filter(s => s !== '').join(' / ');
+
                 const row = [
                     log.date, log.playerName, irsPreVal, irsPostVal, log.fatigue, log.stress, log.trainingLoad, 
                     s1.distance, s1.time, s2.distance, s2.time, s3.distance, s3.time,
                     log.rsi, log.fvResult, log.soreness, log.sorenessPost, log.weight, log.heartRate, log.steps, log.sleep, log.sleepQuality, 
-                    log.injuryPre || '', log.injury || '', log.menu, log.good, log.bad, log.care, coachCommentText
+                    log.injuryPre || '', log.injury || '', log.menu, log.good, log.bad, safeCare, coachCommentText
                 ].map(item => {
                     let text = String(item || '').replace(/"/g, '""').replace(/\n/g, ' '); text = text.replace(/<[^>]*>?/gm, ''); return `"${text}"`;
                 });
