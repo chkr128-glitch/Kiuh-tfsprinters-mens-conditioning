@@ -2,6 +2,11 @@
 // 📌 AthleSense 管理者画面 メインロジック (admin.js)
 // ==========================================
 
+const STATE = {
+    logs: [], filteredLogs: [], players: [], settings: {}, goals: {}, education: [], careOptions: [], broadcasts: [], kudos: [],
+    charts: { load: null, rsi: null, teamTrend: null, reportRadar: null, reportLine: null }
+};
+
 // ==========================================
 // 📌 2. UIコントローラー (Toast, Modal)
 // ==========================================
