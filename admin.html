@@ -10,8 +10,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- 🎨 外部CSSの読み込み -->
-    <link rel="stylesheet" href="./admin.css">
+    <!-- 🎨 外部CSSの読み込み (cssフォルダの中を見に行くように修正！) -->
+    <link rel="stylesheet" href="./css/admin.css">
 </head>
 <body>
 
@@ -162,7 +162,6 @@
                 <div class="menu-card" onclick="openHistoryView('alldata')"><span>📋</span>全データ一覧</div>
             </div>
 
-            <!-- 各種ビュー -->
             <div id="view-teamTrend" class="history-view glass-card">
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 <h3 class="section-title mt-0">📈 チーム全体 コンディション推移</h3>
@@ -521,9 +520,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-    <!-- ⚙️ 外部JSファイルの読み込み -->
-    <script src="./config.js"></script>
-    <script src="./admin.js"></script>
+    <!-- ⚙️ 外部JSファイルの読み込み (jsフォルダの中を見に行くように修正！) -->
+    <script src="./js/config.js"></script>
+    <script src="./js/admin.js"></script>
 
 </body>
 </html>
