@@ -10,7 +10,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- 🎨 外部CSSの読み込み (同じフォルダ内を探すように修正) -->
+    <!-- 🎨 外部CSSの読み込み (同じ場所のadmin.cssを読み込む) -->
     <link rel="stylesheet" href="./admin.css">
 </head>
 <body>
@@ -113,7 +113,7 @@
                     <div class="summary-value" id="summary-acwr-count">0 名</div>
                     <div id="summary-acwr-list" class="critical-list"></div>
                 </div>
-            </div> <!-- End of dashboard-summary -->
+            </div>
 
             <!-- 選択日の入力データ一覧 -->
             <div class="glass-card" style="padding: 24px 0;">
@@ -131,8 +131,7 @@
                     </table>
                 </div>
             </div>
-        </div> <!-- End of tab-today -->
-
+        </div>
 
         <!-- 📊 履歴タブ -->
         <div id="tab-history" class="tab-content">
@@ -163,14 +162,13 @@
                 <div class="menu-card" onclick="openHistoryView('alldata')"><span>📋</span>全データ一覧</div>
             </div>
 
-            <!-- 📈 チーム推移ビュー -->
+            <!-- 各種ビュー（省略せずに全て記載） -->
             <div id="view-teamTrend" class="history-view glass-card">
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 <h3 class="section-title mt-0">📈 チーム全体 コンディション推移</h3>
                 <div style="width: 100%; height: 380px; position: relative;"><canvas id="teamTrendChart"></canvas></div>
             </div>
             
-            <!-- ⚙️ ケア項目ビュー -->
             <div id="view-careSettings" class="history-view glass-card">
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 <h3 class="section-title mt-0">⚙️ ケア項目 カスタマイズ</h3>
@@ -181,7 +179,6 @@
                 <div id="care-options-container" class="flex-row-gap" style="flex-wrap:wrap; background:var(--input-bg); padding:20px; border-radius:16px; border:1px solid var(--border-color); box-shadow:var(--shadow-inner);"></div>
             </div>
 
-            <!-- 🔥 ヒートマップビュー -->
             <div id="view-heatmap" class="history-view glass-card">
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 <h3 class="section-title mt-0">🔥 ヒートマップ (部位別ランキング)</h3>
@@ -248,7 +245,6 @@
                 </table>
             </div>
 
-            <!-- 🏃‍♂️ スプリントビュー -->
             <div id="view-sprint" class="history-view glass-card">
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 <h3 class="section-title mt-0">🏃‍♂️ スプリント ベストタイム・ランキング</h3>
@@ -273,7 +269,6 @@
                 </table>
             </div>
 
-            <!-- 🔬 F-vプロファイルビュー -->
             <div id="view-fv" class="history-view glass-card">
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 <h3 class="section-title mt-0">🔬 F-v プロファイル グループ編成表</h3>
@@ -302,7 +297,6 @@
                 </div>
             </div>
 
-            <!-- 👤 個人詳細ビュー -->
             <div id="view-individual" class="history-view glass-card">
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 <h3 class="section-title mt-0">👤 選手別 詳細分析</h3>
@@ -349,7 +343,6 @@
                 </div>
             </div>
 
-            <!-- 🎯 目標・名簿管理ビュー -->
             <div id="view-goals" class="history-view glass-card" style="padding-bottom: 0;">
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 <div style="background-color: var(--secondary-light); border: 2px solid var(--secondary); border-radius: 16px; padding: 24px; margin-bottom: 30px; box-shadow:var(--shadow-md);">
@@ -381,7 +374,6 @@
                 </div>
             </div>
 
-            <!-- 📖 学び管理ビュー -->
             <div id="view-education" class="history-view glass-card" style="padding-bottom: 0;">
                 <button class="back-btn" onclick="backToHistoryMenu()">← メニューに戻る</button>
                 <h3 class="section-title mt-0">📖 学び・動画コンテンツ管理</h3>
@@ -405,7 +397,6 @@
                 </div>
             </div>
 
-            <!-- 📋 全データ一覧ビュー -->
             <div id="view-alldata" class="history-view glass-card" style="padding: 24px 0;">
                 <div class="flex-between mb-4" style="padding: 0 24px;">
                      <button class="back-btn mb-0" onclick="backToHistoryMenu()">← メニューに戻る</button>
@@ -530,8 +521,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-    <!-- ⚙️ 外部JSファイルの読み込み (同じフォルダ内を探すように修正) -->
-    <script src="./config.js"></script>
+    <!-- ⚙️ 外部JSファイルの読み込み (同じ場所のadmin.jsを読み込む) -->
     <script src="./admin.js"></script>
 
 </body>
