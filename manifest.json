@@ -1,14 +1,14 @@
 {
   "short_name": "AthleSense",
-  "name": "AthleSense KIUH - Submit Form",
+  "name": "AthleSense KIUH",
   "icons": [
     {
-      "src": "icon.png",
+      "src": "icon-athle.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "icon.png",
+      "src": "icon-athle.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
