@@ -13,7 +13,7 @@ const CONSTANTS = {
         messagingSenderId: "330203393971",
         appId: "1:330203393971:web:f47b8e66137d0fce8b65c6"
     },
-    
+
     // ⚖️ アラートや計算ロジックに使用する閾値（ACWR, Monotony, F-vなど）
     THRESHOLDS: { 
         HIGH_FATIGUE: 8,              // 疲労度アラート基準
@@ -43,7 +43,7 @@ const CONSTANTS = {
             SORENESS_OTHER: 3 
         }
     },
-    
+
     // 🎨 グラフ描画用カラーパレット (管理者画面のChart.jsなどで使用)
     COLORS: { 
         CHART_LOAD: '#0ea5e9', 
